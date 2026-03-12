@@ -1,0 +1,692 @@
+// Translation keys and supported languages
+export type Language = 'en' | 'es' | 'fr' | 'de' | 'sk';
+
+export const SUPPORTED_LANGUAGES: Record<Language, string> = {
+  en: 'English',
+  es: 'Español',
+  fr: 'Français',
+  de: 'Deutsch',
+  sk: 'Slovenčina',
+};
+
+export const translations: Record<Language, Record<string, string>> = {
+  en: {
+    // Login/Auth
+    'auth.login': 'Sign In',
+    'auth.register': 'Sign Up',
+    'auth.email': 'Email',
+    'auth.password': 'Password',
+    'auth.confirm_password': 'Confirm Password',
+    'auth.forgot_password': 'Forgot password?',
+    'auth.dont_have_account': "Don't have an account?",
+    'auth.already_have_account': 'Already have an account?',
+    'auth.sign_in_with_apple': 'Sign In with Apple',
+    'auth.sign_in_with_google': 'Sign In with Google',
+    'auth.email_invalid': 'Invalid email address',
+    'auth.password_too_short': 'Password must be at least 6 characters',
+    'auth.error': 'Error',
+    'auth.error_login_failed': 'Login failed. Please check your credentials.',
+    'auth.error_register_failed': 'Registration failed. Please try again.',
+    'auth.ok': 'OK',
+    'auth.or': 'Or',
+
+    // Welcome/Role Selection
+    'welcome.title': 'Brigzy',
+    'welcome.subtitle': 'What are you looking for?',
+    'welcome.job_seeker': 'Looking for Work',
+    'welcome.job_seeker_desc': 'Browse and apply for jobs',
+    'welcome.job_provider': 'Post a Job',
+    'welcome.job_provider_desc': 'Hire workers and manage jobs',
+
+    // Navigation/Tabs
+    'nav.home': 'Home',
+    'nav.saved': 'Saved',
+    'nav.post': 'Post',
+    'nav.messages': 'Messages',
+    'nav.profile': 'Profile',
+
+    // Home Screen
+    'home.title': 'Browse Jobs',
+    'home.search': 'Search jobs...',
+    'home.filter': 'Filter',
+    'home.no_jobs': 'No jobs found',
+    'home.category': 'Category',
+    'home.category_hospitality': 'Hospitality',
+    'home.category_retail': 'Retail',
+    'home.category_delivery': 'Delivery',
+    'home.category_events': 'Events',
+    'home.category_cleaning': 'Cleaning',
+    'home.category_construction': 'Construction',
+    'home.category_moving': 'Moving',
+    'home.category_admin': 'Admin',
+
+    // Job Detail
+    'job.title': 'Job Details',
+    'job.apply': 'Apply Now',
+    'job.save': 'Save',
+    'job.unsave': 'Unsave',
+    'job.share': 'Share',
+    'job.company': 'Company',
+    'job.location': 'Location',
+    'job.salary': 'Salary',
+    'job.duration': 'Duration',
+    'job.requirements': 'Requirements',
+    'job.description': 'Description',
+    'job.already_applied': 'You already applied for this job',
+    'job.apply_success': 'Application sent successfully',
+
+    // Post Job Screen
+    'post.title': 'Post a Job',
+    'post.job_title': 'Job Title',
+    'post.description': 'Description',
+    'post.location': 'Location',
+    'post.salary_type': 'Salary Type',
+    'post.salary_amount': 'Salary Amount',
+    'post.hourly': 'Hourly',
+    'post.fixed': 'Fixed',
+    'post.duration': 'Duration',
+    'post.category': 'Category',
+    'post.publish': 'Publish',
+    'post.success': 'Job posted successfully!',
+    'post.error': 'Failed to post job',
+
+    // Messages
+    'messages.title': 'Messages',
+    'messages.no_conversations': 'No conversations yet',
+    'messages.send': 'Send',
+    'messages.type_message': 'Type a message...',
+
+    // Profile
+    'profile.title': 'Profile',
+    'profile.completed_jobs': 'Completed Jobs',
+    'profile.rating': 'Rating',
+    'profile.reviews': 'Reviews',
+    'profile.switch_role': 'Switch Role',
+    'profile.settings': 'Settings',
+    'profile.logout': 'Log Out',
+    'profile.edit_profile': 'Edit Profile',
+
+    // Saved Jobs
+    'saved.title': 'Saved Jobs',
+    'saved.no_jobs': 'No saved jobs yet',
+
+    // Settings
+    'settings.title': 'Settings',
+    'settings.appearance': 'Appearance',
+    'settings.light': 'Light',
+    'settings.dark': 'Dark',
+    'settings.system': 'System',
+    'settings.general': 'General',
+    'settings.notifications': 'Notifications',
+    'settings.language': 'Language',
+    'settings.account': 'Account',
+    'settings.account_settings': 'Account Settings',
+    'settings.privacy_security': 'Privacy & Security',
+    'settings.logout': 'Log Out',
+    'settings.logout_confirm_title': 'Log Out?',
+    'settings.logout_confirm_msg': 'Are you sure you want to log out?',
+    'settings.cancel': 'Cancel',
+    'settings.confirm': 'Log Out',
+    'settings.version': 'Brigzy v1.0.0',
+
+    // Common
+    'common.loading': 'Loading...',
+    'common.error': 'Error',
+    'common.back': 'Back',
+    'common.next': 'Next',
+    'common.done': 'Done',
+    'common.delete': 'Delete',
+    'common.edit': 'Edit',
+    'common.save': 'Save',
+    'common.cancel': 'Cancel',
+    'common.yes': 'Yes',
+    'common.no': 'No',
+  },
+  es: {
+    // Login/Auth
+    'auth.login': 'Iniciar Sesión',
+    'auth.register': 'Registrarse',
+    'auth.email': 'Correo Electrónico',
+    'auth.password': 'Contraseña',
+    'auth.confirm_password': 'Confirmar Contraseña',
+    'auth.forgot_password': '¿Olvidaste tu contraseña?',
+    'auth.dont_have_account': '¿No tienes cuenta?',
+    'auth.already_have_account': '¿Ya tienes cuenta?',
+    'auth.sign_in_with_apple': 'Inicia Sesión con Apple',
+    'auth.sign_in_with_google': 'Inicia Sesión con Google',
+    'auth.email_invalid': 'Dirección de correo electrónico inválida',
+    'auth.password_too_short': 'La contraseña debe tener al menos 6 caracteres',
+    'auth.error': 'Error',
+    'auth.error_login_failed': 'Error al iniciar sesión. Verifica tus credenciales.',
+    'auth.error_register_failed': 'Error al registrarse. Intenta de nuevo.',
+    'auth.ok': 'OK',
+    'auth.or': 'O',
+
+    // Welcome/Role Selection
+    'welcome.title': 'Brigzy',
+    'welcome.subtitle': '¿Qué estás buscando?',
+    'welcome.job_seeker': 'Buscar Trabajo',
+    'welcome.job_seeker_desc': 'Explora y postula a trabajos',
+    'welcome.job_provider': 'Publicar un Trabajo',
+    'welcome.job_provider_desc': 'Contrata trabajadores y gestiona trabajos',
+
+    // Navigation/Tabs
+    'nav.home': 'Inicio',
+    'nav.saved': 'Guardados',
+    'nav.post': 'Publicar',
+    'nav.messages': 'Mensajes',
+    'nav.profile': 'Perfil',
+
+    // Home Screen
+    'home.title': 'Explorar Trabajos',
+    'home.search': 'Buscar trabajos...',
+    'home.filter': 'Filtrar',
+    'home.no_jobs': 'No se encontraron trabajos',
+    'home.category': 'Categoría',
+    'home.category_hospitality': 'Hospitalidad',
+    'home.category_retail': 'Retail',
+    'home.category_delivery': 'Entrega',
+    'home.category_events': 'Eventos',
+    'home.category_cleaning': 'Limpieza',
+    'home.category_construction': 'Construcción',
+    'home.category_moving': 'Mudanza',
+    'home.category_admin': 'Administración',
+
+    // Job Detail
+    'job.title': 'Detalles del Trabajo',
+    'job.apply': 'Aplicar Ahora',
+    'job.save': 'Guardar',
+    'job.unsave': 'Desguardar',
+    'job.share': 'Compartir',
+    'job.company': 'Empresa',
+    'job.location': 'Ubicación',
+    'job.salary': 'Salario',
+    'job.duration': 'Duración',
+    'job.requirements': 'Requisitos',
+    'job.description': 'Descripción',
+    'job.already_applied': 'Ya aplicaste para este trabajo',
+    'job.apply_success': 'Aplicación enviada exitosamente',
+
+    // Post Job Screen
+    'post.title': 'Publicar Trabajo',
+    'post.job_title': 'Título del Trabajo',
+    'post.description': 'Descripción',
+    'post.location': 'Ubicación',
+    'post.salary_type': 'Tipo de Salario',
+    'post.salary_amount': 'Cantidad de Salario',
+    'post.hourly': 'Por Hora',
+    'post.fixed': 'Fijo',
+    'post.duration': 'Duración',
+    'post.category': 'Categoría',
+    'post.publish': 'Publicar',
+    'post.success': '¡Trabajo publicado exitosamente!',
+    'post.error': 'Error al publicar el trabajo',
+
+    // Messages
+    'messages.title': 'Mensajes',
+    'messages.no_conversations': 'Sin conversaciones aún',
+    'messages.send': 'Enviar',
+    'messages.type_message': 'Escribe un mensaje...',
+
+    // Profile
+    'profile.title': 'Perfil',
+    'profile.completed_jobs': 'Trabajos Completados',
+    'profile.rating': 'Calificación',
+    'profile.reviews': 'Reseñas',
+    'profile.switch_role': 'Cambiar Rol',
+    'profile.settings': 'Configuración',
+    'profile.logout': 'Cerrar Sesión',
+    'profile.edit_profile': 'Editar Perfil',
+
+    // Saved Jobs
+    'saved.title': 'Trabajos Guardados',
+    'saved.no_jobs': 'Sin trabajos guardados aún',
+
+    // Settings
+    'settings.title': 'Configuración',
+    'settings.appearance': 'Apariencia',
+    'settings.light': 'Claro',
+    'settings.dark': 'Oscuro',
+    'settings.system': 'Sistema',
+    'settings.general': 'General',
+    'settings.notifications': 'Notificaciones',
+    'settings.language': 'Idioma',
+    'settings.account': 'Cuenta',
+    'settings.account_settings': 'Configuración de Cuenta',
+    'settings.privacy_security': 'Privacidad y Seguridad',
+    'settings.logout': 'Cerrar Sesión',
+    'settings.logout_confirm_title': '¿Cerrar Sesión?',
+    'settings.logout_confirm_msg': '¿Estás seguro de que quieres cerrar sesión?',
+    'settings.cancel': 'Cancelar',
+    'settings.confirm': 'Cerrar Sesión',
+    'settings.version': 'Brigzy v1.0.0',
+
+    // Common
+    'common.loading': 'Cargando...',
+    'common.error': 'Error',
+    'common.back': 'Atrás',
+    'common.next': 'Siguiente',
+    'common.done': 'Hecho',
+    'common.delete': 'Eliminar',
+    'common.edit': 'Editar',
+    'common.save': 'Guardar',
+    'common.cancel': 'Cancelar',
+    'common.yes': 'Sí',
+    'common.no': 'No',
+  },
+  fr: {
+    // Login/Auth
+    'auth.login': 'Se Connecter',
+    'auth.register': "S'Inscrire",
+    'auth.email': 'E-mail',
+    'auth.password': 'Mot de passe',
+    'auth.confirm_password': 'Confirmer le mot de passe',
+    'auth.forgot_password': 'Mot de passe oublié?',
+    'auth.dont_have_account': "Vous n'avez pas de compte?",
+    'auth.already_have_account': 'Vous avez déjà un compte?',
+    'auth.sign_in_with_apple': 'Se connecter avec Apple',
+    'auth.sign_in_with_google': 'Se connecter avec Google',
+    'auth.email_invalid': 'Adresse e-mail invalide',
+    'auth.password_too_short': 'Le mot de passe doit comporter au moins 6 caractères',
+    'auth.error': 'Erreur',
+    'auth.error_login_failed': "Échec de la connexion. Vérifiez vos identifiants.",
+    'auth.error_register_failed': "Échec de l'inscription. Veuillez réessayer.",
+    'auth.ok': 'OK',
+    'auth.or': 'Ou',
+
+    // Welcome/Role Selection
+    'welcome.title': 'Brigzy',
+    'welcome.subtitle': 'Que recherchez-vous?',
+    'welcome.job_seeker': 'Chercher du Travail',
+    'welcome.job_seeker_desc': 'Explorez et postulez à des emplois',
+    'welcome.job_provider': 'Publier un Emploi',
+    'welcome.job_provider_desc': 'Embauchez des travailleurs et gérez les emplois',
+
+    // Navigation/Tabs
+    'nav.home': 'Accueil',
+    'nav.saved': 'Enregistrés',
+    'nav.post': 'Publier',
+    'nav.messages': 'Messages',
+    'nav.profile': 'Profil',
+
+    // Home Screen
+    'home.title': 'Parcourir les Emplois',
+    'home.search': 'Rechercher des emplois...',
+    'home.filter': 'Filtrer',
+    'home.no_jobs': 'Aucun emploi trouvé',
+    'home.category': 'Catégorie',
+    'home.category_hospitality': 'Hôtellerie',
+    'home.category_retail': 'Vente au Détail',
+    'home.category_delivery': 'Livraison',
+    'home.category_events': 'Événements',
+    'home.category_cleaning': 'Nettoyage',
+    'home.category_construction': 'Construction',
+    'home.category_moving': 'Déménagement',
+    'home.category_admin': 'Administration',
+
+    // Job Detail
+    'job.title': 'Détails de l\'Emploi',
+    'job.apply': 'Postuler Maintenant',
+    'job.save': 'Enregistrer',
+    'job.unsave': 'Supprimer',
+    'job.share': 'Partager',
+    'job.company': 'Entreprise',
+    'job.location': 'Localisation',
+    'job.salary': 'Salaire',
+    'job.duration': 'Durée',
+    'job.requirements': 'Exigences',
+    'job.description': 'Description',
+    'job.already_applied': 'Vous avez déjà postulé à cet emploi',
+    'job.apply_success': 'Candidature envoyée avec succès',
+
+    // Post Job Screen
+    'post.title': 'Publier un Emploi',
+    'post.job_title': 'Titre de l\'Emploi',
+    'post.description': 'Description',
+    'post.location': 'Localisation',
+    'post.salary_type': 'Type de Salaire',
+    'post.salary_amount': 'Montant du Salaire',
+    'post.hourly': 'Horaire',
+    'post.fixed': 'Fixe',
+    'post.duration': 'Durée',
+    'post.category': 'Catégorie',
+    'post.publish': 'Publier',
+    'post.success': 'Emploi publié avec succès!',
+    'post.error': 'Erreur lors de la publication de l\'emploi',
+
+    // Messages
+    'messages.title': 'Messages',
+    'messages.no_conversations': 'Pas de conversations encore',
+    'messages.send': 'Envoyer',
+    'messages.type_message': 'Tapez un message...',
+
+    // Profile
+    'profile.title': 'Profil',
+    'profile.completed_jobs': 'Emplois Complétés',
+    'profile.rating': 'Classement',
+    'profile.reviews': 'Avis',
+    'profile.switch_role': 'Changer de Rôle',
+    'profile.settings': 'Paramètres',
+    'profile.logout': 'Se Déconnecter',
+    'profile.edit_profile': 'Modifier le Profil',
+
+    // Saved Jobs
+    'saved.title': 'Emplois Enregistrés',
+    'saved.no_jobs': 'Aucun emploi enregistré pour l\'instant',
+
+    // Settings
+    'settings.title': 'Paramètres',
+    'settings.appearance': 'Apparence',
+    'settings.light': 'Clair',
+    'settings.dark': 'Sombre',
+    'settings.system': 'Système',
+    'settings.general': 'Général',
+    'settings.notifications': 'Notifications',
+    'settings.language': 'Langue',
+    'settings.account': 'Compte',
+    'settings.account_settings': 'Paramètres du Compte',
+    'settings.privacy_security': 'Confidentialité et Sécurité',
+    'settings.logout': 'Se Déconnecter',
+    'settings.logout_confirm_title': 'Se Déconnecter?',
+    'settings.logout_confirm_msg': 'Êtes-vous sûr de vouloir vous déconnecter?',
+    'settings.cancel': 'Annuler',
+    'settings.confirm': 'Se Déconnecter',
+    'settings.version': 'Brigzy v1.0.0',
+
+    // Common
+    'common.loading': 'Chargement...',
+    'common.error': 'Erreur',
+    'common.back': 'Retour',
+    'common.next': 'Suivant',
+    'common.done': 'Fait',
+    'common.delete': 'Supprimer',
+    'common.edit': 'Modifier',
+    'common.save': 'Enregistrer',
+    'common.cancel': 'Annuler',
+    'common.yes': 'Oui',
+    'common.no': 'Non',
+  },
+  de: {
+    // Login/Auth
+    'auth.login': 'Anmelden',
+    'auth.register': 'Registrieren',
+    'auth.email': 'E-Mail',
+    'auth.password': 'Passwort',
+    'auth.confirm_password': 'Passwort bestätigen',
+    'auth.forgot_password': 'Passwort vergessen?',
+    'auth.dont_have_account': 'Kein Konto?',
+    'auth.already_have_account': 'Haben Sie bereits ein Konto?',
+    'auth.sign_in_with_apple': 'Mit Apple anmelden',
+    'auth.sign_in_with_google': 'Mit Google anmelden',
+    'auth.email_invalid': 'Ungültige E-Mail-Adresse',
+    'auth.password_too_short': 'Das Passwort muss mindestens 6 Zeichen lang sein',
+    'auth.error': 'Fehler',
+    'auth.error_login_failed': 'Anmeldung fehlgeschlagen. Überprüfen Sie Ihre Anmeldedaten.',
+    'auth.error_register_failed': 'Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+    'auth.ok': 'OK',
+    'auth.or': 'Oder',
+
+    // Welcome/Role Selection
+    'welcome.title': 'Brigzy',
+    'welcome.subtitle': 'Was suchen Sie?',
+    'welcome.job_seeker': 'Arbeit Suchen',
+    'welcome.job_seeker_desc': 'Durchsuchen und bewerben Sie sich auf Jobs',
+    'welcome.job_provider': 'Job Posten',
+    'welcome.job_provider_desc': 'Stellen Sie Arbeiter ein und verwalten Sie Jobs',
+
+    // Navigation/Tabs
+    'nav.home': 'Startseite',
+    'nav.saved': 'Gespeichert',
+    'nav.post': 'Posten',
+    'nav.messages': 'Nachrichten',
+    'nav.profile': 'Profil',
+
+    // Home Screen
+    'home.title': 'Jobs Durchsuchen',
+    'home.search': 'Jobs durchsuchen...',
+    'home.filter': 'Filtern',
+    'home.no_jobs': 'Keine Jobs gefunden',
+    'home.category': 'Kategorie',
+    'home.category_hospitality': 'Gastronomie',
+    'home.category_retail': 'Einzelhandel',
+    'home.category_delivery': 'Lieferung',
+    'home.category_events': 'Veranstaltungen',
+    'home.category_cleaning': 'Reinigung',
+    'home.category_construction': 'Bau',
+    'home.category_moving': 'Umzug',
+    'home.category_admin': 'Verwaltung',
+
+    // Job Detail
+    'job.title': 'Job Details',
+    'job.apply': 'Jetzt Bewerben',
+    'job.save': 'Speichern',
+    'job.unsave': 'Löschen',
+    'job.share': 'Teilen',
+    'job.company': 'Unternehmen',
+    'job.location': 'Ort',
+    'job.salary': 'Gehalt',
+    'job.duration': 'Dauer',
+    'job.requirements': 'Anforderungen',
+    'job.description': 'Beschreibung',
+    'job.already_applied': 'Sie haben sich bereits für diese Stelle beworben',
+    'job.apply_success': 'Bewerbung erfolgreich eingereicht',
+
+    // Post Job Screen
+    'post.title': 'Job Posten',
+    'post.job_title': 'Job Titel',
+    'post.description': 'Beschreibung',
+    'post.location': 'Ort',
+    'post.salary_type': 'Gehaltstyp',
+    'post.salary_amount': 'Gehaltsbetrag',
+    'post.hourly': 'Stündlich',
+    'post.fixed': 'Festbetrag',
+    'post.duration': 'Dauer',
+    'post.category': 'Kategorie',
+    'post.publish': 'Posten',
+    'post.success': 'Job erfolgreich gepostet!',
+    'post.error': 'Fehler beim Posten des Jobs',
+
+    // Messages
+    'messages.title': 'Nachrichten',
+    'messages.no_conversations': 'Noch keine Unterhaltungen',
+    'messages.send': 'Senden',
+    'messages.type_message': 'Nachricht eingeben...',
+
+    // Profile
+    'profile.title': 'Profil',
+    'profile.completed_jobs': 'Abgeschlossene Jobs',
+    'profile.rating': 'Bewertung',
+    'profile.reviews': 'Bewertungen',
+    'profile.switch_role': 'Rolle Wechseln',
+    'profile.settings': 'Einstellungen',
+    'profile.logout': 'Abmelden',
+    'profile.edit_profile': 'Profil Bearbeiten',
+
+    // Saved Jobs
+    'saved.title': 'Gespeicherte Jobs',
+    'saved.no_jobs': 'Noch keine Jobs gespeichert',
+
+    // Settings
+    'settings.title': 'Einstellungen',
+    'settings.appearance': 'Erscheinungsbild',
+    'settings.light': 'Hell',
+    'settings.dark': 'Dunkel',
+    'settings.system': 'System',
+    'settings.general': 'Allgemein',
+    'settings.notifications': 'Benachrichtigungen',
+    'settings.language': 'Sprache',
+    'settings.account': 'Konto',
+    'settings.account_settings': 'Kontoeinstellungen',
+    'settings.privacy_security': 'Datenschutz & Sicherheit',
+    'settings.logout': 'Abmelden',
+    'settings.logout_confirm_title': 'Abmelden?',
+    'settings.logout_confirm_msg': 'Möchten Sie sich wirklich abmelden?',
+    'settings.cancel': 'Abbrechen',
+    'settings.confirm': 'Abmelden',
+    'settings.version': 'Brigzy v1.0.0',
+
+    // Common
+    'common.loading': 'Wird geladen...',
+    'common.error': 'Fehler',
+    'common.back': 'Zurück',
+    'common.next': 'Weiter',
+    'common.done': 'Fertig',
+    'common.delete': 'Löschen',
+    'common.edit': 'Bearbeiten',
+    'common.save': 'Speichern',
+    'common.cancel': 'Abbrechen',
+    'common.yes': 'Ja',
+    'common.no': 'Nein',
+  },
+  sk: {
+    // Login/Auth
+    'auth.login': 'Prihlásiť sa',
+    'auth.register': 'Registrovať sa',
+    'auth.email': 'E-mail',
+    'auth.password': 'Heslo',
+    'auth.confirm_password': 'Potvrdiť heslo',
+    'auth.forgot_password': 'Zabudli ste heslo?',
+    'auth.dont_have_account': 'Nemáš účet?',
+    'auth.already_have_account': 'Máš už účet?',
+    'auth.sign_in_with_apple': 'Prihlásiť sa s Apple',
+    'auth.sign_in_with_google': 'Prihlásiť sa cez Google',
+    'auth.email_invalid': 'Neplatná e-mailová adresa',
+    'auth.password_too_short': 'Heslo musí mať aspoň 6 znakov',
+    'auth.error': 'Chyba',
+    'auth.error_login_failed': 'Prihlásenie zlyhalo. Skontrolujte své údaje.',
+    'auth.error_register_failed': 'Registrácia zlyhala. Skúste to prosím znova.',
+    'auth.ok': 'OK',
+    'auth.or': 'Alebo',
+
+    // Welcome/Role Selection
+    'welcome.title': 'Brigzy',
+    'welcome.subtitle': 'Čo hľadáte?',
+    'welcome.job_seeker': 'Hľadám prácu',
+    'welcome.job_seeker_desc': 'Prezerajte a hlasujte na pracovné miesta',
+    'welcome.job_provider': 'Ponúkam prácu',
+    'welcome.job_provider_desc': 'Najímajte pracovníkov a spravujte pracovné miesta',
+
+    // Navigation/Tabs
+    'nav.home': 'Domov',
+    'nav.saved': 'Uložené',
+    'nav.post': 'Zverejniť',
+    'nav.messages': 'Správy',
+    'nav.profile': 'Profil',
+
+    // Home Screen
+    'home.title': 'Prezerať pracovné miesta',
+    'home.search': 'Hľadať pracovné miesta...',
+    'home.filter': 'Filtrovať',
+    'home.no_jobs': 'Pracovné miesta sa nenašli',
+    'home.category': 'Kategória',
+    'home.category_hospitality': 'Pohostinstvo',
+    'home.category_retail': 'Maloobchod',
+    'home.category_delivery': 'Doručenie',
+    'home.category_events': 'Podujatia',
+    'home.category_cleaning': 'Čistenie',
+    'home.category_construction': 'Stavebnictvo',
+    'home.category_moving': 'Presťahovanie',
+    'home.category_admin': 'Administratíva',
+
+    // Job Detail
+    'job.title': 'Detaily pracovného miesta',
+    'job.apply': 'Kandidovať teraz',
+    'job.save': 'Uložiť',
+    'job.unsave': 'Odstrániť',
+    'job.share': 'Zdieľať',
+    'job.company': 'Spoločnosť',
+    'job.location': 'Lokalita',
+    'job.salary': 'Plat',
+    'job.duration': 'Trvanie',
+    'job.requirements': 'Požiadavky',
+    'job.description': 'Popis',
+    'job.already_applied': 'Už ste kandidovali na toto pracovné miesto',
+    'job.apply_success': 'Prihlaska bola úspešne odoslaná',
+
+    // Post Job Screen
+    'post.title': 'Zverejniť pracovné miesto',
+    'post.job_title': 'Názov pracovného miesta',
+    'post.description': 'Popis',
+    'post.location': 'Lokalita',
+    'post.salary_type': 'Typ platu',
+    'post.salary_amount': 'Výška platu',
+    'post.hourly': 'Hodinová sadzba',
+    'post.fixed': 'Fixný',
+    'post.duration': 'Trvanie',
+    'post.category': 'Kategória',
+    'post.publish': 'Zverejniť',
+    'post.success': 'Pracovné miesto bolo úspešne zverejnené!',
+    'post.error': 'Chyba pri zverejňovaní pracovného miesta',
+
+    // Messages
+    'messages.title': 'Správy',
+    'messages.no_conversations': 'Zatiaľ žiadne rozhovory',
+    'messages.send': 'Odoslať',
+    'messages.type_message': 'Napíšte správu...',
+
+    // Profile
+    'profile.title': 'Profil',
+    'profile.completed_jobs': 'Dokončené pracovné miesta',
+    'profile.rating': 'Hodnotenie',
+    'profile.reviews': 'Recenzie',
+    'profile.switch_role': 'Zmeniť rolu',
+    'profile.settings': 'Nastavenia',
+    'profile.logout': 'Odhlásiť sa',
+    'profile.edit_profile': 'Upraviť profil',
+
+    // Saved Jobs
+    'saved.title': 'Uložené pracovné miesta',
+    'saved.no_jobs': 'Zatiaľ žiadne uložené pracovné miesta',
+
+    // Settings
+    'settings.title': 'Nastavenia',
+    'settings.appearance': 'Vzhľad',
+    'settings.light': 'Svetlý',
+    'settings.dark': 'Tmavý',
+    'settings.system': 'Systém',
+    'settings.general': 'Všeobecné',
+    'settings.notifications': 'Notifikácie',
+    'settings.language': 'Jazyk',
+    'settings.account': 'Účet',
+    'settings.account_settings': 'Nastavenia účtu',
+    'settings.privacy_security': 'Ochrana osobných údajov a bezpečnosť',
+    'settings.logout': 'Odhlásiť sa',
+    'settings.logout_confirm_title': 'Odhlásiť sa?',
+    'settings.logout_confirm_msg': 'Ste si istí, že sa chcete odhlásiť?',
+    'settings.cancel': 'Zrušiť',
+    'settings.confirm': 'Odhlásiť',
+    'settings.version': 'Brigzy v1.0.0',
+
+    // Common
+    'common.loading': 'Načítavam...',
+    'common.error': 'Chyba',
+    'common.back': 'Späť',
+    'common.next': 'Ďalej',
+    'common.done': 'Hotovo',
+    'common.delete': 'Odstrániť',
+    'common.edit': 'Upraviť',
+    'common.save': 'Uložiť',
+    'common.cancel': 'Zrušiť',
+    'common.yes': 'Áno',
+    'common.no': 'Nie',
+  },
+};
+
+export function getTranslation(language: Language, key: string): string {
+  const parts = key.split('.');
+  let value: any = translations[language];
+
+  for (const part of parts) {
+    value = value?.[part];
+    if (value === undefined) {
+      // Fallback to English if translation not found
+      value = translations.en;
+      for (const p of parts) {
+        value = value?.[p];
+      }
+      return value ?? key;
+    }
+  }
+
+  return value ?? key;
+}

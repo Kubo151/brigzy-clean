@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Brigzy",
+    "slug": "brigzy",
+    "version": "1.0.0",
+    "scheme": "brigzy",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "android": {
+      "package": "com.brigzy.app"
+    },
+    "ios": {
+      "bundleIdentifier": "com.brigzy.app"
+    },
+    "plugins": [
+      "expo-router",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Brigzy potrebuje prístup k polohe na zobrazenie pracovných pozícií v okolí.",
+          "locationWhenInUsePermission": "Brigzy potrebuje prístup k polohe na zobrazenie pracovných pozícií v okolí."
+        }
+      ]
+    ]
+  }
+}
