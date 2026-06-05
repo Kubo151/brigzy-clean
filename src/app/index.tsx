@@ -2,9 +2,11 @@ import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { supabase } from '../lib/supabase';
+import { useClay } from '@/lib/useClay';
 
 export default function Index() {
     const router = useRouter();
+    const C = useClay();
 
     useEffect(() => {
         // Validate user session with the server
@@ -18,8 +20,8 @@ export default function Index() {
     }, []);
 
     return (
-        <View style={styles.container}>
-            <ActivityIndicator size="large" color="#6366f1" />
+        <View style={[styles.container, { backgroundColor: C.bg }]}>
+            <ActivityIndicator size="large" color={C.accent} />
         </View>
     );
 }
@@ -29,6 +31,5 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#fff',
     },
 });

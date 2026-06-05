@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import {
     View, Text, ScrollView, Pressable, ActivityIndicator,
     Share, StyleSheet, Animated, Linking, Platform,
@@ -7,9 +7,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import {
     ChevronLeft, MoreHorizontal, Heart, MapPin, Clock,
-    Briefcase, DollarSign, Users, MessageSquare, CheckCircle,
+    Briefcase, Euro, Users, MessageSquare, Check, Shield, Star,
     Coffee, ShoppingBag, Truck, PartyPopper, Sparkles,
-    Package, FileText, Star,
+    Package, FileText, Zap,
 } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,8 +19,9 @@ import { useText } from "@/lib/useText";
 import type { Job } from "@/lib/types";
 import { JOB_CATEGORIES } from "@/lib/types";
 import useThemeStore from "@/lib/state/theme-store";
-import { useColors } from "@/lib/useColors";
-import type { AppColors } from "@/lib/useColors";
+import { useClay } from "@/lib/useClay";
+import type { ClayColors } from "@/lib/useClay";
+import { ClaySurface, ClayInset, ClayButton, ClayPill, ClayIconBox } from "@/components/clay";
 import JobLocationMap from "@/components/JobLocationMap";
 
 const getCategoryIcon = (category: string) => {
@@ -37,13 +38,28 @@ const getCategoryIcon = (category: string) => {
     }
 };
 
+// ─── small round clay icon button (header) ───
+function ClayIconButton({ children, onPress, active, C }: {
+    children: React.ReactNode; onPress: () => void; active?: boolean; C: ClayColors;
+}) {
+    return (
+        <Pressable onPress={onPress} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }], opacity: 0.85 }]}>
+            <ClaySurface radius={15} style={{ width: 44, height: 44 }} contentStyle={{
+                width: 44, height: 44, alignItems: 'center', justifyContent: 'center',
+                backgroundColor: active ? C.accentDim : 'transparent', borderRadius: 15,
+            }}>
+                {children}
+            </ClaySurface>
+        </Pressable>
+    );
+}
+
 export default function JobDetailScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const text = useText();
-    const C = useColors();
+    const C = useClay();
     const language = useThemeStore((s) => s.language);
-    const st = useMemo(() => makeStyles(C), [C]);
 
     const currentUser = useAppStore((s) => s.currentUser);
     const savedJobIds = useAppStore((s) => s.savedJobIds);
@@ -122,12 +138,10 @@ export default function JobDetailScreen() {
     const openInMaps = (location: string) => {
         const encoded = encodeURIComponent(location);
         if (Platform.OS === 'ios') {
-            // Try Apple Maps first, fallback to Google Maps
             Linking.openURL(`maps://maps.apple.com/?q=${encoded}`).catch(() => {
                 Linking.openURL(`https://maps.google.com/?q=${encoded}`);
             });
         } else {
-            // Android: try Google Maps app, fallback to web
             Linking.openURL(`geo:0,0?q=${encoded}`).catch(() => {
                 Linking.openURL(`https://maps.google.com/?q=${encoded}`);
             });
@@ -137,8 +151,8 @@ export default function JobDetailScreen() {
     // ── Loading ──
     if (isLoading) {
         return (
-            <SafeAreaView style={[st.container, { alignItems: 'center', justifyContent: 'center' }]}>
-                <ActivityIndicator size="large" color={C.purple} />
+            <SafeAreaView style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center' }}>
+                <ActivityIndicator size="large" color={C.accent} />
             </SafeAreaView>
         );
     }
@@ -146,11 +160,9 @@ export default function JobDetailScreen() {
     // ── Error ──
     if (error || !job) {
         return (
-            <SafeAreaView style={[st.container, { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }]}>
-                <Text style={[st.errorText, { color: C.text }]}>{error || "Pozícia sa nenašla"}</Text>
-                <Pressable onPress={() => router.back()} style={({ pressed }) => [st.errorBtn, pressed && { transform: [{ scale: 0.97 }] }]}>
-                    <Text style={{ color: '#FFF', fontWeight: '600', fontSize: 15 }}>Späť</Text>
-                </Pressable>
+            <SafeAreaView style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
+                <Text style={{ fontSize: 18, fontWeight: '800', color: C.text, marginBottom: 16 }}>{error || "Pozícia sa nenašla"}</Text>
+                <ClayButton label="Späť" onPress={() => router.back()} />
             </SafeAreaView>
         );
     }
@@ -163,188 +175,172 @@ export default function JobDetailScreen() {
     const jobDuration = language === "sk" && job.duration_sk ? job.duration_sk : job.duration;
     const jobRequirements = language === "sk" && job.requirements_sk?.length ? job.requirements_sk : job.requirements || [];
     const CategoryIcon = getCategoryIcon(job.category);
-    const formatSalary = () => job.salaryType === "hourly" ? `€${job.salaryAmount}/hr` : `€${job.salaryAmount}`;
+    const formatSalary = () => job.salaryType === "hourly" ? `${job.salaryAmount} €/h` : `${job.salaryAmount} €`;
+
+    const SectionLabel = ({ children }: { children: string }) => (
+        <Text style={{ fontSize: 10.5, fontWeight: '800', color: C.muted, letterSpacing: 0.7, textTransform: 'uppercase', marginBottom: 10 }}>{children}</Text>
+    );
+
+    const InfoCell = ({ icon, label, value, big }: { icon: React.ReactNode; label: string; value: string; big?: boolean }) => (
+        <ClaySurface radius={18} style={{ flex: 1 }} contentStyle={{ padding: 14 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                {icon}
+                <Text style={{ fontSize: 12, color: C.muted, fontWeight: '700' }}>{label}</Text>
+            </View>
+            <Text style={{ fontSize: big ? 19 : 15, fontWeight: '800', color: C.text, letterSpacing: -0.3 }} numberOfLines={1}>{value}</Text>
+        </ClaySurface>
+    );
 
     return (
         <>
             <Stack.Screen options={{ headerShown: false }} />
-            <SafeAreaView style={st.container} edges={['top']}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
                 {/* Header */}
-                <View style={st.header}>
-                    <Pressable onPress={() => router.back()} style={({ pressed }) => [st.headerBtn, pressed && { transform: [{ scale: 0.97 }] }]}>
-                        <ChevronLeft size={20} color={C.text} />
-                    </Pressable>
+                <View style={styles.header}>
+                    <ClayIconButton onPress={() => router.back()} C={C}>
+                        <ChevronLeft size={20} color={C.text} strokeWidth={2.2} />
+                    </ClayIconButton>
                     <View style={{ flexDirection: 'row', gap: 10 }}>
-                        <Pressable onPress={handleShare} style={({ pressed }) => [st.headerBtn, pressed && { transform: [{ scale: 0.97 }] }]}>
-                            <MoreHorizontal size={20} color={C.text} />
-                        </Pressable>
+                        <ClayIconButton onPress={handleShare} C={C}>
+                            <MoreHorizontal size={20} color={C.text} strokeWidth={2.2} />
+                        </ClayIconButton>
                         <Animated.View style={{ transform: [{ scale: heartScale }] }}>
-                            <Pressable onPress={handleSaveToggle}
-                                style={({ pressed }) => [st.headerBtn, isSaved && { backgroundColor: C.purpleDim }, pressed && { transform: [{ scale: 0.97 }] }]}>
-                                <Heart size={20} color={isSaved ? C.purple : C.secondaryLabel as string} fill={isSaved ? C.purple : "transparent"} />
-                            </Pressable>
+                            <ClayIconButton onPress={handleSaveToggle} active={isSaved} C={C}>
+                                <Heart size={20} color={isSaved ? C.accent : C.muted} fill={isSaved ? C.accent : "transparent"} strokeWidth={2} />
+                            </ClayIconButton>
                         </Animated.View>
                     </View>
                 </View>
 
-                {/* Scroll Content */}
-                <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 110 }}>
-                    {/* Company */}
-                    <View style={st.companySection}>
-                        <View style={st.companyRow}>
-                            <View style={st.companyLogo}><CategoryIcon size={28} color={C.purpleLight} /></View>
-                            <View style={{ flex: 1 }}>
-                                <Text style={st.companyName}>{job.company}</Text>
-                                <Text style={st.jobTitle}>{jobTitle}</Text>
+                <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 120 }}>
+                    {/* Hero card */}
+                    <ClaySurface radius={22} style={{ marginTop: 6 }} contentStyle={{ padding: 18 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <ClayIconBox size={52} radius={17}>
+                                <CategoryIcon size={26} color={C.accent} strokeWidth={1.9} />
+                            </ClayIconBox>
+                            <LinearGradient
+                                colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }}
+                                style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12 }}
+                            >
+                                <Text style={{ fontSize: 15, fontWeight: '800', color: C.onAccent, letterSpacing: -0.3 }}>{formatSalary()}</Text>
+                            </LinearGradient>
+                        </View>
+                        <Text style={{ fontSize: 21, fontWeight: '800', color: C.text, letterSpacing: -0.5, marginTop: 14 }}>{jobTitle}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 }}>
+                            <MapPin size={15} color={C.muted} strokeWidth={2} />
+                            <Text style={{ fontSize: 13.5, color: C.muted, fontWeight: '600' }}>{jobLocation}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12 }}>
+                            <View style={{ flexDirection: 'row', gap: 1 }}>
+                                {[0, 1, 2, 3, 4].map((i) => (
+                                    <Star key={i} size={13} color={C.star} fill={C.star} strokeWidth={0} />
+                                ))}
+                            </View>
+                            <Text style={{ fontSize: 12, color: C.muted, fontWeight: '600' }}>{job.company} · </Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+                                <Shield size={13} color={C.verified} strokeWidth={2.2} />
+                                <Text style={{ fontSize: 12, color: C.verified, fontWeight: '700' }}>overený</Text>
                             </View>
                         </View>
-                        <View style={st.tagsRow}>
-                            <View style={st.tag}><Text style={st.tagText}>{categoryName}</Text></View>
-                            {job.isUrgent && <View style={st.urgentTag}><Text style={st.urgentTagText}>Urgentné</Text></View>}
+                        {/* tags */}
+                        <View style={{ flexDirection: 'row', gap: 8, marginTop: 14 }}>
+                            <View style={{ backgroundColor: C.accentDim, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 9 }}>
+                                <Text style={{ fontSize: 11.5, fontWeight: '800', color: C.accent }}>{categoryName}</Text>
+                            </View>
+                            {job.isUrgent && (
+                                <LinearGradient colors={[C.sosFrom, C.sosTo]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                                    style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 9 }}>
+                                    <Zap size={12} color="#FFF" fill="#FFF" strokeWidth={0} />
+                                    <Text style={{ fontSize: 11.5, fontWeight: '800', color: '#FFF' }}>URGENTNÉ</Text>
+                                </LinearGradient>
+                            )}
                         </View>
-                    </View>
+                    </ClaySurface>
 
-                    {/* Info Grid */}
-                    <View style={st.infoGrid}>
-                        <View style={st.infoRow}>
-                            <Pressable onPress={() => openInMaps(jobLocation)} style={({ pressed }) => [st.infoCard, pressed && { opacity: 0.8 }]}>
-                                <View style={st.infoIconRow}><MapPin size={16} color={C.purple} /><Text style={st.infoLabel}>Lokácia</Text></View>
-                                <Text style={st.infoValue}>{jobLocation}</Text>
-                            </Pressable>
-                            <View style={st.infoCard}>
-                                <View style={st.infoIconRow}><Clock size={16} color={C.secondaryLabel as string} /><Text style={st.infoLabel}>Čas</Text></View>
-                                <Text style={st.infoValue}>{jobDuration}</Text>
-                            </View>
-                        </View>
-                        <View style={st.infoRow}>
-                            <View style={st.infoCard}>
-                                <View style={st.infoIconRow}><Briefcase size={16} color={C.secondaryLabel as string} /><Text style={st.infoLabel}>Typ</Text></View>
-                                <Text style={st.infoValue}>{job.salaryType === "hourly" ? "Hodinová" : "Fixná"}</Text>
-                            </View>
-                            <View style={st.infoCard}>
-                                <View style={st.infoIconRow}><DollarSign size={16} color={C.secondaryLabel as string} /><Text style={st.infoLabel}>Mzda</Text></View>
-                                <Text style={st.infoValueBig}>{formatSalary()}</Text>
-                            </View>
-                        </View>
+                    {/* Info grid */}
+                    <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
+                        <Pressable style={{ flex: 1 }} onPress={() => openInMaps(jobLocation)}>
+                            <InfoCell icon={<MapPin size={15} color={C.accent} strokeWidth={2} />} label="Lokácia" value={jobLocation} />
+                        </Pressable>
+                        <InfoCell icon={<Clock size={15} color={C.muted} strokeWidth={2} />} label="Čas" value={jobDuration} />
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+                        <InfoCell icon={<Briefcase size={15} color={C.muted} strokeWidth={2} />} label="Typ" value={job.salaryType === "hourly" ? "Hodinová" : "Fixná"} />
+                        <InfoCell icon={<Euro size={15} color={C.muted} strokeWidth={2} />} label="Mzda" value={formatSalary()} big />
                     </View>
 
                     {/* Description */}
-                    <View style={st.section}>
-                        <Text style={st.sectionTitle}>Popis pozície</Text>
-                        <View style={st.descCard}><Text style={st.descText}>{jobDesc}</Text></View>
-                    </View>
+                    <ClaySurface radius={22} style={{ marginTop: 14 }} contentStyle={{ padding: 16 }}>
+                        <SectionLabel>Popis pozície</SectionLabel>
+                        <Text style={{ fontSize: 14, lineHeight: 22, color: C.muted, fontWeight: '500' }}>{jobDesc}</Text>
+                    </ClaySurface>
 
                     {/* Requirements */}
-                    <View style={st.section}>
-                        <Text style={st.sectionTitle}>Požiadavky</Text>
-                        <View style={st.reqCard}>
-                            {jobRequirements.length > 0 ? (
-                                jobRequirements.map((req, i) => (
-                                    <View key={i} style={st.reqItem}>
-                                        <CheckCircle size={20} color={C.purple} /><Text style={st.reqText}>{req}</Text>
+                    <ClaySurface radius={22} style={{ marginTop: 14 }} contentStyle={{ padding: 16 }}>
+                        <SectionLabel>Požiadavky</SectionLabel>
+                        <View style={{ gap: 12 }}>
+                            {(jobRequirements.length > 0
+                                ? jobRequirements
+                                : [
+                                    `Dostupnosť: ${jobDuration}`,
+                                    `Lokácia: ${jobLocation}`,
+                                    ...(job.requiresIntroduction ? ['Vyžaduje sa úvodná správa'] : []),
+                                ]
+                            ).map((req, i) => (
+                                <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 11 }}>
+                                    <View style={{ width: 24, height: 24, borderRadius: 8, backgroundColor: C.accentDim, alignItems: 'center', justifyContent: 'center' }}>
+                                        <Check size={15} color={C.accent} strokeWidth={2.6} />
                                     </View>
-                                ))
-                            ) : (
-                                <>
-                                    <View style={st.reqItem}><CheckCircle size={20} color={C.purple} /><Text style={st.reqText}>Dostupnosť: {jobDuration}</Text></View>
-                                    <View style={st.reqItem}><CheckCircle size={20} color={C.purple} /><Text style={st.reqText}>Lokácia: {jobLocation}</Text></View>
-                                    {job.requiresIntroduction && (
-                                        <View style={st.reqItem}><CheckCircle size={20} color={C.purple} /><Text style={st.reqText}>Vyžaduje sa úvodná správa</Text></View>
-                                    )}
-                                </>
-                            )}
+                                    <Text style={{ flex: 1, fontSize: 14, color: C.text, fontWeight: '600', lineHeight: 20 }}>{req}</Text>
+                                </View>
+                            ))}
                         </View>
-                    </View>
+                    </ClaySurface>
 
-                    {/* Location / Map */}
-                    <View style={st.section}>
-                        <Text style={st.sectionTitle}>Lokácia</Text>
-                        <JobLocationMap location={jobLocation} height={200} />
+                    {/* Map */}
+                    <View style={{ marginTop: 14 }}>
+                        <SectionLabel>Lokácia</SectionLabel>
+                        <View style={{ borderRadius: 20, overflow: 'hidden' }}>
+                            <JobLocationMap location={jobLocation} height={190} />
+                        </View>
                     </View>
 
                     {/* Applicants */}
-                    <View style={st.section}>
-                        <Text style={st.sectionTitle}>Uchádzači</Text>
-                        <View style={st.applicantsCard}>
-                            <View style={{ flex: 1 }}>
-                                <Text style={st.applicantsCount}>{job.applicantsCount} uchádzačov</Text>
-                                <Text style={st.applicantsSub}>{job.applicantsCount === 0 ? 'Buď prvý kto sa prihlási' : 'Už sa prihlásili'}</Text>
-                            </View>
-                            <Users size={22} color={C.secondaryLabel as string} />
+                    <ClaySurface radius={22} style={{ marginTop: 14 }} contentStyle={{ flexDirection: 'row', alignItems: 'center', padding: 16 }}>
+                        <View style={{ flex: 1 }}>
+                            <Text style={{ fontSize: 15, fontWeight: '800', color: C.text, marginBottom: 4 }}>{job.applicantsCount} uchádzačov</Text>
+                            <Text style={{ fontSize: 12.5, color: C.muted, fontWeight: '600' }}>{job.applicantsCount === 0 ? 'Buď prvý kto sa prihlási' : 'Už sa prihlásili'}</Text>
                         </View>
-                    </View>
+                        <ClayIconBox size={42} radius={13}><Users size={20} color={C.accent} strokeWidth={2} /></ClayIconBox>
+                    </ClaySurface>
 
-                    <View style={[st.section, { marginBottom: 0 }]}>
-                        <Text style={{ fontSize: 13, color: C.secondaryLabel }}>Zverejnené {job.postedAt}</Text>
-                    </View>
+                    <Text style={{ fontSize: 12, color: C.muted, fontWeight: '600', marginTop: 16 }}>Zverejnené {job.postedAt}</Text>
                 </ScrollView>
 
                 {/* Bottom bar */}
-                <View style={st.bottomBar}>
+                <View style={[styles.bottomBar, { backgroundColor: C.bg, borderTopColor: C.hair }]}>
                     <Pressable onPress={() => router.push(`/messages/${job.employerId}${job.id ? `?jobId=${job.id}` : ''}`)}
-                        style={({ pressed }) => [st.msgBtn, pressed && { transform: [{ scale: 0.97 }] }]}>
-                        <MessageSquare size={22} color={C.text} />
+                        style={({ pressed }) => [pressed && { transform: [{ scale: 0.96 }] }]}>
+                        <ClaySurface radius={16} style={{ width: 54, height: 54 }} contentStyle={{ width: 54, height: 54, alignItems: 'center', justifyContent: 'center' }}>
+                            <MessageSquare size={22} color={C.text} strokeWidth={2} />
+                        </ClaySurface>
                     </Pressable>
-                    <View style={{ flex: 1 }}>
-                        <Pressable onPress={isApplied ? undefined : handleApply} disabled={isApplied}
-                            style={({ pressed }) => [pressed && !isApplied && { transform: [{ scale: 0.97 }] }]}>
-                            <LinearGradient
-                                colors={isApplied ? [C.surface2, C.surface2] : ['#9333EA', '#7C3AED', '#6D28D9']}
-                                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                                style={st.applyBtn}>
-                                <Text style={[st.applyText, isApplied && { color: C.secondaryLabel }]}>
-                                    {isApplied ? "✓ Prihlásené" : "Prihlásiť sa"}
-                                </Text>
-                            </LinearGradient>
-                        </Pressable>
-                    </View>
+                    {isApplied ? (
+                        <ClaySurface radius={18} style={{ flex: 1 }} contentStyle={{ height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                            <Check size={20} color={C.green} strokeWidth={2.6} />
+                            <Text style={{ fontSize: 15, fontWeight: '800', color: C.green }}>Prihlásené</Text>
+                        </ClaySurface>
+                    ) : (
+                        <ClayButton label="Prihlásiť sa" onPress={handleApply} flex={1} style={{ height: 54 }} />
+                    )}
                 </View>
             </SafeAreaView>
         </>
     );
 }
 
-const makeStyles = (C: AppColors) => StyleSheet.create({
-    container: { flex: 1, backgroundColor: C.bg },
-    errorText: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
-    errorBtn: { paddingHorizontal: 24, paddingVertical: 12, backgroundColor: C.purple, borderRadius: 14 },
-
-    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 },
-    headerBtn: { width: 42, height: 42, borderRadius: 14, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center' },
-
-    companySection: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 20 },
-    companyRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-    companyLogo: { width: 64, height: 64, borderRadius: 18, backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
-    companyName: { fontSize: 14, color: C.secondaryLabel, marginBottom: 4 },
-    jobTitle: { fontSize: 22, fontWeight: '700', color: C.text },
-    tagsRow: { flexDirection: 'row', gap: 8 },
-    tag: { backgroundColor: C.purpleDim, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 10 },
-    tagText: { fontSize: 13, fontWeight: '600', color: C.purpleLight },
-    urgentTag: { backgroundColor: 'rgba(52,211,153,0.15)', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 10 },
-    urgentTagText: { fontSize: 13, fontWeight: '600', color: C.green },
-
-    infoGrid: { paddingHorizontal: 20, marginBottom: 24, gap: 10 },
-    infoRow: { flexDirection: 'row', gap: 10 },
-    infoCard: { flex: 1, backgroundColor: C.surface, borderRadius: 16, padding: 14, borderWidth: 1, borderColor: C.border },
-    infoIconRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
-    infoLabel: { fontSize: 13, color: C.secondaryLabel },
-    infoValue: { fontSize: 16, fontWeight: '700', color: C.text },
-    infoValueBig: { fontSize: 20, fontWeight: '700', color: C.text },
-
-    section: { paddingHorizontal: 20, marginBottom: 24 },
-    sectionTitle: { fontSize: 18, fontWeight: '700', color: C.text, marginBottom: 12 },
-    descCard: { backgroundColor: C.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: C.border },
-    descText: { fontSize: 15, lineHeight: 24, color: C.secondaryLabel },
-    reqCard: { backgroundColor: C.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: C.border, gap: 12 },
-    reqItem: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-    reqText: { flex: 1, fontSize: 14, color: C.text, lineHeight: 20 },
-
-    applicantsCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: C.border },
-    applicantsCount: { fontSize: 16, fontWeight: '700', color: C.text, marginBottom: 4 },
-    applicantsSub: { fontSize: 13, color: C.secondaryLabel },
-
-    bottomBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingTop: 14, paddingBottom: 28, gap: 12, backgroundColor: C.bg, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.separator },
-    msgBtn: { width: 52, height: 52, borderRadius: 16, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border },
-    applyBtn: { height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-    applyText: { fontSize: 16, fontWeight: '700', color: '#FFF' },
+const styles = StyleSheet.create({
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 10 },
+    bottomBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingTop: 14, paddingBottom: 28, gap: 12, borderTopWidth: StyleSheet.hairlineWidth },
 });

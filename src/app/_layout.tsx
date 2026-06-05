@@ -1,10 +1,17 @@
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { useFonts } from 'expo-font';
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
+import { MANROPE_FONTS, patchTextWithManrope } from '../lib/fonts';
 
 export default function RootLayout() {
     const [session, setSession] = useState<Session | null>(null);
+    const [fontsLoaded] = useFonts(MANROPE_FONTS);
+
+    useEffect(() => {
+        if (fontsLoaded) patchTextWithManrope();
+    }, [fontsLoaded]);
 
     useEffect(() => {
         // Get initial session
@@ -19,6 +26,9 @@ export default function RootLayout() {
 
         return () => subscription.unsubscribe();
     }, []);
+
+    // Hold render until Manrope is ready so text doesn't flash in the system font.
+    if (!fontsLoaded) return null;
 
     return (
         <Stack

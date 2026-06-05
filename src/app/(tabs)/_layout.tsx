@@ -1,16 +1,15 @@
 import React, { useRef } from 'react';
 import { View, Pressable, Text, Animated, StyleSheet, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
-import { BlurView } from 'expo-blur';
 import { Home, Heart, Plus, MessageSquare, User } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useText } from '@/lib/useText';
-import { useColors } from '@/lib/useColors';
-import type { AppColors } from '@/lib/useColors';
+import { useClay } from '@/lib/useClay';
+import type { ClayColors } from '@/lib/useClay';
 
-const TAB_BAR_H = 64;
-const CAPSULE_RADIUS = 24;
+const TAB_BAR_H = 66;
+const CAPSULE_RADIUS = 26;
 const CAPSULE_INSET = 16;
 
 // ─── TAB CONFIG ──────────────────────────────────────
@@ -24,7 +23,7 @@ const TAB_ITEMS = [
 
 // ─── TAB BUTTON ──────────────────────────────────────
 function TabButton({ item, focused, onPress, C, label }: {
-    item: typeof TAB_ITEMS[0]; focused: boolean; onPress: () => void; C: AppColors; label: string;
+    item: typeof TAB_ITEMS[0]; focused: boolean; onPress: () => void; C: ClayColors; label: string;
 }) {
     const scaleAnim = useRef(new Animated.Value(1)).current;
     const isCenter = item.name === 'add';
@@ -40,16 +39,24 @@ function TabButton({ item, focused, onPress, C, label }: {
         onPress();
     };
 
-    // ── Center Plus button ──
+    // ── Center Plus button (raised accent) ──
     if (isCenter) {
         return (
             <Pressable onPress={handlePress} style={styles.tabSlot}>
-                <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                <Animated.View style={[styles.centerWrap, { transform: [{ scale: scaleAnim }] }]}>
                     <LinearGradient
-                        colors={['#9333EA', '#7C3AED', '#6D28D9']}
+                        colors={[C.accent2, C.accent]}
                         start={{ x: 0.3, y: 0 }}
                         end={{ x: 0.7, y: 1 }}
-                        style={styles.centerBtn}
+                        style={[styles.centerBtn, Platform.select({
+                            ios: {
+                                shadowColor: C.accentShadow.color,
+                                shadowOffset: { width: 0, height: 6 },
+                                shadowOpacity: C.accentShadow.opacity,
+                                shadowRadius: 14,
+                            },
+                            android: { elevation: 8 },
+                        })]}
                     >
                         <LinearGradient
                             colors={['rgba(255,255,255,0.35)', 'rgba(255,255,255,0.05)', 'transparent']}
@@ -57,7 +64,7 @@ function TabButton({ item, focused, onPress, C, label }: {
                             end={{ x: 0.5, y: 0.6 }}
                             style={styles.centerSpecular}
                         />
-                        <Plus size={21} color="#FFF" strokeWidth={2.5} />
+                        <Plus size={24} color={C.onAccent} strokeWidth={2.6} />
                     </LinearGradient>
                 </Animated.View>
             </Pressable>
@@ -65,65 +72,65 @@ function TabButton({ item, focused, onPress, C, label }: {
     }
 
     // ── Regular tab ──
-    const isIOS = Platform.OS === 'ios';
-
     return (
         <Pressable onPress={handlePress} style={styles.tabSlot}>
             <Animated.View style={[styles.tabContent, { transform: [{ scale: scaleAnim }] }]}>
-                {focused && (
-                    isIOS ? (
-                        <View style={[styles.activeBlob, { backgroundColor: C.purpleDim }]} />
-                    ) : (
-                        <View style={[styles.activePill, { backgroundColor: C.purpleDim }]} />
-                    )
-                )}
+                {focused && <View style={[styles.activeBlob, { backgroundColor: C.accentDim }]} />}
                 <Icon
-                    size={isIOS ? 21 : 22}
-                    color={focused ? C.purple : C.tertiaryLabel}
-                    strokeWidth={focused ? 2 : 1.5}
-                    fill={item.name === 'favorites' && focused ? C.purple : 'transparent'}
+                    size={22}
+                    color={focused ? C.accent : C.muted}
+                    strokeWidth={focused ? 2.2 : 1.8}
+                    fill={item.name === 'favorites' && focused ? C.accent : 'transparent'}
                 />
-                {(isIOS ? focused : true) && (
-                    <Text
-                        numberOfLines={1}
-                        style={[
-                            styles.tabLabel,
-                            { color: focused ? C.purple : C.tertiaryLabel },
-                            !isIOS && styles.tabLabelAndroid,
-                        ]}
-                    >{label}</Text>
+                {focused && (
+                    <Text numberOfLines={1} style={[styles.tabLabel, { color: C.accent }]}>{label}</Text>
                 )}
             </Animated.View>
         </Pressable>
     );
 }
 
-// ─── TAB BAR CONTAINERS ─────────────────────────────
-function TabBarContainer({ C, children }: { C: AppColors; children: React.ReactNode }) {
-    const isLight = C.bg === '#F2F2F7';
-    if (Platform.OS === 'ios') {
-        return (
-            <View style={styles.barWrapper} pointerEvents="box-none">
-                <View style={styles.iosCapsuleShadow}>
-                    <BlurView intensity={100} tint={isLight ? 'light' : 'dark'} style={styles.iosCapsuleBlur}>
-                        <View style={[styles.iosCapsule, { backgroundColor: C.glassMaterial, borderColor: C.glassBorder }]}>
-                            <LinearGradient colors={['transparent', C.glassSpecular, 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.iosSpecular} />
-                            <LinearGradient colors={['rgba(255,255,255,0.05)', 'transparent', 'rgba(0,0,0,0.03)']} style={[StyleSheet.absoluteFill, { borderRadius: CAPSULE_RADIUS }]} />
-                            {children}
-                        </View>
-                    </BlurView>
-                </View>
-            </View>
-        );
-    }
+// ─── TAB BAR CONTAINER — clay capsule ───────────────
+function TabBarContainer({ C, children }: { C: ClayColors; children: React.ReactNode }) {
+    const isIOS = Platform.OS === 'ios';
     return (
         <View style={styles.barWrapper} pointerEvents="box-none">
             <LinearGradient colors={['transparent', C.bg]} style={styles.fadeOverlay} pointerEvents="none" />
-            <View style={styles.androidBarShadow}>
-                <View style={[styles.androidBar, { backgroundColor: C.surface, borderColor: C.border }]}>
-                    <View style={[styles.androidTopLine, { backgroundColor: C.thinSeparator }]} />
+            <View style={styles.capsuleOuter}>
+                {/* iOS rim-light layer */}
+                {isIOS && (
+                    <View style={[StyleSheet.absoluteFillObject, {
+                        borderRadius: CAPSULE_RADIUS,
+                        backgroundColor: C.cLo,
+                        shadowColor: C.lightShadow.color,
+                        shadowOffset: { width: -3, height: -4 },
+                        shadowOpacity: C.lightShadow.opacity,
+                        shadowRadius: 10,
+                    }]} />
+                )}
+                {/* depth shadow layer */}
+                <View style={[StyleSheet.absoluteFillObject, {
+                    borderRadius: CAPSULE_RADIUS,
+                    backgroundColor: C.cLo,
+                    ...Platform.select({
+                        ios: {
+                            shadowColor: C.darkShadow.color,
+                            shadowOffset: { width: 0, height: 6 },
+                            shadowOpacity: C.darkShadow.opacity,
+                            shadowRadius: 16,
+                        },
+                        android: { elevation: 16 },
+                    }),
+                }]} />
+                {/* gradient face */}
+                <LinearGradient
+                    colors={[C.cHi, C.cLo]}
+                    start={{ x: 0.1, y: 0 }}
+                    end={{ x: 0.9, y: 1 }}
+                    style={[styles.capsuleFace, { borderColor: C.hair }]}
+                >
                     {children}
-                </View>
+                </LinearGradient>
             </View>
         </View>
     );
@@ -159,7 +166,7 @@ function FloatingTabBar({ state, navigation, C, text }: any) {
 // ─── LAYOUT EXPORT ──────────────────────────────────
 export default function TabLayout() {
     const text = useText();
-    const C = useColors();
+    const C = useClay();
     return (
         <Tabs
             screenOptions={{ headerShown: false }}
@@ -180,45 +187,17 @@ const styles = StyleSheet.create({
         position: 'absolute', bottom: 0, left: 0, right: 0,
         height: 130, justifyContent: 'flex-end', alignItems: 'stretch',
     },
-    fadeOverlay: {
-        position: 'absolute', top: 0, left: 0, right: 0, height: 50,
-    },
-    iosCapsuleShadow: {
-        marginHorizontal: CAPSULE_INSET, marginBottom: 30,
-        shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.5, shadowRadius: 20,
-    },
-    iosCapsuleBlur: { borderRadius: CAPSULE_RADIUS, overflow: 'hidden' },
-    iosCapsule: {
+    fadeOverlay: { position: 'absolute', top: 0, left: 0, right: 0, height: 50 },
+    capsuleOuter: { marginHorizontal: CAPSULE_INSET, marginBottom: 28, borderRadius: CAPSULE_RADIUS },
+    capsuleFace: {
         flexDirection: 'row', alignItems: 'center', height: TAB_BAR_H,
-        borderRadius: CAPSULE_RADIUS, borderWidth: 0.5, paddingHorizontal: 4,
-    },
-    iosSpecular: { position: 'absolute', top: 0, left: 30, right: 30, height: 0.5 },
-    androidBarShadow: {
-        marginHorizontal: CAPSULE_INSET, marginBottom: 16, elevation: 16, borderRadius: CAPSULE_RADIUS,
-    },
-    androidBar: {
-        flexDirection: 'row', alignItems: 'center', height: TAB_BAR_H,
-        borderRadius: CAPSULE_RADIUS, borderWidth: 1, paddingHorizontal: 4, overflow: 'hidden',
-    },
-    androidTopLine: {
-        position: 'absolute', top: 0, left: 20, right: 20, height: 1, backgroundColor: 'rgba(255,255,255,0.06)',
+        borderRadius: CAPSULE_RADIUS, borderWidth: 1, paddingHorizontal: 6,
     },
     tabSlot: { flex: 1, alignItems: 'center', justifyContent: 'center', height: TAB_BAR_H },
-    tabContent: {
-        alignItems: 'center', justifyContent: 'center', position: 'relative', paddingVertical: 6, paddingHorizontal: 8,
-    },
+    tabContent: { alignItems: 'center', justifyContent: 'center', position: 'relative', paddingVertical: 6, paddingHorizontal: 8 },
     activeBlob: { ...StyleSheet.absoluteFillObject, borderRadius: 14 },
-    activePill: { ...StyleSheet.absoluteFillObject, borderRadius: 14 },
-    tabLabel: { fontSize: 10, fontWeight: '600', marginTop: 2, letterSpacing: 0.2 },
-    tabLabelAndroid: { fontSize: 11, fontWeight: '500', marginTop: 3 },
-    centerBtn: {
-        width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
-        ...Platform.select({
-            ios: { shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 14 },
-            android: { elevation: 8 },
-        }),
-    },
-    centerSpecular: {
-        position: 'absolute', top: 0, left: 4, right: 4, height: 22, borderTopLeftRadius: 22, borderTopRightRadius: 22,
-    },
+    tabLabel: { fontSize: 10, fontWeight: '800', marginTop: 2, letterSpacing: 0.1 },
+    centerWrap: { marginTop: -22 },
+    centerBtn: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+    centerSpecular: { position: 'absolute', top: 0, left: 4, right: 4, height: 26, borderTopLeftRadius: 26, borderTopRightRadius: 26 },
 });

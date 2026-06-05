@@ -5,7 +5,16 @@
       "Read(//c/Users/nemci/Downloads/**)",
       "Bash(python -c ' *)",
       "PowerShell(Invoke-Item *)",
-      "Read(//c/Claude-memory/**)"
+      "Read(//c/Claude-memory/**)",
+      "Bash(npx tsc *)",
+      "Bash(npx expo *)",
+      "Bash(npm install *)",
+      "Bash(node -e \"const m=require\\('@expo-google-fonts/manrope'\\); console.log\\(Object.keys\\(m\\).filter\\(k=>k.startsWith\\('Manrope'\\)\\)\\)\")",
+      "Bash(node -e \"try{console.log\\(require\\('expo-font/package.json'\\).version\\)}catch\\(e\\){console.log\\('NOT FOUND:',e.message\\)}\")",
+      "Bash(grep -E \"job/\\\\[id\\\\]|job\\\\\\\\\\\\\\\\\\\\[id\\\\]\")",
+      "Bash(node *)",
+      "Bash(grep -iE \"^\\(euro|zap|shield|check|star\\)\\\\.js$\")",
+      "Bash(grep -iE \"login|welcome|app.index|app/index|app\\\\\\\\\\\\\\\\index\")"
     ]
   }
 }

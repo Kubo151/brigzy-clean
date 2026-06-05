@@ -10,30 +10,31 @@ import CountryPicker, { Country, CountryCode } from 'react-native-country-picker
 import { AsYouType } from 'libphonenumber-js';
 import useAppStore from '../lib/state/app-store';
 import type { User } from '../lib/types';
-import { useColors } from '@/lib/useColors';
-import type { AppColors } from '@/lib/useColors';
+import { useClay } from '@/lib/useClay';
+import type { ClayColors } from '@/lib/useClay';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import {
-    Mail, Lock, UserCircle, Phone, ChevronDown, AtSign, Eye, EyeOff,
+    Mail, Lock, UserCircle, Phone, ChevronDown, AtSign, Eye, EyeOff, Zap,
 } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
+import { ClaySurface, ClayInset } from '@/components/clay';
 
 type LoginMethod = 'email' | 'phone' | 'username';
 
-// ── Reusable input field ──
+// ── Reusable input field (clay inset) ──
 function InputField({ icon: Icon, placeholder, value, onChangeText, secure, keyboard, editable = true, C, loading }: {
     icon: any; placeholder: string; value: string; onChangeText: (t: string) => void;
-    secure?: boolean; keyboard?: string; editable?: boolean; C: AppColors; loading: boolean;
+    secure?: boolean; keyboard?: string; editable?: boolean; C: ClayColors; loading: boolean;
 }) {
     const [showPassword, setShowPassword] = useState(false);
     return (
-        <View style={[styles.inputRow, { backgroundColor: C.surface, borderColor: C.separator }]}>
-            <Icon size={18} color={C.tertiaryLabel} strokeWidth={1.8} />
+        <ClayInset radius={15} contentStyle={styles.inputRow}>
+            <Icon size={18} color={C.muted} strokeWidth={1.9} />
             <TextInput
                 style={[styles.input, { color: C.text }]}
                 placeholder={placeholder}
-                placeholderTextColor={C.tertiaryLabel}
+                placeholderTextColor={C.muted}
                 value={value}
                 onChangeText={onChangeText}
                 secureTextEntry={secure && !showPassword}
@@ -44,18 +45,18 @@ function InputField({ icon: Icon, placeholder, value, onChangeText, secure, keyb
             {secure && (
                 <Pressable onPress={() => setShowPassword(!showPassword)} hitSlop={8}>
                     {showPassword
-                        ? <EyeOff size={18} color={C.tertiaryLabel} strokeWidth={1.8} />
-                        : <Eye size={18} color={C.tertiaryLabel} strokeWidth={1.8} />
+                        ? <EyeOff size={18} color={C.muted} strokeWidth={1.9} />
+                        : <Eye size={18} color={C.muted} strokeWidth={1.9} />
                     }
                 </Pressable>
             )}
-        </View>
+        </ClayInset>
     );
 }
 
 // ── Login method tab ──
 function MethodTab({ label, active, onPress, C }: {
-    label: string; active: boolean; onPress: () => void; C: AppColors;
+    label: string; active: boolean; onPress: () => void; C: ClayColors;
 }) {
     return (
         <Pressable
@@ -63,45 +64,52 @@ function MethodTab({ label, active, onPress, C }: {
             style={{
                 flex: 1, alignItems: 'center', paddingVertical: 12,
                 borderBottomWidth: 2.5,
-                borderBottomColor: active ? C.purple : 'transparent',
+                borderBottomColor: active ? C.accent : 'transparent',
             }}
         >
             <Text style={{
-                fontSize: 14, fontWeight: '600',
-                color: active ? C.purple : C.tertiaryLabel,
+                fontSize: 14, fontWeight: '800',
+                color: active ? C.accent : C.muted,
             }}>{label}</Text>
         </Pressable>
     );
 }
 
-// ── Social login button ──
-function SocialButton({ label, iconType, C, onPress }: {
-    label: string; iconType: 'apple' | 'google'; C: AppColors; onPress: () => void;
-}) {
-    const isDark = C.text === '#FFFFFF';
-    const btnBg = isDark ? '#1C1C2E' : '#F2F2F7';
-    const btnBorder = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)';
-    const txtColor = isDark ? '#FFFFFF' : '#000000';
-
+// ── Brand logo (clay accent square) ──
+function BrandLogo({ C }: { C: ClayColors }) {
     return (
-        <Pressable
-            onPress={onPress}
-            style={{
-                height: 54,
-                borderRadius: 14,
-                borderWidth: 1,
-                backgroundColor: btnBg,
-                borderColor: btnBorder,
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}
-        >
-            <View style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 12,
-            }}>
+        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.logo}>
+            <LinearGradient colors={['rgba(255,255,255,0.4)', 'transparent']} style={styles.logoSpecular} />
+            <Zap size={30} color={C.onAccent} fill={C.onAccent} strokeWidth={0} />
+        </LinearGradient>
+    );
+}
+
+// ── Submit button (accent gradient + sheen, loading aware) ──
+function SubmitButton({ label, onPress, loading, C }: {
+    label: string; onPress: () => void; loading: boolean; C: ClayColors;
+}) {
+    return (
+        <Pressable onPress={onPress} disabled={loading} style={({ pressed }) => [styles.submitBtn, Platform.select({
+            ios: { shadowColor: C.accentShadow.color, shadowOffset: { width: 0, height: 6 }, shadowOpacity: C.accentShadow.opacity, shadowRadius: 14 },
+            android: { elevation: 6 },
+        }), { opacity: loading ? 0.6 : pressed ? 0.9 : 1 }]}>
+            <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.submitGradient}>
+                <LinearGradient colors={['rgba(255,255,255,0.28)', 'transparent']} style={styles.submitSheen} />
+                {loading ? <ActivityIndicator color={C.onAccent} /> : <Text style={[styles.submitText, { color: C.onAccent }]}>{label}</Text>}
+            </LinearGradient>
+        </Pressable>
+    );
+}
+
+// ── Social login button (clay ghost) ──
+function SocialButton({ label, iconType, C, onPress }: {
+    label: string; iconType: 'apple' | 'google'; C: ClayColors; onPress: () => void;
+}) {
+    const txtColor = C.text;
+    return (
+        <Pressable onPress={onPress} style={({ pressed }) => [pressed && { opacity: 0.85, transform: [{ scale: 0.99 }] }]}>
+            <ClaySurface radius={16} contentStyle={styles.socialBtn}>
                 {iconType === 'apple' ? (
                     <Svg width={18} height={22} viewBox="0 0 384 512" fill={txtColor}>
                         <Path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5c0 26.2 4.8 53.3 14.4 81.2 12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
@@ -114,14 +122,14 @@ function SocialButton({ label, iconType, C, onPress }: {
                         <Path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.2-2.7-.4-3.9z" />
                     </Svg>
                 )}
-                <Text style={{ fontSize: 16, fontWeight: '600', color: txtColor }}>{label}</Text>
-            </View>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: txtColor }}>{label}</Text>
+            </ClaySurface>
         </Pressable>
     );
 }
 
 export default function Login() {
-    const C = useColors();
+    const C = useClay();
     const router = useRouter();
     const setCurrentUser = useAppStore((s) => s.setCurrentUser);
     const setAuthenticated = useAppStore((s) => s.setAuthenticated);
@@ -227,7 +235,6 @@ export default function Login() {
         if (!username || !password) { Alert.alert('Chyba', 'Vyplňte používateľské meno a heslo'); return; }
         setLoading(true);
         try {
-            // Lookup email by display_name
             const { data: userRow, error: lookupErr } = await supabase
                 .from('users').select('email').eq('display_name', username).single();
             if (lookupErr || !userRow) throw new Error('Nesprávne prihlasovacie údaje');
@@ -351,17 +358,20 @@ export default function Login() {
         } finally { setLoading(false); }
     };
 
+    const countryTheme = {
+        backgroundColor: C.cLo, onBackgroundTextColor: C.text, fontSize: 15,
+        filterPlaceholderTextColor: C.muted, activeOpacity: 0.7,
+    };
+
     // ══════════ SIGN UP ══════════
     if (isSignUp) {
         return (
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.flex, { backgroundColor: C.bg }]}>
                 <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
                     <View style={styles.brandWrap}>
-                        <LinearGradient colors={[C.purpleDim, 'transparent']} style={styles.brandCircle}>
-                            <Text style={styles.brandLetter}>B</Text>
-                        </LinearGradient>
-                        <Text style={[styles.brandName, { color: C.purple }]}>Brigzy</Text>
-                        <Text style={[styles.brandSub, { color: C.secondaryLabel }]}>Vytvorte si účet</Text>
+                        <BrandLogo C={C} />
+                        <Text style={[styles.brandName, { color: C.text }]}>Brigzy</Text>
+                        <Text style={[styles.brandSub, { color: C.muted }]}>Vytvorte si účet</Text>
                     </View>
 
                     <View style={styles.formGroup}>
@@ -372,23 +382,19 @@ export default function Login() {
                         <InputField icon={Lock} placeholder="Heslo" value={password} onChangeText={setPassword} secure C={C} loading={loading} />
 
                         <Text style={[styles.phoneLabel, { color: C.text }]}>Telefónne číslo</Text>
-                        <View style={[styles.phoneRow, { backgroundColor: C.surface, borderColor: C.separator }]}>
-                            <Pressable onPress={() => setCountryPickerVisible(true)} style={[styles.countryBtn, { borderRightColor: C.separator }]}>
-                                <CountryPicker countryCode={countryCode} withFlag withCallingCode withEmoji onSelect={handleCountrySelect} visible={countryPickerVisible} onClose={() => setCountryPickerVisible(false)} theme={{ backgroundColor: C.surface, onBackgroundTextColor: C.text, fontSize: 15, filterPlaceholderTextColor: C.tertiaryLabel as string, activeOpacity: 0.7 }} />
+                        <ClayInset radius={15} contentStyle={styles.phoneRow}>
+                            <Pressable onPress={() => setCountryPickerVisible(true)} style={[styles.countryBtn, { borderRightColor: C.hair }]}>
+                                <CountryPicker countryCode={countryCode} withFlag withCallingCode withEmoji onSelect={handleCountrySelect} visible={countryPickerVisible} onClose={() => setCountryPickerVisible(false)} theme={countryTheme} />
                                 <Text style={[styles.callingCode, { color: C.text }]}>+{callingCode}</Text>
-                                <ChevronDown size={14} color={C.tertiaryLabel} />
+                                <ChevronDown size={14} color={C.muted} />
                             </Pressable>
-                            <TextInput style={[styles.phoneInput, { color: C.text }]} placeholder="XXX XXX XXX" placeholderTextColor={C.tertiaryLabel} value={phoneNumber} onChangeText={formatPhoneNumber} keyboardType="phone-pad" editable={!loading} />
-                        </View>
+                            <TextInput style={[styles.phoneInput, { color: C.text }]} placeholder="XXX XXX XXX" placeholderTextColor={C.muted} value={phoneNumber} onChangeText={formatPhoneNumber} keyboardType="phone-pad" editable={!loading} />
+                        </ClayInset>
 
-                        <Pressable onPress={handleSignUp} disabled={loading} style={({ pressed }) => [styles.submitBtn, { opacity: loading ? 0.5 : pressed ? 0.85 : 1 }]}>
-                            <LinearGradient colors={['#9333EA', '#7C3AED', '#6D28D9']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.submitGradient}>
-                                {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.submitText}>Registrovať</Text>}
-                            </LinearGradient>
-                        </Pressable>
+                        <SubmitButton label="Registrovať" onPress={handleSignUp} loading={loading} C={C} />
 
                         <Pressable onPress={() => setIsSignUp(false)} disabled={loading}>
-                            <Text style={[styles.switchText, { color: C.purple }]}>Už máte účet? Prihláste sa</Text>
+                            <Text style={[styles.switchText, { color: C.accent }]}>Už máte účet? Prihláste sa</Text>
                         </Pressable>
                     </View>
                 </ScrollView>
@@ -402,15 +408,13 @@ export default function Login() {
             <ScrollView contentContainerStyle={styles.loginScroll} keyboardShouldPersistTaps="handled">
                 {/* Brand */}
                 <View style={styles.brandWrap}>
-                    <LinearGradient colors={[C.purpleDim, 'transparent']} style={styles.brandCircle}>
-                        <Text style={styles.brandLetter}>B</Text>
-                    </LinearGradient>
-                    <Text style={[styles.brandName, { color: C.purple }]}>Brigzy</Text>
-                    <Text style={[styles.brandSub, { color: C.secondaryLabel }]}>Nájdi prácu. Zarábaj.</Text>
+                    <BrandLogo C={C} />
+                    <Text style={[styles.brandName, { color: C.text }]}>Brigzy</Text>
+                    <Text style={[styles.brandSub, { color: C.muted }]}>Nájdi prácu. Zarábaj.</Text>
                 </View>
 
                 {/* Method tabs */}
-                <View style={[styles.methodRow, { borderBottomColor: C.separator }]}>
+                <View style={[styles.methodRow, { borderBottomColor: C.hair }]}>
                     <MethodTab label="Email" active={loginMethod === 'email'} onPress={() => { setLoginMethod('email'); setOtpSent(false); }} C={C} />
                     <MethodTab label="Používateľ" active={loginMethod === 'username'} onPress={() => { setLoginMethod('username'); setOtpSent(false); }} C={C} />
                     <MethodTab label="Telefón" active={loginMethod === 'phone'} onPress={() => { setLoginMethod('phone'); setOtpSent(false); }} C={C} />
@@ -423,7 +427,7 @@ export default function Login() {
                             <InputField icon={Mail} placeholder="Email" value={email} onChangeText={setEmail} keyboard="email-address" C={C} loading={loading} />
                             <InputField icon={Lock} placeholder="Heslo" value={password} onChangeText={setPassword} secure C={C} loading={loading} />
                             <Pressable onPress={handleForgotPassword} disabled={loading} style={{ alignSelf: 'flex-end', marginTop: -6 }}>
-                                <Text style={{ fontSize: 13, fontWeight: '600', color: C.purple }}>Zabudli ste heslo?</Text>
+                                <Text style={{ fontSize: 13, fontWeight: '700', color: C.accent }}>Zabudli ste heslo?</Text>
                             </Pressable>
                         </>
                     )}
@@ -437,14 +441,14 @@ export default function Login() {
 
                     {loginMethod === 'phone' && (
                         <>
-                            <View style={[styles.phoneRow, { backgroundColor: C.surface, borderColor: C.separator }]}>
-                                <Pressable onPress={() => setCountryPickerVisible(true)} style={[styles.countryBtn, { borderRightColor: C.separator }]}>
-                                    <CountryPicker countryCode={countryCode} withFlag withCallingCode withEmoji onSelect={handleCountrySelect} visible={countryPickerVisible} onClose={() => setCountryPickerVisible(false)} theme={{ backgroundColor: C.surface, onBackgroundTextColor: C.text, fontSize: 15, filterPlaceholderTextColor: C.tertiaryLabel as string, activeOpacity: 0.7 }} />
+                            <ClayInset radius={15} contentStyle={styles.phoneRow}>
+                                <Pressable onPress={() => setCountryPickerVisible(true)} style={[styles.countryBtn, { borderRightColor: C.hair }]}>
+                                    <CountryPicker countryCode={countryCode} withFlag withCallingCode withEmoji onSelect={handleCountrySelect} visible={countryPickerVisible} onClose={() => setCountryPickerVisible(false)} theme={countryTheme} />
                                     <Text style={[styles.callingCode, { color: C.text }]}>+{callingCode}</Text>
-                                    <ChevronDown size={14} color={C.tertiaryLabel} />
+                                    <ChevronDown size={14} color={C.muted} />
                                 </Pressable>
-                                <TextInput style={[styles.phoneInput, { color: C.text }]} placeholder="XXX XXX XXX" placeholderTextColor={C.tertiaryLabel} value={phoneNumber} onChangeText={formatPhoneNumber} keyboardType="phone-pad" editable={!loading && !otpSent} />
-                            </View>
+                                <TextInput style={[styles.phoneInput, { color: C.text }]} placeholder="XXX XXX XXX" placeholderTextColor={C.muted} value={phoneNumber} onChangeText={formatPhoneNumber} keyboardType="phone-pad" editable={!loading && !otpSent} />
+                            </ClayInset>
                             {otpSent && (
                                 <InputField icon={Lock} placeholder="Overovací kód z SMS" value={otp} onChangeText={setOtp} keyboard="number-pad" C={C} loading={loading} />
                             )}
@@ -452,21 +456,18 @@ export default function Login() {
                     )}
 
                     {/* Submit */}
-                    <Pressable onPress={handleLogin} disabled={loading} style={({ pressed }) => [styles.submitBtn, { opacity: loading ? 0.5 : pressed ? 0.85 : 1 }]}>
-                        <LinearGradient colors={['#9333EA', '#7C3AED', '#6D28D9']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.submitGradient}>
-                            {loading ? <ActivityIndicator color="#FFF" /> : (
-                                <Text style={styles.submitText}>
-                                    {loginMethod === 'phone' && !otpSent ? 'Odoslať kód' : 'Prihlásiť sa'}
-                                </Text>
-                            )}
-                        </LinearGradient>
-                    </Pressable>
+                    <SubmitButton
+                        label={loginMethod === 'phone' && !otpSent ? 'Odoslať kód' : 'Prihlásiť sa'}
+                        onPress={handleLogin}
+                        loading={loading}
+                        C={C}
+                    />
 
                     {/* Switch to register */}
                     <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 4, marginTop: 4 }}>
-                        <Text style={{ fontSize: 14, color: C.secondaryLabel }}>Nemáte účet?</Text>
+                        <Text style={{ fontSize: 14, color: C.muted, fontWeight: '600' }}>Nemáte účet?</Text>
                         <Pressable onPress={() => setIsSignUp(true)} disabled={loading}>
-                            <Text style={{ fontSize: 14, fontWeight: '700', color: C.purple }}>Registrujte sa</Text>
+                            <Text style={{ fontSize: 14, fontWeight: '800', color: C.accent }}>Registrujte sa</Text>
                         </Pressable>
                     </View>
 
@@ -475,7 +476,7 @@ export default function Login() {
                             onPress={() => { setOtpSent(false); setOtp(''); handlePhoneSendOtp(); }}
                             disabled={otpCooldown > 0}
                         >
-                            <Text style={[styles.switchText, { color: otpCooldown > 0 ? C.tertiaryLabel : C.purple }]}>
+                            <Text style={[styles.switchText, { color: otpCooldown > 0 ? C.muted : C.accent }]}>
                                 {otpCooldown > 0 ? `Odoslať znova za ${otpCooldown}s` : 'Odoslať kód znova'}
                             </Text>
                         </Pressable>
@@ -484,9 +485,9 @@ export default function Login() {
 
                 {/* Divider */}
                 <View style={styles.dividerRow}>
-                    <View style={[styles.dividerLine, { backgroundColor: C.separator }]} />
-                    <Text style={[styles.dividerText, { color: C.tertiaryLabel }]}>alebo</Text>
-                    <View style={[styles.dividerLine, { backgroundColor: C.separator }]} />
+                    <View style={[styles.dividerLine, { backgroundColor: C.hair }]} />
+                    <Text style={[styles.dividerText, { color: C.muted }]}>alebo</Text>
+                    <View style={[styles.dividerLine, { backgroundColor: C.hair }]} />
                 </View>
 
                 {/* Social logins */}
@@ -496,10 +497,10 @@ export default function Login() {
                 </View>
 
                 {/* Terms */}
-                <Text style={{ fontSize: 12, color: C.tertiaryLabel, textAlign: 'center', marginTop: 16, lineHeight: 18 }}>
+                <Text style={{ fontSize: 12, color: C.muted, textAlign: 'center', marginTop: 16, lineHeight: 18 }}>
                     By continuing, you agree to our{' '}
-                    <Text style={{ color: C.purple, fontWeight: '500' }} onPress={() => Linking.openURL('https://brigzy.sk/terms')}>Terms</Text> and{' '}
-                    <Text style={{ color: C.purple, fontWeight: '500' }} onPress={() => Linking.openURL('https://brigzy.sk/privacy')}>Privacy Policy</Text>
+                    <Text style={{ color: C.accent, fontWeight: '700' }} onPress={() => Linking.openURL('https://brigzy.sk/terms')}>Terms</Text> and{' '}
+                    <Text style={{ color: C.accent, fontWeight: '700' }} onPress={() => Linking.openURL('https://brigzy.sk/privacy')}>Privacy Policy</Text>
                 </Text>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -513,56 +514,41 @@ const styles = StyleSheet.create({
 
     // Brand
     brandWrap: { alignItems: 'center', marginBottom: 36 },
-    brandCircle: {
-        width: 80, height: 80, borderRadius: 24,
-        alignItems: 'center', justifyContent: 'center', marginBottom: 16,
-    },
-    brandLetter: { fontSize: 36, fontWeight: '800', color: '#7C3AED' },
-    brandName: { fontSize: 42, fontWeight: '800', letterSpacing: 0.5, marginBottom: 6 },
-    brandSub: { fontSize: 17 },
+    logo: { width: 68, height: 68, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginBottom: 16, overflow: 'hidden' },
+    logoSpecular: { position: 'absolute', top: 0, left: 0, right: 0, height: 34 },
+    brandName: { fontSize: 40, fontWeight: '800', letterSpacing: -0.5, marginBottom: 6 },
+    brandSub: { fontSize: 16, fontWeight: '600' },
 
     // Method tabs
-    methodRow: {
-        flexDirection: 'row', marginBottom: 24,
-        borderBottomWidth: 0.5,
-    },
+    methodRow: { flexDirection: 'row', marginBottom: 24, borderBottomWidth: 1 },
 
     // Form
     formGroup: { gap: 14 },
-    inputRow: {
-        flexDirection: 'row', alignItems: 'center',
-        borderRadius: 14, borderWidth: StyleSheet.hairlineWidth,
-        paddingHorizontal: 14, paddingVertical: 14, gap: 10,
-    },
-    input: { flex: 1, fontSize: 16 },
+    inputRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 14, gap: 10 },
+    input: { flex: 1, fontSize: 16, fontWeight: '500' },
 
     // Phone
-    phoneLabel: { fontSize: 13, fontWeight: '600', marginBottom: -6, marginLeft: 4 },
-    phoneRow: {
-        flexDirection: 'row', borderRadius: 14,
-        borderWidth: StyleSheet.hairlineWidth, overflow: 'hidden',
-    },
-    countryBtn: {
-        flexDirection: 'row', alignItems: 'center',
-        paddingHorizontal: 14, paddingVertical: 14,
-        borderRightWidth: StyleSheet.hairlineWidth, gap: 6,
-    },
-    callingCode: { fontSize: 15, fontWeight: '500' },
-    phoneInput: { flex: 1, paddingHorizontal: 14, fontSize: 16 },
+    phoneLabel: { fontSize: 13, fontWeight: '700', marginBottom: -6, marginLeft: 4 },
+    phoneRow: { flexDirection: 'row', alignItems: 'center' },
+    countryBtn: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 14, borderRightWidth: 1, gap: 6 },
+    callingCode: { fontSize: 15, fontWeight: '600' },
+    phoneInput: { flex: 1, paddingHorizontal: 14, fontSize: 16, fontWeight: '500' },
 
     // Submit
-    submitBtn: { borderRadius: 16, overflow: 'hidden', marginTop: 4 },
-    submitGradient: { paddingVertical: 17, alignItems: 'center', borderRadius: 16 },
-    submitText: { color: '#FFF', fontSize: 17, fontWeight: '700' },
+    submitBtn: { borderRadius: 18, overflow: 'hidden', marginTop: 4 },
+    submitGradient: { paddingVertical: 17, alignItems: 'center', borderRadius: 18, overflow: 'hidden' },
+    submitSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '50%' },
+    submitText: { fontSize: 16, fontWeight: '800' },
 
     // Divider
     dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 24, gap: 14 },
-    dividerLine: { flex: 1, height: StyleSheet.hairlineWidth },
-    dividerText: { fontSize: 13, fontWeight: '500' },
+    dividerLine: { flex: 1, height: 1 },
+    dividerText: { fontSize: 13, fontWeight: '600' },
 
     // Social
     socialGroup: { gap: 12, marginBottom: 8 },
+    socialBtn: { height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, borderRadius: 16 },
 
     // Switch
-    switchText: { textAlign: 'center', fontSize: 14, fontWeight: '600', marginTop: 4 },
+    switchText: { textAlign: 'center', fontSize: 14, fontWeight: '700', marginTop: 4 },
 });

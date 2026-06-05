@@ -23,7 +23,8 @@
           "locationAlwaysAndWhenInUsePermission": "Brigzy potrebuje prístup k polohe na zobrazenie pracovných pozícií v okolí.",
           "locationWhenInUsePermission": "Brigzy potrebuje prístup k polohe na zobrazenie pracovných pozícií v okolí."
         }
-      ]
+      ],
+      "expo-font"
     ]
   }
 }
