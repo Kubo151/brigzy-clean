@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brigzy.sk — Claymorphism mockups v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--font:'Manrope',-apple-system,system-ui,'Segoe UI',sans-serif;}
+  *{box-sizing:border-box;margin:0;padding:0;font-family:var(--font);-webkit-font-smoothing:antialiased;}
+  body{background:radial-gradient(1200px 620px at 50% -12%,#1b1b29,#0b0b11 62%);color:#e9e9f0;
+       padding:28px 16px 90px;min-height:100vh;}
+  header.top{max-width:1320px;margin:0 auto;}
+  h1{font-size:22px;font-weight:800;letter-spacing:-.6px;}
+  .sub{color:#9a9ab0;font-size:13px;margin-top:6px;line-height:1.6;}
+  .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:22px auto 0;max-width:1320px;}
+  .tab{display:flex;align-items:center;gap:9px;padding:11px 18px;border-radius:14px;border:1px solid #28283a;
+       background:#14141e;color:#d2d2e2;cursor:pointer;font-weight:700;font-size:13px;transition:.15s;letter-spacing:.2px;}
+  .tab:hover{border-color:#3a3a52;}
+  .tab.active{background:linear-gradient(160deg,#9863F2,#7C3AED);border-color:#7C3AED;color:#fff;box-shadow:0 10px 26px rgba(124,58,237,.42);}
+  .swatch{width:13px;height:13px;border-radius:5px;}
+  .palnote{max-width:1320px;margin:16px auto 24px;color:#8a8aa0;font-size:13px;line-height:1.55;}
+  .stage{display:none;} .stage.active{display:block;}
+  .grid{display:flex;gap:38px;flex-wrap:wrap;justify-content:center;max-width:1400px;margin:0 auto;}
+  .col{display:flex;flex-direction:column;align-items:center;gap:12px;}
+  .label{font-size:11.5px;color:#9a9ab0;font-weight:700;letter-spacing:.3px;text-transform:uppercase;}
+
+  .ic{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .ic.fill{fill:currentColor;stroke:none;}
+  .s14{width:14px;height:14px;}.s16{width:16px;height:16px;}.s18{width:18px;height:18px;}.s22{width:22px;height:22px;}.s24{width:24px;height:24px;}.s26{width:26px;height:26px;}.s30{width:30px;height:30px;}
+
+  /* PHONE */
+  .phone{width:298px;height:624px;border-radius:54px;padding:9px;position:relative;
+         background:linear-gradient(155deg,#43434f,#17171f);
+         box-shadow:0 36px 84px rgba(0,0,0,.62),inset 0 0 0 2px rgba(0,0,0,.55),inset 0 2px 3px rgba(255,255,255,.13);}
+  .screen{width:100%;height:100%;border-radius:46px;overflow:hidden;position:relative;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
+  .screen::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.022;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+  .island{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:86px;height:23px;background:#000;border-radius:13px;z-index:40;}
+  .sb{display:flex;justify-content:space-between;align-items:center;padding:15px 24px 2px;font-size:12.5px;font-weight:700;color:var(--text);}
+  .body{flex:1;overflow:hidden;padding:10px 17px 0;display:flex;flex-direction:column;gap:13px;position:relative;z-index:2;}
+  .scrollfade{position:absolute;bottom:66px;left:0;right:0;height:46px;background:linear-gradient(transparent,var(--bg));pointer-events:none;z-index:5;}
+
+  /* CLAY — premium soft-UI: lighter dual shadow + hairline rim light */
+  .clay{background:linear-gradient(145deg,var(--cHi),var(--cLo));border-radius:22px;border:1px solid var(--hair);
+        box-shadow:7px 7px 16px var(--sd),-5px -5px 12px var(--sl);}
+  .clay-sm{background:linear-gradient(145deg,var(--cHi),var(--cLo));border-radius:16px;border:1px solid var(--hair);
+        box-shadow:5px 5px 12px var(--sd),-4px -4px 9px var(--sl);}
+  .inset{box-shadow:inset 4px 4px 9px var(--sd),inset -4px -4px 9px var(--sl);background:var(--cLo);border:1px solid var(--hairIn);}
+  .pill{display:flex;align-items:center;gap:6px;padding:9px 13px;border-radius:13px;background:linear-gradient(145deg,var(--cHi),var(--cLo));
+        font-size:12px;font-weight:700;color:var(--text);border:1px solid var(--hair);box-shadow:4px 4px 9px var(--sd),-3px -3px 7px var(--sl);white-space:nowrap;}
+  .pill.on{background:linear-gradient(160deg,var(--accent2),var(--accent));color:var(--onAccent);border-color:transparent;box-shadow:4px 5px 12px var(--accentSd);}
+  .pill.icononly{padding:9px;}
+  .btn{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;padding:15px;border-radius:18px;
+       background:linear-gradient(160deg,var(--accent2),var(--accent));color:var(--onAccent);font-weight:800;font-size:15px;letter-spacing:-.2px;
+       box-shadow:6px 8px 18px var(--accentSd),-3px -3px 9px var(--sl);overflow:hidden;}
+  .btn::before{content:"";position:absolute;inset:0 0 auto 0;height:50%;background:linear-gradient(rgba(255,255,255,.25),transparent);}
+  .btn-ghost{display:flex;align-items:center;justify-content:center;gap:8px;padding:15px;border-radius:18px;background:linear-gradient(145deg,var(--cHi),var(--cLo));
+       color:var(--text);font-weight:800;font-size:15px;border:1px solid var(--hair);box-shadow:5px 5px 12px var(--sd),-4px -4px 9px var(--sl);}
+  .row{display:flex;align-items:center;gap:10px;}.between{justify-content:space-between;}.col2{display:flex;flex-direction:column;}.wrap{flex-wrap:wrap;}
+  .muted{color:var(--muted);}.h{font-weight:800;letter-spacing:-.4px;}.sb7{font-weight:700;}
+  .sec{font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);}
+  .icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--accent);
+        background:var(--accentDim);box-shadow:inset 3px 3px 6px var(--sd),inset -3px -3px 6px var(--sl);}
+  .avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);
+          background:var(--accentDim);border:1px solid var(--hair);box-shadow:4px 4px 9px var(--sd),-3px -3px 7px var(--sl);}
+  .tag-sos{display:flex;align-items:center;gap:5px;background:linear-gradient(160deg,#FF6B5E,#FF3B30);color:#fff;padding:5px 9px;border-radius:10px;
+           font-size:10px;font-weight:800;letter-spacing:.3px;box-shadow:3px 5px 12px rgba(255,59,48,.42);}
+  .chip-pay{background:linear-gradient(160deg,var(--accent2),var(--accent));color:var(--onAccent);padding:7px 12px;border-radius:12px;font-weight:800;font-size:13px;box-shadow:4px 5px 12px var(--accentSd);}
+  .verified{display:inline-flex;color:#2EA8FF;}
+  .stars{color:#FFB300;display:flex;gap:1px;}.stars .ic{stroke:none;fill:#FFB300;}
+  .divider{height:1px;background:var(--sd);opacity:.5;}
+  .b15{font-size:15px;}.b14{font-size:14px;}.b13{font-size:13px;}.b12{font-size:12px;}.tiny{font-size:10.5px;}
+  .mt2{margin-top:2px;}.mt6{margin-top:6px;}.mt10{margin-top:10px;}.mt14{margin-top:14px;}.mtA{margin-top:auto;}.lh{line-height:1.55;}
+  .bar{height:11px;border-radius:7px;background:var(--cLo);border:1px solid var(--hairIn);box-shadow:inset 3px 3px 6px var(--sd),inset -2px -2px 5px var(--sl);overflow:hidden;}
+  .fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:7px;}
+  .field{background:var(--cLo);border-radius:14px;padding:12px 14px;border:1px solid var(--hairIn);box-shadow:inset 4px 4px 8px var(--sd),inset -3px -3px 7px var(--sl);}
+  .toggle{width:46px;height:26px;border-radius:14px;background:linear-gradient(160deg,var(--accent2),var(--accent));position:relative;box-shadow:inset 2px 2px 5px rgba(0,0,0,.2);}
+  .toggle::after{content:"";position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:1px 1px 3px rgba(0,0,0,.3);}
+  .badge{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;}
+  .bi{width:46px;height:46px;border-radius:15px;background:var(--accentDim);color:var(--accent);display:flex;align-items:center;justify-content:center;
+      border:1px solid var(--hair);box-shadow:4px 4px 9px var(--sd),-3px -3px 7px var(--sl);}
+  .logo{width:60px;height:60px;border-radius:20px;background:linear-gradient(160deg,var(--accent2),var(--accent));color:var(--onAccent);
+        display:flex;align-items:center;justify-content:center;box-shadow:7px 9px 20px var(--accentSd),inset 0 2px 3px rgba(255,255,255,.4);}
+
+  .tabbar{position:absolute;bottom:0;left:0;right:0;height:66px;background:linear-gradient(145deg,var(--cHi),var(--cLo));border-radius:26px 26px 0 0;
+          display:flex;align-items:center;justify-content:space-around;box-shadow:0 -6px 16px var(--sd);z-index:10;padding:0 16px;border-top:1px solid var(--hair);}
+  .tb{color:var(--muted);opacity:.65;}.tb.on{color:var(--accent);opacity:1;}
+  .tb.center{position:relative;width:52px;height:52px;border-radius:50%;color:var(--onAccent);background:linear-gradient(160deg,var(--accent2),var(--accent));
+             display:flex;align-items:center;justify-content:center;margin-top:-24px;box-shadow:6px 8px 18px var(--accentSd),-3px -3px 8px var(--sl);}
+
+  .map{flex:1;border-radius:22px;position:relative;overflow:hidden;min-height:160px;border:1px solid var(--hair);
+       background:radial-gradient(circle at 28% 26%,var(--mapHi),transparent 55%),radial-gradient(circle at 76% 72%,var(--mapHi),transparent 50%),
+                  repeating-linear-gradient(0deg,var(--mapLine) 0 1px,transparent 1px 38px),repeating-linear-gradient(90deg,var(--mapLine) 0 1px,transparent 1px 38px),var(--mapBg);
+       box-shadow:inset 5px 5px 12px var(--sd),inset -5px -5px 12px var(--sl);}
+  .road{position:absolute;height:7px;border-radius:7px;background:var(--cHi);opacity:.55;}
+  .pin{position:absolute;display:flex;align-items:center;gap:4px;background:linear-gradient(160deg,var(--accent2),var(--accent));color:var(--onAccent);
+       padding:6px 9px;border-radius:12px;font-size:10.5px;font-weight:800;box-shadow:3px 5px 12px var(--accentSd);transform:translate(-50%,-50%);border:2px solid var(--cHi);}
+  .pin.sos{background:linear-gradient(160deg,#FF6B5E,#FF3B30);box-shadow:3px 5px 13px rgba(255,59,48,.5);}
+  .pin::after{content:"";position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--accent);}
+  .pin.sos::after{border-top-color:#FF3B30;}
+
+  .bub{max-width:78%;padding:11px 14px;border-radius:17px;font-size:12.5px;line-height:1.45;}
+  .bub.them{background:linear-gradient(145deg,var(--cHi),var(--cLo));color:var(--text);align-self:flex-start;border-bottom-left-radius:6px;border:1px solid var(--hair);box-shadow:4px 4px 11px var(--sd),-3px -3px 8px var(--sl);}
+  .bub.me{background:linear-gradient(160deg,var(--accent2),var(--accent));color:var(--onAccent);align-self:flex-end;border-bottom-right-radius:6px;box-shadow:4px 5px 12px var(--accentSd);}
+  .checkbox{width:23px;height:23px;border-radius:7px;color:var(--onAccent);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:linear-gradient(160deg,var(--accent2),var(--accent));box-shadow:3px 3px 8px var(--accentSd);}
+  .glow{position:absolute;width:160px;height:160px;border-radius:50%;background:var(--accentGlow);filter:blur(46px);opacity:.65;pointer-events:none;}
+
+  .pal-purple{--bg:#ECE9F5;--cHi:#F8F6FD;--cLo:#ECE9F6;--sd:#C9C3DF;--sl:#FFFFFF;--hair:rgba(255,255,255,.65);--hairIn:rgba(255,255,255,.4);
+    --accent:#7C3AED;--accent2:#9863F2;--accentDim:#E7DEFB;--accentSd:rgba(124,58,237,.28);--accentGlow:rgba(124,58,237,.38);--onAccent:#fff;
+    --text:#2A2440;--muted:#8C86A6;--mapBg:#E1DEF0;--mapLine:rgba(124,58,237,.06);--mapHi:rgba(124,58,237,.11);}
+  .pal-pastel{--bg:#F2EEE7;--cHi:#FDFBF7;--cLo:#F3EFE8;--sd:#E0D5C7;--sl:#FFFFFF;--hair:rgba(255,255,255,.7);--hairIn:rgba(255,255,255,.45);
+    --accent:#D8755A;--accent2:#E89376;--accentDim:#F6DFD4;--accentSd:rgba(216,117,90,.28);--accentGlow:rgba(216,117,90,.3);--onAccent:#fff;
+    --text:#3A322D;--muted:#A0938A;--mapBg:#E8E1D6;--mapLine:rgba(120,95,70,.055);--mapHi:rgba(205,235,217,.5);}
+  .pal-pastel .icon,.pal-pastel .bi{color:#3DA67A;background:#CFEEDC;}
+  .pal-pastel .avatar{color:#8257C7;background:#E4D8F6;}
+  .pal-dark{--bg:#15121E;--cHi:#272234;--cLo:#1D1928;--sd:#0A0810;--sl:#332C46;--hair:rgba(255,255,255,.055);--hairIn:rgba(255,255,255,.03);
+    --accent:#A78BFA;--accent2:#8B6CF0;--accentDim:#2C2540;--accentSd:rgba(167,139,250,.3);--accentGlow:rgba(167,139,250,.42);--onAccent:#17132A;
+    --text:#F1EEFA;--muted:#9A91B4;--mapBg:#1A1626;--mapLine:rgba(167,139,250,.08);--mapHi:rgba(167,139,250,.12);}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Brigzy.sk — Claymorphism mockups <span style="color:#9863F2">v3</span></h1>
+  <div class="sub">10 obrazoviek × 3 palety · jemnejšie premium clay tiene + rim-light · Manrope · SVG ikony · jemný grain.<br>
+  Prepínaj paletu nižšie. Dizajn tokeny prejdú 1:1 do RN komponentového kitu.</div>
+</header>
+<div class="tabs">
+  <div class="tab active" data-p="purple"><span class="swatch" style="background:linear-gradient(160deg,#9863F2,#7C3AED)"></span>Purple Clay</div>
+  <div class="tab" data-p="pastel"><span class="swatch" style="background:linear-gradient(160deg,#E89376,#D8755A)"></span>Soft Pastel</div>
+  <div class="tab" data-p="dark"><span class="swatch" style="background:linear-gradient(160deg,#A78BFA,#8B6CF0)"></span>Dark Clay</div>
+</div>
+<div class="palnote" id="pnote"></div>
+<div id="stages"></div>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+ <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></symbol>
+ <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6 7-11a7 7 0 1 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+ <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-6.5-4.3-9-8.2C1.2 8.9 2.6 5 6.2 5c2.3 0 3.8 1.7 4.8 3 1-1.3 2.5-3 4.8-3 3.6 0 5 3.9 3.2 6.8C18.5 15.7 12 20 12 20z"/></symbol>
+ <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></symbol>
+ <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+ <symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.5A8 8 0 1 1 21 12z"/></symbol>
+ <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+ <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+ <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.4 3-5 6.5-5"/><circle cx="17" cy="9" r="2.5"/><path d="M14.6 15c3.4 0 5.4 1.6 5.4 5"/></symbol>
+ <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></symbol>
+ <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 8-8 11-4.5-3-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></symbol>
+ <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></symbol>
+ <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 9l9-5 9 5"/><path d="M5 9v8M9 9v8M15 9v8M19 9v8"/><path d="M3 21h18"/></symbol>
+ <symbol id="i-in" viewBox="0 0 24 24"><path d="M17 7 7 17"/><path d="M17 17H7V7"/></symbol>
+ <symbol id="i-out" viewBox="0 0 24 24"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></symbol>
+ <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8L6.6 19.6l1-6L3.3 9.4l6-.9z"/></symbol>
+ <symbol id="i-chev" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+ <symbol id="i-chevr" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+ <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></symbol>
+ <symbol id="i-clip" viewBox="0 0 24 24"><path d="M21 11l-9 9a5 5 0 0 1-7-7l9-9a3.4 3.4 0 0 1 5 5l-9 9a1.9 1.9 0 0 1-3-3l8-8"/></symbol>
+ <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></symbol>
+ <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-6M4 11V3M12 21v-8M12 9V3M20 21v-4M20 13V3"/><circle cx="4" cy="13" r="2"/><circle cx="12" cy="7" r="2"/><circle cx="20" cy="15" r="2"/></symbol>
+ <symbol id="i-fork" viewBox="0 0 24 24"><path d="M6 3v6a2 2 0 0 0 4 0V3"/><path d="M8 9v12"/><path d="M16 3c-1.4 0-2.4 2-2.4 5s1 4 2.4 4v9"/></symbol>
+ <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v9"/></symbol>
+ <symbol id="i-sig" viewBox="0 0 24 24"><path d="M3 18c3 0 4-9 6-9s2 6 4 6 2-4 4-4 2 2 4 2"/><path d="M3 21h18"/></symbol>
+ <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/><path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></symbol>
+ <symbol id="i-batt" viewBox="0 0 24 24"><rect x="2" y="8" width="18" height="9" rx="2.5"/><path d="M22 11v3"/><rect x="4" y="10" width="11" height="5" rx="1.2" fill="currentColor" stroke="none"/></symbol>
+ <symbol id="i-cam" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L19 6h0a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.4"/></symbol>
+ <symbol id="i-id" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="2"/><path d="M13 9.5h5M13 13h5M6 15.5c.5-1.5 4-1.5 4.5 0"/></symbol>
+ <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M9 13.5 8 21l4-2 4 2-1-7.5"/></symbol>
+ <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></symbol>
+ <symbol id="i-euro" viewBox="0 0 24 24"><path d="M16.5 6a6.5 6.5 0 1 0 0 12"/><path d="M4 10h9M4 14h8"/></symbol>
+ <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7z"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol>
+ <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 13A8 8 0 1 1 11 4a6 6 0 0 0 9 9z"/></symbol>
+</svg>
+
+<script>
+const NOTES={
+ purple:"Purple Clay — fialový brand #7C3AED na jemných lavanduľových clay povrchoch. Premium, brand-continuita, čitateľné pre platobnú appku. (odporúčané)",
+ pastel:"Soft Pastel — teplá krémová + jemný terakotový akcent, mätové kategórie. Mäkšie a priateľské, no stále kultivované.",
+ dark:"Dark Clay — tmavé desaturované clay povrchy s fialovým glow akcentom. Premium / nočný režim."
+};
+function I(id,cls){return `<svg class="ic ${cls||''}"><use href="#i-${id}"/></svg>`;}
+function star5(n){n=n||4;let h='';for(let i=0;i<5;i++)h+=I('star','s14'+(i<n?' fill':''));return `<span class="stars">${h}</span>`;}
+function sbar(){return `<div class="sb"><span>9:41</span><span class="row" style="gap:6px;">${I('wifi','s16')}${I('batt','s18')}</span></div>`;}
+function tabbar(a){const t=['home','heart',null,'msg','user'];return `<div class="tabbar">${t.map((x,i)=>i===2?`<span class="tb center">${I('plus','s26')}</span>`:`<span class="tb ${i===a?'on':''}">${I(x,'s22')}</span>`).join('')}</div>`;}
+function phone(label,inner){return `<div class="col"><div class="label">${label}</div><div class="phone"><div class="island"></div><div class="screen">${inner}</div></div></div>`;}
+
+function screens(){return `<div class="grid">
+
+${phone('1 · Onboarding',`${sbar()}<div class="body" style="text-align:center;align-items:center;justify-content:center;gap:0;padding-bottom:30px;position:relative;">
+  <div class="glow" style="left:50%;top:80px;transform:translateX(-50%)"></div>
+  <div class="logo" style="margin-bottom:26px;">${I('bolt','s30 fill')}</div>
+  <div class="h" style="font-size:27px;line-height:1.2;">Brigády na pár<br>klikov.</div>
+  <div class="muted b13 mt14 lh" style="max-width:230px;">Nájdi prácu v okolí, dohodni sa v chate a peniaze máš isté cez zabezpečenú platbu.</div>
+  <div style="height:30px"></div>
+  <div class="row clay" style="padding:12px;gap:10px;width:100%;"><span class="icon" style="width:40px;height:40px;">${I('search','s18')}</span><div class="col2" style="text-align:left;"><span class="sb7 b13">Hľadám brigádu</span><span class="muted tiny">Pracujem a zarábam</span></div><span style="margin-left:auto;color:var(--accent)">${I('chevr','s18')}</span></div>
+  <div class="row clay" style="padding:12px;gap:10px;width:100%;margin-top:10px;"><span class="icon" style="width:40px;height:40px;">${I('plus','s18')}</span><div class="col2" style="text-align:left;"><span class="sb7 b13">Zadávam brigádu</span><span class="muted tiny">Hľadám brigádnika</span></div><span style="margin-left:auto;color:var(--accent)">${I('chevr','s18')}</span></div>
+  <div class="muted tiny" style="margin-top:auto;">Už máš účet? <span style="color:var(--accent);font-weight:700;">Prihlásiť sa</span></div>
+</div>`)}
+
+${phone('2 · Domov / Mapa',`${sbar()}<div class="body">
+  <div class="row between"><div class="col2"><span class="muted b12">Tvoja poloha</span><span class="h b15">Bratislava · Staré Mesto</span></div><span class="avatar">K</span></div>
+  <div class="clay row" style="padding:13px 15px;gap:11px;">${I('search','s18')}<span class="muted b13">Hľadať brigádu…</span><span style="margin-left:auto;color:var(--accent)">${I('sliders','s18')}</span></div>
+  <div class="row" style="gap:8px;overflow:hidden;"><span class="pill on">Všetko</span><span class="pill">${I('pin','s16')}5 km</span><span class="pill">${I('fork','s16')}Gastro</span><span class="pill">${I('box','s16')}Sklad</span></div>
+  <div class="map"><div class="road" style="left:-10%;top:38%;width:130%;transform:rotate(-8deg)"></div><div class="road" style="left:55%;top:-10%;width:7px;height:120%"></div>
+    <div class="pin" style="left:33%;top:30%;">12 €/h</div><div class="pin" style="left:66%;top:46%;">60 €</div><div class="pin sos" style="left:45%;top:64%;">${I('bolt','s14')}90 €</div><div class="pin" style="left:23%;top:72%;">15 €/h</div></div>
+  <div class="clay" style="padding:14px;"><div class="row between"><span class="tag-sos">${I('bolt','s14')}URGENTNÉ</span><span class="chip-pay">90 €</span></div>
+    <div class="h b14 mt10">Výpomoc v kuchyni — dnes</div><div class="row mt6 muted tiny" style="gap:5px;">${I('pin','s14')}Reštaurácia Hviezda · 1,2 km</div></div>
+  <div class="clay row between" style="padding:13px 14px;"><div class="row"><span class="icon">${I('box')}</span><div class="col2"><span class="sb7 b13">Sťahovanie nábytku</span><span class="row muted tiny mt2" style="gap:4px;">${I('pin','s14')}Petržalka · 3,4 km</span></div></div><span class="chip-pay">60 €</span></div>
+ </div><div class="scrollfade"></div>${tabbar(0)}`)}
+
+${phone('3 · Detail brigády',`${sbar()}<div class="body">
+  <div class="row between"><span class="pill icononly">${I('chev','s18')}</span><span class="pill icononly">${I('heart','s18')}</span></div>
+  <div class="clay" style="padding:16px;"><div class="row between"><span class="icon">${I('fork')}</span><span class="chip-pay">12 €/hod</span></div>
+    <div class="h" style="font-size:19px;margin-top:12px;">Pomocný čašník — terasa</div>
+    <div class="row muted b13 mt6" style="gap:5px;">${I('pin','s16')}Hlavná 12, Bratislava · 1,2 km</div>
+    <div class="row mt10" style="gap:8px;">${star5(5)}<span class="muted b12">Gastro s.r.o. · 4,7 · <span class="verified">${I('shield','s14')}</span> overený</span></div></div>
+  <div class="map" style="flex:none;height:112px;"><div class="pin" style="left:50%;top:50%;">${I('pin','s14')}Tu</div></div>
+  <div class="clay" style="padding:15px;"><div class="sec">Popis</div><div class="muted b12 mt6 lh">Obsluha hostí na letnej terase, nosenie nápojov a jedál. Skúsenosť výhodou, nie podmienkou. Rozsah cca 6 hodín.</div></div>
+  <div class="row" style="gap:10px;"><span class="pill">${I('clock','s16')}12:00–18:00</span><span class="pill">${I('users','s16')}2 miesta</span></div>
+ </div><div style="padding:12px 17px 18px;"><div class="btn">Prihlásiť sa</div></div>`)}
+
+${phone('4 · Chat + návrh sumy',`${sbar()}<div class="body">
+  <div class="row between"><span class="pill icononly">${I('chev','s18')}</span><div class="row"><span class="avatar" style="width:34px;height:34px;font-size:13px;">G</span><span class="h b13">Gastro s.r.o.</span></div><span class="pill icononly">${I('dots','s18')}</span></div>
+  <div style="display:flex;flex-direction:column;gap:9px;margin-top:4px;">
+    <div class="bub them">Dobrý deň, máte čas dnes na terasu?</div><div class="bub me">Áno, viem prísť. Dalo by sa 13 €/hod?</div><div class="bub them">Ponúkam 12 €/hod 🙂</div>
+    <div class="clay" style="padding:14px;"><div class="row sec" style="gap:5px;">${I('euro','s16')}Návrh novej sumy</div><div class="h" style="font-size:24px;margin:6px 0;">55,00 €</div>
+      <div class="row" style="gap:8px;"><div class="btn-ghost" style="flex:1;padding:11px;font-size:13px;">Odmietnuť</div><div class="btn" style="flex:1;padding:11px;font-size:13px;">Prijať</div></div></div></div>
+  <div class="clay-sm row between mtA" style="padding:11px 14px;margin-bottom:10px;"><span class="row muted b13" style="gap:8px;">${I('clip','s18')}Správa…</span><span style="color:var(--accent)">${I('send','s18')}</span></div>
+ </div>`)}
+
+${phone('5 · Escrow + podpis',`${sbar()}<div class="body">
+  <div class="row between"><span class="pill icononly">${I('chev','s18')}</span><span class="h b14">Zabezpečená platba</span><span style="width:34px"></span></div>
+  <div class="clay" style="padding:20px 18px;text-align:center;position:relative;overflow:hidden;"><div class="glow" style="left:50%;top:-30px;transform:translateX(-50%)"></div>
+    <span class="icon" style="margin:0 auto;width:54px;height:54px;border-radius:18px;">${I('shield','s26')}</span>
+    <div class="sec mt10">Suma v escrowe</div><div class="h" style="font-size:36px;letter-spacing:-1px;">60,00 €</div>
+    <div class="row tiny muted mt6" style="gap:5px;justify-content:center;">${I('shield','s14')}Zabezpečené cez Brigzy · uvoľní sa po dokončení</div></div>
+  <div class="clay" style="padding:15px;"><div class="row" style="gap:8px;">${I('file','s18')}<span class="h b13">Dohoda o vykonaní práce</span></div><div class="divider" style="margin:10px 0;"></div>
+    <div class="row between b12"><span class="muted">Zadávateľ</span><span class="sb7">Gastro s.r.o.</span></div>
+    <div class="row between b12 mt6"><span class="muted">Úloha</span><span class="sb7">Pomocný čašník</span></div>
+    <div class="row between b12 mt6"><span class="muted">Termín</span><span class="sb7">31.05. 12:00–18:00</span></div>
+    <div class="row between b12 mt6"><span class="muted">Odmena</span><span class="h">60,00 €</span></div></div>
+  <div class="row" style="gap:11px;align-items:flex-start;"><span class="checkbox">${I('check','s18')}</span><span class="muted tiny lh">Oboznámil/a som sa s textom zmluvy a súhlasím s podmienkami bez výhrad.</span></div>
+ </div><div style="padding:10px 17px 18px;display:flex;gap:10px;"><div class="btn-ghost" style="flex:1;">Odmietnuť</div><div class="btn" style="flex:1.7;">${I('sig','s18')}Záväzne podpísať</div></div>`)}
+
+${phone('6 · Overenie (KYC)',`${sbar()}<div class="body">
+  <div class="row between"><span class="pill icononly">${I('chev','s18')}</span><span class="h b14">Overenie totožnosti</span><span style="width:34px"></span></div>
+  <div class="clay" style="padding:18px;text-align:center;position:relative;overflow:hidden;"><div class="glow" style="left:50%;top:-20px;transform:translateX(-50%)"></div>
+    <span class="icon" style="margin:0 auto;width:52px;height:52px;border-radius:17px;">${I('id','s26')}</span>
+    <div class="h b15 mt10">Over si účet</div><div class="muted tiny mt6 lh" style="max-width:220px;margin-inline:auto;">Kvôli bezpečnosti platieb potrebujeme overiť tvoju totožnosť. Trvá to ~2 minúty.</div></div>
+  <div class="clay row between" style="padding:14px;"><div class="row"><span class="icon" style="width:38px;height:38px;border-radius:12px;color:#34C759;background:rgba(52,199,89,.14);box-shadow:none;">${I('check','s18')}</span><span class="sb7 b13">Telefónne číslo</span></div><span class="tiny" style="color:#34C759;font-weight:700;">Hotovo</span></div>
+  <div class="clay row between" style="padding:14px;"><div class="row"><span class="icon" style="width:38px;height:38px;border-radius:12px;">${I('id','s18')}</span><div class="col2"><span class="sb7 b13">Doklad totožnosti</span><span class="muted tiny">Občiansky / pas</span></div></div><span style="color:var(--accent)">${I('chevr','s18')}</span></div>
+  <div class="clay row between" style="padding:14px;"><div class="row"><span class="icon" style="width:38px;height:38px;border-radius:12px;">${I('cam','s18')}</span><div class="col2"><span class="sb7 b13">Selfie kontrola</span><span class="muted tiny">Porovnanie s dokladom</span></div></div><span style="color:var(--accent)">${I('chevr','s18')}</span></div>
+ </div><div style="padding:12px 17px 18px;"><div class="btn">${I('cam','s18')}Naskenovať doklad</div></div>`)}
+
+${phone('7 · Pridať brigádu',`${sbar()}<div class="body">
+  <div class="row between"><span class="pill icononly">${I('chev','s18')}</span><span class="h b14">Nová brigáda</span><span style="width:34px"></span></div>
+  <div class="col2" style="gap:5px;"><span class="sec">Názov</span><div class="field b13">Pomocník na sťahovanie</div></div>
+  <div class="col2" style="gap:5px;"><span class="sec">Kategória</span><div class="row" style="gap:8px;"><span class="pill on">${I('box','s16')}Sklad</span><span class="pill">${I('fork','s16')}Gastro</span><span class="pill">+ Iné</span></div></div>
+  <div class="row" style="gap:10px;"><div class="col2" style="gap:5px;flex:1;"><span class="sec">Odmena</span><div class="field row between b13"><span>60</span><span class="muted">€ / úloha</span></div></div>
+    <div class="col2" style="gap:5px;flex:1;"><span class="sec">Miesta</span><div class="field row between b13"><span>2</span><span class="muted">${I('users','s16')}</span></div></div></div>
+  <div class="col2" style="gap:5px;"><span class="sec">Miesto</span><div class="field row b13" style="gap:8px;">${I('pin','s16')}Petržalka, Bratislava</div></div>
+  <div class="clay row between" style="padding:14px;"><div class="row"><span class="icon" style="width:38px;height:38px;border-radius:12px;color:#FF3B30;background:rgba(255,59,48,.12);box-shadow:none;">${I('bolt','s18')}</span><div class="col2"><span class="sb7 b13">Urgentné / SOS</span><span class="muted tiny">Vyšší poplatok · viac dosahu</span></div></div><span class="toggle"></span></div>
+ </div><div style="padding:10px 17px 18px;"><div class="btn">Uverejniť brigádu</div></div>`)}
+
+${phone('8 · Profil + XP',`${sbar()}<div class="body">
+  <div class="row between"><span class="h b15">Profil</span><span class="pill icononly">${I('dots','s18')}</span></div>
+  <div class="clay" style="padding:18px;text-align:center;position:relative;overflow:hidden;"><div class="glow" style="left:50%;top:-26px;transform:translateX(-50%)"></div>
+    <span class="avatar" style="width:66px;height:66px;font-size:24px;margin:0 auto;">P</span>
+    <div class="h b15 mt10">Peter Novák <span class="verified">${I('shield','s14')}</span></div>
+    <div class="row" style="gap:6px;justify-content:center;margin-top:4px;">${star5(5)}<span class="muted tiny">4,9 · 32 hodnotení</span></div>
+    <div class="row between mt14" style="gap:6px;"><span class="sec">Rank · Profík</span><span class="sec" style="color:var(--accent)">1240 / 1500 XP</span></div>
+    <div class="bar mt6"><div class="fill" style="width:82%;"></div></div></div>
+  <div class="row" style="gap:10px;"><div class="clay" style="flex:1;padding:14px;text-align:center;"><div class="h" style="font-size:22px;">47</div><div class="sec mt2">Brigád</div></div>
+    <div class="clay" style="flex:1;padding:14px;text-align:center;"><div class="h" style="font-size:22px;">100%</div><div class="sec mt2">Dochvíľnosť</div></div></div>
+  <div class="sec">Odznaky</div>
+  <div class="row" style="gap:10px;"><div class="badge"><span class="bi">${I('clock','s22')}</span><span class="tiny sb7" style="text-align:center;">Vždy načas</span></div>
+    <div class="badge"><span class="bi">${I('moon','s22')}</span><span class="tiny sb7" style="text-align:center;">Nočný špec.</span></div>
+    <div class="badge"><span class="bi">${I('award','s22')}</span><span class="tiny sb7" style="text-align:center;">Top hodnotený</span></div></div>
+ </div><div class="scrollfade"></div>${tabbar(4)}`)}
+
+${phone('9 · Hodnotenie',`${sbar()}<div class="body">
+  <div class="row between"><span class="pill icononly">${I('chev','s18')}</span><span class="h b14">Hodnotenie</span><span style="width:34px"></span></div>
+  <div class="clay" style="padding:18px;text-align:center;"><span class="avatar" style="width:56px;height:56px;font-size:20px;margin:0 auto;">G</span>
+    <div class="h b15 mt10">Ako hodnotíš Gastro s.r.o.?</div><div class="muted tiny mt6">Pomocný čašník · 31.05.</div>
+    <div class="row" style="gap:7px;justify-content:center;margin-top:14px;">${I('star','s24 fill')}${I('star','s24 fill')}${I('star','s24 fill')}${I('star','s24 fill')}${I('star','s24')}</div></div>
+  <div class="col2" style="gap:6px;"><span class="sec">Komentár</span><div class="field b13 lh" style="min-height:74px;">Super partia, férové podmienky, platba okamžite po práci.</div></div>
+  <div class="clay row" style="padding:12px 14px;gap:10px;"><span style="color:var(--accent)">${I('shield','s18')}</span><span class="muted tiny lh">Obojstranné hodnotenie — zobrazí sa až keď ohodnotia obe strany.</span></div>
+ </div><div style="padding:10px 17px 18px;"><div class="btn">Odoslať hodnotenie</div></div>`)}
+
+${phone('10 · Peňaženka',`${sbar()}<div class="body">
+  <div class="row between"><span class="h b15">Peňaženka</span><span class="pill">${I('file','s16')}Report</span></div>
+  <div class="clay" style="padding:22px 18px;text-align:center;position:relative;overflow:hidden;"><div class="glow" style="left:50%;top:-20px;transform:translateX(-50%)"></div>
+    <div class="sec">Disponibilný zostatok</div><div class="h" style="font-size:38px;letter-spacing:-1px;margin-top:4px;">84,50 €</div>
+    <div class="btn" style="margin-top:15px;">${I('bank','s18')}Vybrať na účet</div><div class="muted tiny mt10">Min. výber 15 € · SEPA prevod</div></div>
+  <div class="sec">Posledné transakcie</div>
+  <div class="clay" style="padding:4px 14px;">
+    <div class="row between" style="padding:11px 0;"><div class="row"><span class="icon" style="width:36px;height:36px;border-radius:12px;color:#34C759;background:rgba(52,199,89,.14);box-shadow:none;">${I('in','s18')}</span><div class="col2"><span class="b13 sb7">Pomocný čašník</span><span class="muted tiny">Gastro s.r.o. · 30.05.</span></div></div><span class="h b13" style="color:#34C759">+60,00 €</span></div>
+    <div class="divider"></div>
+    <div class="row between" style="padding:11px 0;"><div class="row"><span class="icon" style="width:36px;height:36px;border-radius:12px;color:#34C759;background:rgba(52,199,89,.14);box-shadow:none;">${I('in','s18')}</span><div class="col2"><span class="b13 sb7">Sťahovanie</span><span class="muted tiny">P. Novák · 28.05.</span></div></div><span class="h b13" style="color:#34C759">+24,50 €</span></div>
+    <div class="divider"></div>
+    <div class="row between" style="padding:11px 0;"><div class="row"><span class="icon" style="width:36px;height:36px;border-radius:12px;">${I('bank','s18')}</span><div class="col2"><span class="b13 sb7">Výber na účet</span><span class="muted tiny">SEPA · 20.05.</span></div></div><span class="h b13 muted">−40,00 €</span></div></div>
+ </div><div class="scrollfade"></div>${tabbar(4)}`)}
+
+</div>`;}
+
+const stages=document.getElementById('stages');
+['purple','pastel','dark'].forEach((p,i)=>{const s=document.createElement('div');s.className='stage pal-'+p+(i===0?' active':'');s.dataset.p=p;s.innerHTML=screens();stages.appendChild(s);});
+document.getElementById('pnote').textContent=NOTES.purple;
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.stage').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.querySelector('.stage[data-p="'+t.dataset.p+'"]').classList.add('active');document.getElementById('pnote').textContent=NOTES[t.dataset.p];});
+</script>
+</body>
+</html>

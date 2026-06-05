@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Read(//c/Users/nemci/Downloads/**)",
+      "Bash(python -c ' *)",
+      "PowerShell(Invoke-Item *)",
+      "Read(//c/Claude-memory/**)"
     ]
   }
 }
