@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View, Text, ScrollView, Pressable, ActivityIndicator, StyleSheet,
 } from "react-native";
@@ -10,8 +10,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useText } from "@/lib/useText";
 import { supabase } from "@/lib/supabase";
 import useAppStore from "@/lib/state/app-store";
-import { useColors } from "@/lib/useColors";
-import type { AppColors } from "@/lib/useColors";
+import { useClay } from "@/lib/useClay";
+import type { ClayColors } from "@/lib/useClay";
+import { ClaySurface, ClayInset, ClayIconBox, ClayButton } from "@/components/clay";
 
 type ApplicationStatus = "pending" | "accepted" | "rejected" | "completed";
 type TabType = "pending" | "accepted" | "history";
@@ -20,22 +21,14 @@ interface Application {
   id: string;
   status: ApplicationStatus;
   created_at: string;
-  job: {
-    id: string;
-    title: string;
-    company_name: string;
-    location: string;
-    pay_type: "hourly" | "fixed";
-    pay_amount: number;
-  };
+  job: { id: string; title: string; company_name: string; location: string; pay_type: "hourly" | "fixed"; pay_amount: number; };
 }
 
 export default function MyApplicationsScreen() {
   const router = useRouter();
-  const C = useColors();
+  const C = useClay();
   const text = useText();
   const currentUser = useAppStore((s) => s.currentUser);
-  const st = useMemo(() => makeStyles(C), [C]);
 
   const [activeTab, setActiveTab] = useState<TabType>("pending");
   const [isLoading, setIsLoading] = useState(true);
@@ -84,10 +77,10 @@ export default function MyApplicationsScreen() {
 
   const getStatusInfo = (status: ApplicationStatus) => {
     switch (status) {
-      case "pending": return { label: "Čaká", color: C.yellow };
+      case "pending": return { label: "Čaká", color: C.star };
       case "accepted": return { label: "Prijaté", color: C.green };
       case "rejected": return { label: "Odmietnuté", color: C.red };
-      case "completed": return { label: "Dokončené", color: C.secondaryLabel as string };
+      case "completed": return { label: "Dokončené", color: C.muted };
     }
   };
 
@@ -100,116 +93,100 @@ export default function MyApplicationsScreen() {
   const activeApplications = activeTab === 'pending' ? pendingApps : activeTab === 'accepted' ? acceptedApps : historyApps;
 
   return (
-    <SafeAreaView style={st.container} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
       {/* Header */}
-      <View style={st.header}>
-        <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }}
-          style={({ pressed }) => [st.backBtn, pressed && { transform: [{ scale: 0.95 }] }]}>
-          <ChevronLeft size={22} color={C.text} />
+      <View style={styles.header}>
+        <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+          <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+            <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
+          </ClaySurface>
         </Pressable>
-        <Text style={st.headerTitle}>Moje prihlášky</Text>
+        <Text style={[styles.headerTitle, { color: C.text }]}>Moje prihlášky</Text>
         <View style={{ width: 42 }} />
       </View>
 
       {/* Segmented tabs */}
-      <View style={[st.tabRow, { backgroundColor: C.surface, borderColor: C.separator }]}>
-        {tabs.map(tab => (
-          <Pressable
-            key={tab.id}
-            onPress={() => { Haptics.selectionAsync(); setActiveTab(tab.id); }}
-            style={[st.tabBtn, activeTab === tab.id && st.tabBtnActive]}
-          >
-            <Text style={[st.tabText, {
-              color: activeTab === tab.id ? '#FFF' : C.secondaryLabel,
-              fontWeight: activeTab === tab.id ? '600' : '400',
-            }]}>
-              {tab.label}
-            </Text>
-          </Pressable>
-        ))}
+      <View style={{ paddingHorizontal: 20, marginBottom: 8 }}>
+        <ClayInset radius={14} contentStyle={styles.tabRow}>
+          {tabs.map(tab => {
+            const active = activeTab === tab.id;
+            return (
+              <Pressable key={tab.id} onPress={() => { Haptics.selectionAsync(); setActiveTab(tab.id); }} style={{ flex: 1 }}>
+                {active ? (
+                  <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.tabBtn}>
+                    <Text style={[styles.tabText, { color: C.onAccent, fontWeight: '800' }]}>{tab.label}</Text>
+                  </LinearGradient>
+                ) : (
+                  <View style={styles.tabBtn}><Text style={[styles.tabText, { color: C.muted, fontWeight: '700' }]}>{tab.label}</Text></View>
+                )}
+              </Pressable>
+            );
+          })}
+        </ClayInset>
       </View>
 
       {/* Content */}
       {isLoading ? (
-        <View style={st.center}>
-          <ActivityIndicator size="large" color={C.purple} />
-        </View>
+        <View style={styles.center}><ActivityIndicator size="large" color={C.accent} /></View>
       ) : activeApplications.length === 0 ? (
-        <View style={st.emptyWrap}>
-          <View style={[st.emptyIcon, { backgroundColor: C.purpleDim }]}>
-            <FileText size={42} color={C.purple} strokeWidth={1.5} />
-          </View>
-          <Text style={[st.emptyTitle, { color: C.text }]}>Žiadne prihlášky</Text>
-          <Text style={[st.emptyDesc, { color: C.secondaryLabel }]}>Hľadajte prácu a prihlasujte sa</Text>
-          <Pressable onPress={() => router.push("/(tabs)/")}
-            style={({ pressed }) => [st.emptyBtn, { opacity: pressed ? 0.85 : 1 }]}>
-            <LinearGradient colors={['#9333EA', '#7C3AED', '#6D28D9']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={st.emptyBtnGrad}>
-              <Text style={st.emptyBtnText}>Nájsť brigády</Text>
-            </LinearGradient>
-          </Pressable>
+        <View style={styles.emptyWrap}>
+          <ClayIconBox size={88} radius={28}><FileText size={40} color={C.accent} strokeWidth={1.6} /></ClayIconBox>
+          <Text style={[styles.emptyTitle, { color: C.text }]}>Žiadne prihlášky</Text>
+          <Text style={[styles.emptyDesc, { color: C.muted }]}>Hľadajte prácu a prihlasujte sa</Text>
+          <ClayButton label="Nájsť brigády" onPress={() => router.push("/(tabs)/")} style={{ paddingHorizontal: 28 }} />
         </View>
       ) : (
-        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 100 }}>
-          <View style={st.cardGroup}>
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 100 }}>
+          <ClaySurface radius={18}>
             {activeApplications.map((app, index) => {
               const info = getStatusInfo(app.status);
               return (
                 <React.Fragment key={app.id}>
-                  {index > 0 && <View style={st.divider} />}
+                  {index > 0 && <View style={{ height: 1, backgroundColor: C.hair, marginLeft: 16 }} />}
                   <Pressable
                     onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(`/job/${app.job.id}`); }}
-                    style={({ pressed }) => [st.appRow, { opacity: pressed ? 0.7 : 1 }]}
+                    style={({ pressed }) => [styles.appRow, pressed && { opacity: 0.7 }]}
                   >
                     <View style={{ flex: 1 }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                        <View style={[st.statusDot, { backgroundColor: info.color }]} />
-                        <Text style={[st.statusLabel, { color: info.color }]}>{info.label}</Text>
-                        <Text style={[st.timeAgo, { color: C.tertiaryLabel }]}>{getTimeAgo(app.created_at)}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 5 }}>
+                        <View style={[styles.statusDot, { backgroundColor: info.color }]} />
+                        <Text style={[styles.statusLabel, { color: info.color }]}>{info.label}</Text>
+                        <Text style={[styles.timeAgo, { color: C.muted }]}>{getTimeAgo(app.created_at)}</Text>
                       </View>
-                      <Text style={[st.appTitle, { color: C.text }]} numberOfLines={1}>{app.job.title}</Text>
+                      <Text style={[styles.appTitle, { color: C.text }]} numberOfLines={1}>{app.job.title}</Text>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                        <MapPin size={13} color={C.tertiaryLabel} />
-                        <Text style={[st.appLocation, { color: C.secondaryLabel }]} numberOfLines={1}>{app.job.location}</Text>
-                        <Text style={[st.appPay, { color: C.purple }]}>€{app.job.pay_amount}{app.job.pay_type === "hourly" ? "/hr" : ""}</Text>
+                        <MapPin size={13} color={C.muted} strokeWidth={1.9} />
+                        <Text style={[styles.appLocation, { color: C.muted }]} numberOfLines={1}>{app.job.location}</Text>
+                        <Text style={[styles.appPay, { color: C.accent }]}>€{app.job.pay_amount}{app.job.pay_type === "hourly" ? "/h" : ""}</Text>
                       </View>
                     </View>
-                    <ChevronRight size={16} color={C.tertiaryLabel} strokeWidth={1.8} />
+                    <ChevronRight size={16} color={C.muted} strokeWidth={2} />
                   </Pressable>
                 </React.Fragment>
               );
             })}
-          </View>
+          </ClaySurface>
         </ScrollView>
       )}
     </SafeAreaView>
   );
 }
 
-const makeStyles = (C: AppColors) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: C.bg },
+const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 },
-  backBtn: { width: 42, height: 42, borderRadius: 14, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: C.text },
-  tabRow: { flexDirection: 'row', marginHorizontal: 20, borderRadius: 14, borderWidth: StyleSheet.hairlineWidth, padding: 4, gap: 4, marginBottom: 8 },
-  tabBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
-  tabBtnActive: { backgroundColor: '#7C3AED' },
-  tabText: { fontSize: 14 },
+  headerTitle: { fontSize: 18, fontWeight: '800', letterSpacing: -0.3 },
+  tabRow: { flexDirection: 'row', padding: 4, gap: 4 },
+  tabBtn: { paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
+  tabText: { fontSize: 13.5 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
-  emptyIcon: { width: 88, height: 88, borderRadius: 44, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
-  emptyTitle: { fontSize: 22, fontWeight: '700', marginBottom: 8 },
-  emptyDesc: { fontSize: 15, textAlign: 'center', marginBottom: 24 },
-  emptyBtn: { borderRadius: 16, overflow: 'hidden' },
-  emptyBtnGrad: { paddingHorizontal: 24, paddingVertical: 14, borderRadius: 16 },
-  emptyBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
-  cardGroup: { backgroundColor: C.surface, borderRadius: 18, borderWidth: 1, borderColor: C.border, overflow: 'hidden' },
-  divider: { height: StyleSheet.hairlineWidth, backgroundColor: C.separator, marginLeft: 16 },
+  emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, gap: 0 },
+  emptyTitle: { fontSize: 21, fontWeight: '800', marginBottom: 8, marginTop: 20, letterSpacing: -0.4 },
+  emptyDesc: { fontSize: 14, textAlign: 'center', marginBottom: 24, fontWeight: '500' },
   appRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14 },
-  statusDot: { width: 6, height: 6, borderRadius: 3 },
-  statusLabel: { fontSize: 12, fontWeight: '600' },
-  timeAgo: { fontSize: 11, marginLeft: 'auto' },
-  appTitle: { fontSize: 17, fontWeight: '600', marginBottom: 4 },
-  appLocation: { fontSize: 14, marginRight: 'auto' },
-  appPay: { fontSize: 15, fontWeight: '700' },
+  statusDot: { width: 7, height: 7, borderRadius: 4 },
+  statusLabel: { fontSize: 11.5, fontWeight: '800' },
+  timeAgo: { fontSize: 11, marginLeft: 'auto', fontWeight: '600' },
+  appTitle: { fontSize: 16, fontWeight: '800', marginBottom: 4, letterSpacing: -0.3 },
+  appLocation: { fontSize: 13, marginRight: 'auto', fontWeight: '500' },
+  appPay: { fontSize: 14, fontWeight: '800' },
 });

@@ -92,34 +92,23 @@ function TabButton({ item, focused, onPress, C, label }: {
 
 // ─── TAB BAR CONTAINER — clay capsule ───────────────
 function TabBarContainer({ C, children }: { C: ClayColors; children: React.ReactNode }) {
-    const isIOS = Platform.OS === 'ios';
     return (
         <View style={styles.barWrapper} pointerEvents="box-none">
             <LinearGradient colors={['transparent', C.bg]} style={styles.fadeOverlay} pointerEvents="none" />
             <View style={styles.capsuleOuter}>
-                {/* iOS rim-light layer */}
-                {isIOS && (
-                    <View style={[StyleSheet.absoluteFillObject, {
-                        borderRadius: CAPSULE_RADIUS,
-                        backgroundColor: C.cLo,
-                        shadowColor: C.lightShadow.color,
-                        shadowOffset: { width: -3, height: -4 },
-                        shadowOpacity: C.lightShadow.opacity,
-                        shadowRadius: 10,
-                    }]} />
-                )}
-                {/* depth shadow layer */}
+                {/* single soft downward depth shadow — no upward rim-light
+                    layer (it cast a bright full-width halo above the bar). */}
                 <View style={[StyleSheet.absoluteFillObject, {
                     borderRadius: CAPSULE_RADIUS,
                     backgroundColor: C.cLo,
                     ...Platform.select({
                         ios: {
                             shadowColor: C.darkShadow.color,
-                            shadowOffset: { width: 0, height: 6 },
-                            shadowOpacity: C.darkShadow.opacity,
-                            shadowRadius: 16,
+                            shadowOffset: { width: 0, height: 8 },
+                            shadowOpacity: C.isLight ? 0.18 : 0.4,
+                            shadowRadius: 14,
                         },
-                        android: { elevation: 16 },
+                        android: { elevation: 14 },
                     }),
                 }]} />
                 {/* gradient face */}

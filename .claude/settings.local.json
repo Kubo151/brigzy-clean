@@ -14,7 +14,12 @@
       "Bash(grep -E \"job/\\\\[id\\\\]|job\\\\\\\\\\\\\\\\\\\\[id\\\\]\")",
       "Bash(node *)",
       "Bash(grep -iE \"^\\(euro|zap|shield|check|star\\)\\\\.js$\")",
-      "Bash(grep -iE \"login|welcome|app.index|app/index|app\\\\\\\\\\\\\\\\index\")"
+      "Bash(grep -iE \"login|welcome|app.index|app/index|app\\\\\\\\\\\\\\\\index\")",
+      "Bash(grep -iE \"home\\\\.tsx|welcome\\\\.tsx|app/index\\\\.tsx|app\\\\\\\\\\\\\\\\index\\\\.tsx\")",
+      "Bash(grep -v \"messages\\\\\\\\\\\\\\\\\\\\[\")",
+      "Bash(grep -E \"favorites|account|add\\\\.tsx|tabs.\\\\\\\\\\\\\\\\messages|tabs./messages\")",
+      "Bash(grep -E \"apply.\\\\\\\\\\\\\\\\\\\\[id\\\\]|apply./\\\\[id\\\\]|wallet.\\\\\\\\\\\\\\\\index|wallet./index\")",
+      "Bash(grep -E \"messages.\\\\\\\\\\\\\\\\index|messages/index|account-settings|job-employer|wallet|favorites|tabs.\\\\\\\\\\\\\\\\\\(messages|account|add|index\\)|welcome|home\\\\.tsx|app.\\\\\\\\\\\\\\\\index|login|settings|notifications|language|role-switch|privacy|my-jobs|my-applications|activity|useClay|fonts|clay\\\\\\\\\\\\\\\\\")"
     ]
   }
 }

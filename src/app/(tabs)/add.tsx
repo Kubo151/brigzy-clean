@@ -6,55 +6,53 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import {
-    Briefcase, MapPin, DollarSign, Clock, FileText, CheckCircle,
+    Briefcase, MapPin, Euro, Clock, FileText, CheckCircle,
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import useAppStore from "@/lib/state/app-store";
 import { supabase } from "@/lib/supabase";
-import { useColors } from "@/lib/useColors";
+import { useClay } from "@/lib/useClay";
+import type { ClayColors } from "@/lib/useClay";
 import type { JobCategory, SalaryType } from "@/lib/types";
 import { useText } from "@/lib/useText";
 import { JOB_CATEGORIES } from "@/lib/types";
+import { ClaySurface, ClayInset, ClayIconBox } from "@/components/clay";
 
 const CATEGORIES: JobCategory[] = [
     "hospitality", "retail", "delivery", "events",
     "cleaning", "construction", "moving", "admin", "other",
 ];
 
-// ─── INPUT ROW ──────────────────────────────────────
-function FormInput({ icon: Icon, label, value, onChangeText, placeholder, C, multiline, keyboardType }: any) {
+// ─── INPUT ROW (clay inset) ─────────────────────────
+function FormInput({ icon: Icon, label, value, onChangeText, placeholder, C, multiline, keyboardType }: {
+    icon: any; label: string; value: string; onChangeText: (t: string) => void;
+    placeholder: string; C: ClayColors; multiline?: boolean; keyboardType?: any;
+}) {
     return (
         <View style={styles.fieldGroup}>
-            <Text style={[styles.fieldLabel, { color: C.text }]}>{label}</Text>
-            <View style={[styles.inputRow, {
-                backgroundColor: C.surface,
-                borderColor: C.separator,
-            }]}>
-                <Icon size={18} color={C.tertiaryLabel} strokeWidth={1.8} />
+            <Text style={[styles.fieldLabel, { color: C.muted }]}>{label}</Text>
+            <ClayInset radius={14} contentStyle={[styles.inputRow, multiline && { alignItems: 'flex-start', paddingTop: 14 }]}>
+                <Icon size={18} color={C.muted} strokeWidth={1.9} />
                 <TextInput
                     value={value}
                     onChangeText={onChangeText}
                     placeholder={placeholder}
-                    placeholderTextColor={C.tertiaryLabel}
+                    placeholderTextColor={C.muted}
                     multiline={multiline}
                     numberOfLines={multiline ? 4 : 1}
                     textAlignVertical={multiline ? "top" : "center"}
                     keyboardType={keyboardType}
-                    style={[
-                        styles.input,
-                        { color: C.text },
-                        multiline && { minHeight: 100, paddingTop: 0 },
-                    ]}
+                    style={[styles.input, { color: C.text }, multiline && { minHeight: 100, paddingTop: 0 }]}
                 />
-            </View>
+            </ClayInset>
         </View>
     );
 }
 
 export default function AddJobScreen() {
     const router = useRouter();
-    const C = useColors();
+    const C = useClay();
     const text = useText();
     const currentUser = useAppStore((s) => s.currentUser);
 
@@ -119,11 +117,11 @@ export default function AddJobScreen() {
     if (showSuccess) {
         return (
             <View style={[styles.center, { backgroundColor: C.bg }]}>
-                <View style={[styles.successIcon, { backgroundColor: 'rgba(48,209,88,0.12)' }]}>
-                    <CheckCircle size={56} color={C.green} strokeWidth={1.5} />
-                </View>
+                <ClayIconBox size={100} radius={32} tintBg={C.greenDim}>
+                    <CheckCircle size={52} color={C.green} strokeWidth={1.8} />
+                </ClayIconBox>
                 <Text style={[styles.successTitle, { color: C.text }]}>{text.jobPosted}</Text>
-                <Text style={[styles.successDesc, { color: C.secondaryLabel }]}>{text.jobPostedSuccess}</Text>
+                <Text style={[styles.successDesc, { color: C.muted }]}>{text.jobPostedSuccess}</Text>
             </View>
         );
     }
@@ -133,78 +131,62 @@ export default function AddJobScreen() {
             <SafeAreaView edges={['top']} style={{ backgroundColor: C.bg }}>
                 <View style={styles.header}>
                     <Text style={[styles.largeTitle, { color: C.text }]}>{text.postJob}</Text>
-                    <Text style={[styles.subtitle, { color: C.secondaryLabel }]}>{text.findIdealWorker}</Text>
+                    <Text style={[styles.subtitle, { color: C.muted }]}>{text.findIdealWorker}</Text>
                 </View>
             </SafeAreaView>
 
-            <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={{ flex: 1 }}
-            >
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    keyboardShouldPersistTaps="handled"
-                    contentContainerStyle={styles.scrollContent}
-                >
-                    {/* Form fields */}
-                    <FormInput icon={Briefcase} label={text.jobTitle} value={title}
-                        onChangeText={setTitle} placeholder={text.jobTitlePlaceholder} C={C} />
-                    <FormInput icon={FileText} label={text.description} value={description}
-                        onChangeText={setDescription} placeholder={text.descriptionPlaceholder} C={C} multiline />
-                    <FormInput icon={MapPin} label={text.location} value={location}
-                        onChangeText={setLocation} placeholder={text.locationPlaceholder} C={C} />
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+                <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContent}>
+                    <FormInput icon={Briefcase} label={text.jobTitle} value={title} onChangeText={setTitle} placeholder={text.jobTitlePlaceholder} C={C} />
+                    <FormInput icon={FileText} label={text.description} value={description} onChangeText={setDescription} placeholder={text.descriptionPlaceholder} C={C} multiline />
+                    <FormInput icon={MapPin} label={text.location} value={location} onChangeText={setLocation} placeholder={text.locationPlaceholder} C={C} />
 
                     {/* Salary Type Toggle */}
                     <View style={styles.fieldGroup}>
-                        <Text style={[styles.fieldLabel, { color: C.text }]}>{text.salaryType}</Text>
-                        <View style={[styles.toggleRow, { backgroundColor: C.surface, borderColor: C.separator }]}>
-                            {(['hourly', 'fixed'] as SalaryType[]).map(type => (
-                                <Pressable
-                                    key={type}
-                                    onPress={() => { Haptics.selectionAsync(); setSalaryType(type); }}
-                                    style={[styles.toggleBtn, salaryType === type && styles.toggleBtnActive]}
-                                >
-                                    <Text style={[styles.toggleText, {
-                                        color: salaryType === type ? '#FFF' : C.secondaryLabel,
-                                        fontWeight: salaryType === type ? '600' : '400',
-                                    }]}>
-                                        {type === 'hourly' ? text.hourly : text.fixed}
-                                    </Text>
-                                </Pressable>
-                            ))}
-                        </View>
+                        <Text style={[styles.fieldLabel, { color: C.muted }]}>{text.salaryType}</Text>
+                        <ClayInset radius={14} contentStyle={styles.toggleRow}>
+                            {(['hourly', 'fixed'] as SalaryType[]).map(type => {
+                                const active = salaryType === type;
+                                return (
+                                    <Pressable key={type} onPress={() => { Haptics.selectionAsync(); setSalaryType(type); }} style={{ flex: 1 }}>
+                                        {active ? (
+                                            <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.toggleBtn}>
+                                                <Text style={[styles.toggleText, { color: C.onAccent, fontWeight: '800' }]}>{type === 'hourly' ? text.hourly : text.fixed}</Text>
+                                            </LinearGradient>
+                                        ) : (
+                                            <View style={styles.toggleBtn}>
+                                                <Text style={[styles.toggleText, { color: C.muted, fontWeight: '600' }]}>{type === 'hourly' ? text.hourly : text.fixed}</Text>
+                                            </View>
+                                        )}
+                                    </Pressable>
+                                );
+                            })}
+                        </ClayInset>
                     </View>
 
-                    <FormInput icon={DollarSign}
-                        label={salaryType === "hourly" ? text.hourlyRate : text.fixedAmount}
-                        value={salary} onChangeText={setSalary}
-                        placeholder="napr. 10" C={C} keyboardType="numeric" />
-                    <FormInput icon={Clock} label={text.duration} value={duration}
-                        onChangeText={setDuration} placeholder={text.durationPlaceholder} C={C} />
+                    <FormInput icon={Euro} label={salaryType === "hourly" ? text.hourlyRate : text.fixedAmount} value={salary} onChangeText={setSalary} placeholder="napr. 10" C={C} keyboardType="numeric" />
+                    <FormInput icon={Clock} label={text.duration} value={duration} onChangeText={setDuration} placeholder={text.durationPlaceholder} C={C} />
 
                     {/* Category Selection */}
                     <View style={[styles.fieldGroup, { marginBottom: 28 }]}>
-                        <Text style={[styles.fieldLabel, { color: C.text }]}>{text.category}</Text>
+                        <Text style={[styles.fieldLabel, { color: C.muted }]}>{text.category}</Text>
                         <View style={styles.categoryGrid}>
                             {CATEGORIES.map((category) => {
                                 const cat = JOB_CATEGORIES.find(c => c.id === category);
                                 const isSelected = selectedCategory === category;
                                 return (
-                                    <Pressable
-                                        key={category}
-                                        onPress={() => { Haptics.selectionAsync(); setSelectedCategory(category); }}
-                                        style={[styles.categoryChip, {
-                                            backgroundColor: isSelected ? C.purple : C.surface,
-                                            borderColor: isSelected ? C.purple : C.separator,
-                                        }]}
-                                    >
-                                        <Text style={{ fontSize: 15, marginRight: 5 }}>{cat?.icon || '📋'}</Text>
-                                        <Text style={[styles.categoryChipText, {
-                                            color: isSelected ? '#FFF' : C.text,
-                                            fontWeight: isSelected ? '600' : '400',
-                                        }]}>
-                                            {cat?.name || category}
-                                        </Text>
+                                    <Pressable key={category} onPress={() => { Haptics.selectionAsync(); setSelectedCategory(category); }}>
+                                        {isSelected ? (
+                                            <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.categoryChip}>
+                                                <Text style={{ fontSize: 15, marginRight: 5 }}>{cat?.icon || '📋'}</Text>
+                                                <Text style={[styles.categoryChipText, { color: C.onAccent, fontWeight: '800' }]}>{cat?.name || category}</Text>
+                                            </LinearGradient>
+                                        ) : (
+                                            <View style={[styles.categoryChip, { backgroundColor: C.cLo, borderWidth: 1, borderColor: C.hair }]}>
+                                                <Text style={{ fontSize: 15, marginRight: 5 }}>{cat?.icon || '📋'}</Text>
+                                                <Text style={[styles.categoryChipText, { color: C.text, fontWeight: '600' }]}>{cat?.name || category}</Text>
+                                            </View>
+                                        )}
                                     </Pressable>
                                 );
                             })}
@@ -212,31 +194,13 @@ export default function AddJobScreen() {
                     </View>
 
                     {/* Submit */}
-                    <Pressable
-                        onPress={handleSubmit}
-                        disabled={!isFormValid || isSubmitting}
-                        style={({ pressed }) => [
-                            styles.submitBtn,
-                            { opacity: (!isFormValid || isSubmitting) ? 0.4 : pressed ? 0.85 : 1 },
-                        ]}
-                    >
-                        <LinearGradient
-                            colors={(!isFormValid || isSubmitting)
-                                ? [C.surface2, C.surface2]
-                                : ['#9333EA', '#7C3AED', '#6D28D9']}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 1 }}
-                            style={styles.submitGradient}
-                        >
-                            {isSubmitting ? (
-                                <ActivityIndicator color="#FFF" />
-                            ) : (
-                                <Text style={[styles.submitText, {
-                                    color: (!isFormValid || isSubmitting) ? C.tertiaryLabel : '#FFF',
-                                }]}>
-                                    Pridať prácu
-                                </Text>
-                            )}
+                    <Pressable onPress={handleSubmit} disabled={!isFormValid || isSubmitting} style={({ pressed }) => [styles.submitBtn, Platform.select({
+                        ios: { shadowColor: C.accentShadow.color, shadowOffset: { width: 0, height: 6 }, shadowOpacity: isFormValid ? C.accentShadow.opacity : 0, shadowRadius: 14 },
+                        android: { elevation: isFormValid ? 6 : 0 },
+                    }), { opacity: (!isFormValid || isSubmitting) ? 0.45 : pressed ? 0.9 : 1 }]}>
+                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.submitGradient}>
+                            <LinearGradient colors={['rgba(255,255,255,0.28)', 'transparent']} style={styles.submitSheen} />
+                            {isSubmitting ? <ActivityIndicator color={C.onAccent} /> : <Text style={[styles.submitText, { color: C.onAccent }]}>Pridať brigádu</Text>}
                         </LinearGradient>
                     </Pressable>
                 </ScrollView>
@@ -248,116 +212,24 @@ export default function AddJobScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1 },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
-
-    header: {
-        paddingHorizontal: 20,
-        paddingTop: 8,
-        paddingBottom: 16,
-    },
-    largeTitle: {
-        fontSize: 34,
-        fontWeight: '800',
-        letterSpacing: 0.2,
-        marginBottom: 4,
-    },
-    subtitle: { fontSize: 15 },
-
-    scrollContent: {
-        paddingHorizontal: 16,
-        paddingBottom: 120,
-    },
-
-    // Form fields
+    header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 16 },
+    largeTitle: { fontSize: 32, fontWeight: '800', letterSpacing: -0.5, marginBottom: 4 },
+    subtitle: { fontSize: 14, fontWeight: '600' },
+    scrollContent: { paddingHorizontal: 20, paddingBottom: 130 },
     fieldGroup: { marginBottom: 18 },
-    fieldLabel: {
-        fontSize: 13,
-        fontWeight: '600',
-        marginBottom: 8,
-        marginLeft: 4,
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
-    },
-    inputRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderRadius: 14,
-        borderWidth: StyleSheet.hairlineWidth,
-        paddingHorizontal: 14,
-        paddingVertical: 12,
-        gap: 10,
-    },
-    input: {
-        flex: 1,
-        fontSize: 16,
-    },
-
-    // Toggle
-    toggleRow: {
-        flexDirection: 'row',
-        borderRadius: 14,
-        borderWidth: StyleSheet.hairlineWidth,
-        padding: 4,
-        gap: 4,
-    },
-    toggleBtn: {
-        flex: 1,
-        paddingVertical: 10,
-        borderRadius: 10,
-        alignItems: 'center',
-    },
-    toggleBtnActive: {
-        backgroundColor: '#7C3AED',
-    },
-    toggleText: { fontSize: 15 },
-
-    // Categories
-    categoryGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 8,
-    },
-    categoryChip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 14,
-        paddingVertical: 9,
-        borderRadius: 12,
-        borderWidth: StyleSheet.hairlineWidth,
-    },
+    fieldLabel: { fontSize: 11, fontWeight: '800', marginBottom: 8, marginLeft: 4, textTransform: 'uppercase', letterSpacing: 0.7 },
+    inputRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 13, gap: 10 },
+    input: { flex: 1, fontSize: 16, fontWeight: '500' },
+    toggleRow: { flexDirection: 'row', padding: 4, gap: 4 },
+    toggleBtn: { paddingVertical: 11, borderRadius: 10, alignItems: 'center' },
+    toggleText: { fontSize: 14.5 },
+    categoryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    categoryChip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12 },
     categoryChipText: { fontSize: 14 },
-
-    // Submit
-    submitBtn: {
-        borderRadius: 16,
-        overflow: 'hidden',
-        marginBottom: 20,
-    },
-    submitGradient: {
-        paddingVertical: 16,
-        alignItems: 'center',
-        borderRadius: 16,
-    },
-    submitText: {
-        fontSize: 16,
-        fontWeight: '700',
-    },
-
-    // Success
-    successIcon: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 24,
-    },
-    successTitle: {
-        fontSize: 24,
-        fontWeight: '700',
-        marginBottom: 8,
-    },
-    successDesc: {
-        fontSize: 15,
-        textAlign: 'center',
-    },
+    submitBtn: { borderRadius: 18, overflow: 'hidden', marginBottom: 20 },
+    submitGradient: { paddingVertical: 17, alignItems: 'center', borderRadius: 18, overflow: 'hidden' },
+    submitSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '50%' },
+    submitText: { fontSize: 16, fontWeight: '800' },
+    successTitle: { fontSize: 23, fontWeight: '800', marginBottom: 8, marginTop: 24, letterSpacing: -0.4 },
+    successDesc: { fontSize: 14, textAlign: 'center', fontWeight: '500' },
 });

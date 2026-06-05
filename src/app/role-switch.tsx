@@ -1,13 +1,13 @@
-import React, { useState, useMemo } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, ScrollView, Pressable, StyleSheet, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { ChevronLeft, Briefcase, Building2, Check } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import useAppStore from "@/lib/state/app-store";
-import { useColors } from "@/lib/useColors";
-import type { AppColors } from "@/lib/useColors";
+import { useClay } from "@/lib/useClay";
+import { ClaySurface, ClayIconBox } from "@/components/clay";
 
 const ROLES = [
     { id: 'worker' as const, icon: Briefcase, label: 'Režim brigádnika', subtitle: 'Hľadám prácu' },
@@ -16,8 +16,7 @@ const ROLES = [
 
 export default function RoleSwitchScreen() {
     const router = useRouter();
-    const C = useColors();
-    const st = useMemo(() => makeStyles(C), [C]);
+    const C = useClay();
     const currentRole = useAppStore((s) => s.currentRole);
     const setCurrentRole = useAppStore((s) => s.setCurrentRole);
     const [selected, setSelected] = useState(currentRole);
@@ -29,48 +28,50 @@ export default function RoleSwitchScreen() {
     };
 
     return (
-        <SafeAreaView style={st.container} edges={['top']}>
-            <View style={st.header}>
-                <Pressable onPress={() => router.back()} style={({ pressed }) => [st.backBtn, pressed && { transform: [{ scale: 0.95 }] }]}>
-                    <ChevronLeft size={22} color={C.text} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
+            <View style={styles.header}>
+                <Pressable onPress={() => router.back()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                        <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
+                    </ClaySurface>
                 </Pressable>
-                <Text style={st.headerTitle}>Zmeniť režim</Text>
+                <Text style={[styles.headerTitle, { color: C.text }]}>Zmeniť režim</Text>
                 <View style={{ width: 42 }} />
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 20, flex: 1 }}>
-                <View style={{ flex: 1, justifyContent: 'center' }}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 20, flexGrow: 1 }}>
+                <View style={{ flex: 1, justifyContent: 'center', gap: 16 }}>
                     {ROLES.map((role) => {
                         const active = selected === role.id;
                         const Icon = role.icon;
                         return (
-                            <Pressable
-                                key={role.id}
-                                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setSelected(role.id); }}
-                                style={[st.roleCard, active && { borderColor: C.purple, backgroundColor: C.purpleDim }]}
-                            >
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <View style={[st.roleIcon, { backgroundColor: active ? C.purple : C.surface2 }]}>
-                                        <Icon size={24} color={active ? '#FFF' : C.muted} />
-                                    </View>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={st.roleLabel}>{role.label}</Text>
-                                        <Text style={st.roleSub}>{role.subtitle}</Text>
+                            <Pressable key={role.id} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setSelected(role.id); }}>
+                                <ClaySurface radius={20} style={active ? styles.activeWrap : undefined} contentStyle={[styles.roleCard, active && { borderRadius: 20, borderWidth: 2, borderColor: C.accent, backgroundColor: C.accentDim }]}>
+                                    <ClayIconBox size={52} radius={16} tintBg={active ? undefined : C.cLo}>
+                                        <Icon size={24} color={C.accent} strokeWidth={2} />
+                                    </ClayIconBox>
+                                    <View style={{ flex: 1, marginLeft: 16 }}>
+                                        <Text style={[styles.roleLabel, { color: C.text }]}>{role.label}</Text>
+                                        <Text style={[styles.roleSub, { color: C.muted }]}>{role.subtitle}</Text>
                                     </View>
                                     {active && (
-                                        <View style={st.checkCircle}>
-                                            <Check size={16} color="#FFF" strokeWidth={3} />
-                                        </View>
+                                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.checkCircle}>
+                                            <Check size={16} color={C.onAccent} strokeWidth={3.2} />
+                                        </LinearGradient>
                                     )}
-                                </View>
+                                </ClaySurface>
                             </Pressable>
                         );
                     })}
                 </View>
 
-                <Pressable onPress={handleConfirm} style={({ pressed }) => [pressed && { transform: [{ scale: 0.97 }] }]}>
-                    <LinearGradient colors={['#7c3aed', '#a855f7']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={st.confirmBtn}>
-                        <Text style={st.confirmText}>Potvrdiť výber</Text>
+                <Pressable onPress={handleConfirm} style={({ pressed }) => [styles.confirmWrap, Platform.select({
+                    ios: { shadowColor: C.accentShadow.color, shadowOffset: { width: 0, height: 6 }, shadowOpacity: C.accentShadow.opacity, shadowRadius: 14 },
+                    android: { elevation: 6 },
+                }), pressed && { transform: [{ scale: 0.97 }] }]}>
+                    <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.confirmBtn}>
+                        <LinearGradient colors={['rgba(255,255,255,0.28)', 'transparent']} style={styles.confirmSheen} />
+                        <Text style={[styles.confirmText, { color: C.onAccent }]}>Potvrdiť výber</Text>
                     </LinearGradient>
                 </Pressable>
             </ScrollView>
@@ -78,16 +79,16 @@ export default function RoleSwitchScreen() {
     );
 }
 
-const makeStyles = (C: AppColors) => StyleSheet.create({
-    container: { flex: 1, backgroundColor: C.bg },
+const styles = StyleSheet.create({
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 },
-    backBtn: { width: 42, height: 42, borderRadius: 14, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center' },
-    headerTitle: { fontSize: 18, fontWeight: '700', color: C.text },
-    roleCard: { backgroundColor: C.surface, borderRadius: 18, borderWidth: 2, borderColor: C.border, padding: 20, marginBottom: 16 },
-    roleIcon: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
-    roleLabel: { fontSize: 18, fontWeight: '700', color: C.text, marginBottom: 4 },
-    roleSub: { fontSize: 14, color: C.muted },
-    checkCircle: { width: 32, height: 32, borderRadius: 16, backgroundColor: C.purple, alignItems: 'center', justifyContent: 'center' },
-    confirmBtn: { paddingVertical: 18, borderRadius: 16, alignItems: 'center', marginBottom: 20 },
-    confirmText: { fontSize: 17, fontWeight: '700', color: '#FFF' },
+    headerTitle: { fontSize: 18, fontWeight: '800', letterSpacing: -0.3 },
+    activeWrap: {},
+    roleCard: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 20 },
+    roleLabel: { fontSize: 17, fontWeight: '800', marginBottom: 4, letterSpacing: -0.3 },
+    roleSub: { fontSize: 13.5, fontWeight: '500' },
+    checkCircle: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+    confirmWrap: { borderRadius: 18, overflow: 'hidden', marginBottom: 20 },
+    confirmBtn: { paddingVertical: 17, borderRadius: 18, alignItems: 'center', overflow: 'hidden' },
+    confirmSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '50%' },
+    confirmText: { fontSize: 16, fontWeight: '800' },
 });

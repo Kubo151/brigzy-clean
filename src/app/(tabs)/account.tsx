@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import {
     View, Text, ScrollView, Pressable, Image, Alert, StyleSheet, Platform,
 } from "react-native";
@@ -8,29 +8,24 @@ import {
     Settings, ChevronRight, CreditCard, User, UserCheck,
     Bell, Lock, HelpCircle, LogOut, Pencil, Star,
 } from "lucide-react-native";
-import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useText } from "@/lib/useText";
 import useAppStore from "@/lib/state/app-store";
 import { supabase } from "@/lib/supabase";
-import { useColors } from "@/lib/useColors";
-import type { AppColors } from "@/lib/useColors";
+import { useClay } from "@/lib/useClay";
+import type { ClayColors } from "@/lib/useClay";
+import { ClaySurface, ClayIconBox } from "@/components/clay";
 
 // ─── PROFILE SCREEN ─────────────────────────────────
 export default function ProfileScreen() {
     const router = useRouter();
     const text = useText();
-    const C = useColors();
+    const C = useClay();
     const currentUser = useAppStore((s) => s.currentUser);
     const logout = useAppStore((s) => s.logout);
     const currentRole = useAppStore((s) => s.currentRole);
 
-    const [stats, setStats] = useState({
-        completedJobs: 0,
-        rating: 0,
-        reviews: 0,
-        earned: 0,
-    });
+    const [stats, setStats] = useState({ completedJobs: 0, rating: 0, reviews: 0, earned: 0 });
 
     useEffect(() => { loadUserStats(); }, []);
 
@@ -38,17 +33,9 @@ export default function ProfileScreen() {
         if (!currentUser?.id) return;
         try {
             const { data } = await supabase
-                .from('users')
-                .select('rating, reviews_count')
-                .eq('id', currentUser.id)
-                .single();
+                .from('users').select('rating, reviews_count').eq('id', currentUser.id).single();
             if (data) {
-                setStats({
-                    completedJobs: 0,
-                    rating: data.rating || 0,
-                    reviews: data.reviews_count || 0,
-                    earned: 0,
-                });
+                setStats({ completedJobs: 0, rating: data.rating || 0, reviews: data.reviews_count || 0, earned: 0 });
             }
         } catch (e) {
             console.error('Error loading stats:', e);
@@ -56,178 +43,154 @@ export default function ProfileScreen() {
     };
 
     const handleLogout = () => {
-        Alert.alert(
-            'Odhlásiť sa',
-            'Naozaj sa chcete odhlásiť?',
-            [
-                { text: 'Zrušiť', style: 'cancel' },
-                {
-                    text: 'Odhlásiť',
-                    style: 'destructive',
-                    onPress: async () => {
-                        await supabase.auth.signOut();
-                        logout();
-                        router.replace('/login');
-                    },
+        Alert.alert('Odhlásiť sa', 'Naozaj sa chcete odhlásiť?', [
+            { text: 'Zrušiť', style: 'cancel' },
+            {
+                text: 'Odhlásiť', style: 'destructive',
+                onPress: async () => {
+                    await supabase.auth.signOut();
+                    logout();
+                    router.replace('/login');
                 },
-            ]
-        );
+            },
+        ]);
     };
 
     const displayName = (currentUser as any)?.display_name || currentUser?.name || 'Používateľ';
     const email = currentUser?.email || '';
     const initial = displayName.charAt(0).toUpperCase();
 
-    const st = useMemo(() => makeStyles(C), [C]);
-
     return (
-        <SafeAreaView style={st.container} edges={['top']}>
-            <ScrollView
-                style={{ flex: 1 }}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 40 }}
-            >
-                {/* ─── HEADER ────────────────────────── */}
-                <View style={st.header}>
-                    <Text style={st.headerTitle}>Profil</Text>
-                    <Pressable
-                        onPress={() => router.push('/settings')}
-                        style={({ pressed }) => [st.settingsBtn, pressed && { transform: [{ scale: 0.97 }] }]}
-                    >
-                        <Settings size={20} color={C.text} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
+            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <Text style={[styles.headerTitle, { color: C.text }]}>Profil</Text>
+                    <Pressable onPress={() => router.push('/settings')} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                        <ClaySurface radius={15} style={{ width: 44, height: 44 }} contentStyle={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+                            <Settings size={20} color={C.text} strokeWidth={2} />
+                        </ClaySurface>
                     </Pressable>
                 </View>
 
-                {/* ─── PROFILE HEADER ────────────────── */}
-                <View style={st.profileSection}>
-                    <View style={st.avatarWrap}>
-                        {(currentUser as any)?.avatar_url ? (
-                            <Image source={{ uri: (currentUser as any).avatar_url }} style={st.avatar} />
-                        ) : (
-                            <LinearGradient
-                                colors={['#7c3aed', '#a78bfa']}
-                                style={st.avatar}
-                            >
-                                <Text style={st.avatarText}>{initial}</Text>
-                            </LinearGradient>
-                        )}
-                        <Pressable
-                            onPress={() => router.push('/account-settings')}
-                            style={({ pressed }) => [st.editBadge, pressed && { transform: [{ scale: 0.9 }] }]}
-                        >
-                            <Pencil size={14} color="#FFF" strokeWidth={2.5} />
-                        </Pressable>
-                    </View>
+                {/* Profile card */}
+                <View style={{ paddingHorizontal: 20 }}>
+                    <ClaySurface radius={24} contentStyle={{ alignItems: 'center', paddingVertical: 24, paddingHorizontal: 20 }}>
+                        <View style={styles.avatarWrap}>
+                            {(currentUser as any)?.avatar_url ? (
+                                <Image source={{ uri: (currentUser as any).avatar_url }} style={styles.avatar} />
+                            ) : (
+                                <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.avatar}>
+                                    <Text style={[styles.avatarText, { color: C.onAccent }]}>{initial}</Text>
+                                </LinearGradient>
+                            )}
+                            <Pressable onPress={() => router.push('/account-settings')} style={({ pressed }) => [styles.editBadge, { backgroundColor: C.accent, borderColor: C.cHi }, pressed && { transform: [{ scale: 0.9 }] }]}>
+                                <Pencil size={14} color={C.onAccent} strokeWidth={2.6} />
+                            </Pressable>
+                        </View>
 
-                    <Text style={st.userName}>{displayName}</Text>
-                    <Text style={st.userEmail}>{email}</Text>
+                        <Text style={[styles.userName, { color: C.text }]}>{displayName}</Text>
+                        <Text style={[styles.userEmail, { color: C.muted }]}>{email}</Text>
 
-                    <View style={st.statsRow}>
-                        <View style={st.statItem}>
-                            <Text style={st.statValue}>{stats.completedJobs}</Text>
-                            <Text style={st.statLabel}>Brigády</Text>
+                        <View style={styles.statsRow}>
+                            <View style={styles.statItem}>
+                                <Text style={[styles.statValue, { color: C.text }]}>{stats.completedJobs}</Text>
+                                <Text style={[styles.statLabel, { color: C.muted }]}>Brigády</Text>
+                            </View>
+                            <View style={[styles.statDivider, { backgroundColor: C.hair }]} />
+                            <View style={styles.statItem}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+                                    <Star size={15} color={C.star} fill={C.star} strokeWidth={0} />
+                                    <Text style={[styles.statValue, { color: C.text }]}>{stats.rating.toFixed(1)}</Text>
+                                </View>
+                                <Text style={[styles.statLabel, { color: C.muted }]}>Hodnotenie</Text>
+                            </View>
+                            <View style={[styles.statDivider, { backgroundColor: C.hair }]} />
+                            <View style={styles.statItem}>
+                                <Text style={[styles.statValue, { color: C.text }]}>€{stats.earned}</Text>
+                                <Text style={[styles.statLabel, { color: C.muted }]}>Zarobené</Text>
+                            </View>
                         </View>
-                        <View style={st.statDivider} />
-                        <View style={st.statItem}>
-                            <Text style={st.statValue}>
-                                <Star size={14} color={C.yellow} /> {stats.rating.toFixed(1)}
-                            </Text>
-                            <Text style={st.statLabel}>Hodnotenie</Text>
-                        </View>
-                        <View style={st.statDivider} />
-                        <View style={st.statItem}>
-                            <Text style={st.statValue}>€{stats.earned}</Text>
-                            <Text style={st.statLabel}>Zarobené</Text>
-                        </View>
-                    </View>
+                    </ClaySurface>
                 </View>
 
-                {/* ─── SECTION: ÚČET ─────────────────── */}
-                <View style={st.sectionWrap}>
-                    <Text style={st.sectionLabel}>ÚČET</Text>
-                    <View style={st.menuGroup}>
-                        <MenuItem C={C} st={st} icon={<CreditCard size={18} color={C.purple} />} iconBg={C.purpleDim} label="Peňaženka" subtitle="Dostupné prostriedky" onPress={() => router.push('/wallet')} />
-                        <View style={st.menuDivider} />
-                        <MenuItem C={C} st={st} icon={<User size={18} color={C.purple} />} iconBg={C.purpleDim} label="Upraviť profil" onPress={() => router.push('/account-settings')} />
-                        <View style={st.menuDivider} />
-                        <MenuItem C={C} st={st} icon={<UserCheck size={18} color={C.green} />} iconBg="rgba(52,211,153,0.15)" label="Moje prihlášky" subtitle={currentRole === 'employer' ? 'Moje brigády' : 'Aktívne prihlášky'} onPress={() => router.push(currentRole === 'employer' ? '/my-jobs' : '/my-applications')} />
-                    </View>
-                </View>
+                {/* ÚČET */}
+                <Section label="ÚČET" C={C}>
+                    <MenuItem C={C} icon={<CreditCard size={18} color={C.accent} strokeWidth={2} />} label="Peňaženka" subtitle="Dostupné prostriedky" onPress={() => router.push('/wallet')} first />
+                    <Divider C={C} />
+                    <MenuItem C={C} icon={<User size={18} color={C.accent} strokeWidth={2} />} label="Upraviť profil" onPress={() => router.push('/account-settings')} />
+                    <Divider C={C} />
+                    <MenuItem C={C} icon={<UserCheck size={18} color={C.green} strokeWidth={2} />} tintBg={C.greenDim} label="Moje prihlášky" subtitle={currentRole === 'employer' ? 'Moje brigády' : 'Aktívne prihlášky'} onPress={() => router.push(currentRole === 'employer' ? '/my-jobs' : '/my-applications')} last />
+                </Section>
 
-                {/* ─── SECTION: NASTAVENIA ───────────── */}
-                <View style={st.sectionWrap}>
-                    <Text style={st.sectionLabel}>NASTAVENIA</Text>
-                    <View style={st.menuGroup}>
-                        <MenuItem C={C} st={st} icon={<Bell size={18} color={C.yellow} />} iconBg="rgba(251,191,36,0.15)" label="Notifikácie" onPress={() => router.push('/notifications')} />
-                        <View style={st.menuDivider} />
-                        <MenuItem C={C} st={st} icon={<Lock size={18} color={C.purple} />} iconBg={C.purpleDim} label="Súkromie a bezpečnosť" onPress={() => router.push('/privacy')} />
-                        <View style={st.menuDivider} />
-                        <MenuItem C={C} st={st} icon={<HelpCircle size={18} color={C.purpleLight} />} iconBg={C.purpleDim} label="Pomoc a podpora" onPress={() => { }} />
-                    </View>
-                </View>
+                {/* NASTAVENIA */}
+                <Section label="NASTAVENIA" C={C}>
+                    <MenuItem C={C} icon={<Bell size={18} color={C.star} strokeWidth={2} />} tintBg="rgba(255,179,0,0.15)" label="Notifikácie" onPress={() => router.push('/notifications')} first />
+                    <Divider C={C} />
+                    <MenuItem C={C} icon={<Lock size={18} color={C.accent} strokeWidth={2} />} label="Súkromie a bezpečnosť" onPress={() => router.push('/privacy')} />
+                    <Divider C={C} />
+                    <MenuItem C={C} icon={<HelpCircle size={18} color={C.accent} strokeWidth={2} />} label="Pomoc a podpora" onPress={() => { }} last />
+                </Section>
 
-                {/* ─── LOGOUT ────────────────────────── */}
-                <View style={st.sectionWrap}>
-                    <View style={st.menuGroup}>
-                        <MenuItem C={C} st={st} icon={<LogOut size={18} color={C.red} />} iconBg="rgba(239,68,68,0.12)" label="Odhlásiť sa" onPress={handleLogout} danger />
-                    </View>
+                {/* LOGOUT */}
+                <View style={{ paddingHorizontal: 20, marginTop: 4 }}>
+                    <ClaySurface radius={18}>
+                        <MenuItem C={C} icon={<LogOut size={18} color={C.red} strokeWidth={2} />} tintBg="rgba(255,69,58,0.13)" label="Odhlásiť sa" onPress={handleLogout} danger first last />
+                    </ClaySurface>
                 </View>
             </ScrollView>
         </SafeAreaView>
     );
 }
 
-/* ─── MENU ITEM ─────────────────────────────── */
-function MenuItem({ C, st, icon, iconBg, label, subtitle, badge, onPress, danger }: {
-    C: AppColors; st: any; icon: React.ReactNode; iconBg: string; label: string;
-    subtitle?: string; badge?: string; onPress?: () => void; danger?: boolean;
+function Section({ label, C, children }: { label: string; C: ClayColors; children: React.ReactNode }) {
+    return (
+        <View style={{ paddingHorizontal: 20, marginTop: 26 }}>
+            <Text style={[styles.sectionLabel, { color: C.muted }]}>{label}</Text>
+            <ClaySurface radius={18}>{children}</ClaySurface>
+        </View>
+    );
+}
+
+function Divider({ C }: { C: ClayColors }) {
+    return <View style={{ height: 1, backgroundColor: C.hair, marginLeft: 70 }} />;
+}
+
+function MenuItem({ C, icon, tintBg, label, subtitle, onPress, danger, first, last }: {
+    C: ClayColors; icon: React.ReactNode; tintBg?: string; label: string;
+    subtitle?: string; onPress?: () => void; danger?: boolean; first?: boolean; last?: boolean;
 }) {
     return (
-        <Pressable onPress={onPress} style={({ pressed }) => [{ paddingHorizontal: 18, paddingVertical: 18 }, pressed && { transform: [{ scale: 0.98 }] }]}>
+        <Pressable onPress={onPress} style={({ pressed }) => [{
+            paddingHorizontal: 14, paddingVertical: 14,
+            borderTopLeftRadius: first ? 18 : 0, borderTopRightRadius: first ? 18 : 0,
+            borderBottomLeftRadius: last ? 18 : 0, borderBottomRightRadius: last ? 18 : 0,
+        }, pressed && { opacity: 0.7 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={[st.menuIcon, { backgroundColor: iconBg }]}>{icon}</View>
+                <ClayIconBox size={42} radius={13} tintBg={tintBg ?? C.accentDim} style={{ marginRight: 14 }}>{icon}</ClayIconBox>
                 <View style={{ flex: 1, marginRight: 8 }}>
-                    <Text style={[st.menuLabel, danger && { color: C.red }]}>{label}</Text>
-                    {subtitle ? <Text style={st.menuSub}>{subtitle}</Text> : null}
+                    <Text style={{ fontSize: 16, fontWeight: '700', color: danger ? C.red : C.text, letterSpacing: -0.2 }}>{label}</Text>
+                    {subtitle ? <Text style={{ fontSize: 13, color: C.muted, marginTop: 2, fontWeight: '500' }}>{subtitle}</Text> : null}
                 </View>
-                {badge ? (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                        <View style={st.badge}><Text style={st.badgeText}>{badge}</Text></View>
-                        <ChevronRight size={18} color={C.muted} />
-                    </View>
-                ) : !danger ? (
-                    <ChevronRight size={18} color={C.muted} />
-                ) : null}
+                {!danger && <ChevronRight size={18} color={C.muted} strokeWidth={2} />}
             </View>
         </Pressable>
     );
 }
 
-/* ─── STYLES FACTORY ────────────────────────── */
-const makeStyles = (C: AppColors) => StyleSheet.create({
-    container: { flex: 1, backgroundColor: C.bg },
-    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8 },
-    headerTitle: { fontSize: 30, fontWeight: '700', color: C.text },
-    settingsBtn: { width: 42, height: 42, borderRadius: 14, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center' },
-    profileSection: { alignItems: 'center', paddingTop: 12, paddingBottom: 24, paddingHorizontal: 20 },
-    avatarWrap: { position: 'relative', marginBottom: 16 },
+const styles = StyleSheet.create({
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 12, paddingBottom: 12 },
+    headerTitle: { fontSize: 30, fontWeight: '800', letterSpacing: -0.5 },
+    avatarWrap: { position: 'relative', marginBottom: 14 },
     avatar: { width: 88, height: 88, borderRadius: 44, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-    avatarText: { color: '#FFF', fontSize: 32, fontWeight: '700' },
-    editBadge: { position: 'absolute', bottom: -2, right: -2, width: 34, height: 34, borderRadius: 17, backgroundColor: C.bg === '#F2F2F7' ? '#1C1C1E' : C.purple, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: C.bg, ...Platform.select({ ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 6 }, android: { elevation: 6 } }) },
-    userName: { fontSize: 24, fontWeight: '700', color: C.text, marginBottom: 4 },
-    userEmail: { fontSize: 15, color: C.muted, marginBottom: 24 },
-    statsRow: { flexDirection: 'row', backgroundColor: C.surface, borderRadius: 16, paddingVertical: 24, paddingHorizontal: 8, borderWidth: 1, borderColor: C.border, width: '100%' },
+    avatarText: { fontSize: 32, fontWeight: '800' },
+    editBadge: { position: 'absolute', bottom: -2, right: -2, width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', borderWidth: 3, ...Platform.select({ ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 6 }, android: { elevation: 6 } }) },
+    userName: { fontSize: 23, fontWeight: '800', marginBottom: 4, letterSpacing: -0.4 },
+    userEmail: { fontSize: 14, marginBottom: 20, fontWeight: '500' },
+    statsRow: { flexDirection: 'row', width: '100%', paddingTop: 6 },
     statItem: { flex: 1, alignItems: 'center' },
-    statValue: { fontSize: 24, fontWeight: '700', color: C.text, marginBottom: 6 },
-    statLabel: { fontSize: 14, color: C.muted, fontWeight: '500' },
-    statDivider: { width: 1, backgroundColor: C.border, marginVertical: 4 },
-    sectionWrap: { paddingHorizontal: 20, marginBottom: 28 },
-    sectionLabel: { fontSize: 13, fontWeight: '700', color: C.muted, letterSpacing: 1, marginBottom: 14, marginLeft: 4 },
-    menuGroup: { backgroundColor: C.surface, borderRadius: 18, borderWidth: 1, borderColor: C.border, overflow: 'hidden' },
-    menuDivider: { height: 1, backgroundColor: C.border, marginLeft: 72 },
-    menuIcon: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 14 },
-    menuLabel: { fontSize: 17, fontWeight: '600', color: C.text },
-    menuSub: { fontSize: 14, color: C.muted, marginTop: 3 },
-    badge: { backgroundColor: C.purple, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3, minWidth: 24, alignItems: 'center' },
-    badgeText: { fontSize: 12, fontWeight: '700', color: '#FFF' },
+    statValue: { fontSize: 22, fontWeight: '800', marginBottom: 5, letterSpacing: -0.5 },
+    statLabel: { fontSize: 12.5, fontWeight: '600' },
+    statDivider: { width: 1, marginVertical: 2 },
+    sectionLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, marginBottom: 12, marginLeft: 4 },
 });

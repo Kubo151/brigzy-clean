@@ -1,34 +1,33 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { View, Text, ScrollView, Pressable, Switch, Alert, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { ChevronLeft, ChevronRight, Eye, Phone, Mail, Lock, ShieldCheck, Download, Trash2 } from "lucide-react-native";
-import { useColors } from "@/lib/useColors";
-import type { AppColors } from "@/lib/useColors";
+import { useClay } from "@/lib/useClay";
+import type { ClayColors } from "@/lib/useClay";
+import { ClaySurface, ClayIconBox } from "@/components/clay";
 
 function ToggleRow({ C, label, icon, value, onToggle }: {
-    C: AppColors; label: string; icon: React.ReactNode; value: boolean; onToggle: (v: boolean) => void;
+    C: ClayColors; label: string; icon: React.ReactNode; value: boolean; onToggle: (v: boolean) => void;
 }) {
     return (
-        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 16 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                {icon}
-                <Text style={{ fontSize: 17, fontWeight: '600', color: C.text, marginLeft: 14 }}>{label}</Text>
-            </View>
-            <Switch value={value} onValueChange={onToggle} trackColor={{ false: C.surface2, true: C.purple }} thumbColor="#FFF" ios_backgroundColor={C.surface2} style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }} />
+        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 13 }}>
+            <ClayIconBox size={42} radius={13} style={{ marginRight: 14 }}>{icon}</ClayIconBox>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: C.text, flex: 1, letterSpacing: -0.2 }}>{label}</Text>
+            <Switch value={value} onValueChange={onToggle} trackColor={{ false: C.cLo, true: C.accent }} thumbColor="#FFF" ios_backgroundColor={C.cLo} style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }} />
         </View>
     );
 }
 
-function NavRow({ C, st, label, icon, iconBg, onPress, danger }: {
-    C: AppColors; st: any; label: string; icon: React.ReactNode; iconBg: string; onPress: () => void; danger?: boolean;
+function NavRow({ C, label, icon, tintBg, onPress, danger }: {
+    C: ClayColors; label: string; icon: React.ReactNode; tintBg?: string; onPress: () => void; danger?: boolean;
 }) {
     return (
-        <Pressable onPress={onPress} style={({ pressed }) => [{ paddingHorizontal: 16, paddingVertical: 16 }, pressed && { transform: [{ scale: 0.98 }] }]}>
+        <Pressable onPress={onPress} style={({ pressed }) => [{ paddingHorizontal: 14, paddingVertical: 13 }, pressed && { opacity: 0.7 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={[st.navIcon, { backgroundColor: iconBg }]}>{icon}</View>
-                <Text style={{ fontSize: 17, fontWeight: '600', color: danger ? C.red : C.text, flex: 1 }}>{label}</Text>
-                {!danger && <ChevronRight size={18} color={C.muted} />}
+                <ClayIconBox size={42} radius={13} tintBg={tintBg ?? C.accentDim} style={{ marginRight: 14 }}>{icon}</ClayIconBox>
+                <Text style={{ fontSize: 16, fontWeight: '700', color: danger ? C.red : C.text, flex: 1, letterSpacing: -0.2 }}>{label}</Text>
+                {!danger && <ChevronRight size={18} color={C.muted} strokeWidth={2} />}
             </View>
         </Pressable>
     );
@@ -36,8 +35,7 @@ function NavRow({ C, st, label, icon, iconBg, onPress, danger }: {
 
 export default function PrivacyScreen() {
     const router = useRouter();
-    const C = useColors();
-    const st = useMemo(() => makeStyles(C), [C]);
+    const C = useClay();
     const [publicProfile, setPublicProfile] = useState(true);
     const [showPhone, setShowPhone] = useState(false);
     const [showEmail, setShowEmail] = useState(true);
@@ -49,58 +47,54 @@ export default function PrivacyScreen() {
         ]);
     };
 
+    const Section = ({ label, children }: { label: string; children: React.ReactNode }) => (
+        <View style={styles.section}>
+            <Text style={[styles.sectionLabel, { color: C.muted }]}>{label}</Text>
+            <ClaySurface radius={18}>{children}</ClaySurface>
+        </View>
+    );
+    const Divider = () => <View style={{ height: 1, backgroundColor: C.hair, marginLeft: 70 }} />;
+
     return (
-        <SafeAreaView style={st.container} edges={['top']}>
-            <View style={st.header}>
-                <Pressable onPress={() => router.back()} style={({ pressed }) => [st.backBtn, pressed && { transform: [{ scale: 0.95 }] }]}>
-                    <ChevronLeft size={22} color={C.text} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
+            <View style={styles.header}>
+                <Pressable onPress={() => router.back()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                        <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
+                    </ClaySurface>
                 </Pressable>
-                <Text style={st.headerTitle}>Nastavenia súkromia</Text>
+                <Text style={[styles.headerTitle, { color: C.text }]}>Nastavenia súkromia</Text>
                 <View style={{ width: 42 }} />
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
-                <View style={st.section}>
-                    <Text style={st.sectionLabel}>VIDITEĽNOSŤ PROFILU</Text>
-                    <View style={st.menuGroup}>
-                        <ToggleRow C={C} label="Verejný profil" icon={<Eye size={18} color={C.purple} />} value={publicProfile} onToggle={setPublicProfile} />
-                        <View style={st.divider} />
-                        <ToggleRow C={C} label="Zobraziť telefón" icon={<Phone size={18} color={C.purple} />} value={showPhone} onToggle={setShowPhone} />
-                        <View style={st.divider} />
-                        <ToggleRow C={C} label="Zobraziť email" icon={<Mail size={18} color={C.purple} />} value={showEmail} onToggle={setShowEmail} />
-                    </View>
-                </View>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40, paddingTop: 8 }}>
+                <Section label="VIDITEĽNOSŤ PROFILU">
+                    <ToggleRow C={C} label="Verejný profil" icon={<Eye size={18} color={C.accent} strokeWidth={2} />} value={publicProfile} onToggle={setPublicProfile} />
+                    <Divider />
+                    <ToggleRow C={C} label="Zobraziť telefón" icon={<Phone size={18} color={C.accent} strokeWidth={2} />} value={showPhone} onToggle={setShowPhone} />
+                    <Divider />
+                    <ToggleRow C={C} label="Zobraziť email" icon={<Mail size={18} color={C.accent} strokeWidth={2} />} value={showEmail} onToggle={setShowEmail} />
+                </Section>
 
-                <View style={st.section}>
-                    <Text style={st.sectionLabel}>BEZPEČNOSŤ</Text>
-                    <View style={st.menuGroup}>
-                        <NavRow C={C} st={st} icon={<Lock size={18} color={C.purple} />} iconBg={C.purpleDim} label="Zmeniť heslo" onPress={() => { }} />
-                        <View style={st.divider} />
-                        <NavRow C={C} st={st} icon={<ShieldCheck size={18} color={C.purple} />} iconBg={C.purpleDim} label="Dvojfaktorové overenie" onPress={() => { }} />
-                    </View>
-                </View>
+                <Section label="BEZPEČNOSŤ">
+                    <NavRow C={C} icon={<Lock size={18} color={C.accent} strokeWidth={2} />} label="Zmeniť heslo" onPress={() => { }} />
+                    <Divider />
+                    <NavRow C={C} icon={<ShieldCheck size={18} color={C.accent} strokeWidth={2} />} label="Dvojfaktorové overenie" onPress={() => { }} />
+                </Section>
 
-                <View style={st.section}>
-                    <Text style={st.sectionLabel}>DÁTA</Text>
-                    <View style={st.menuGroup}>
-                        <NavRow C={C} st={st} icon={<Download size={18} color={C.purple} />} iconBg={C.purpleDim} label="Stiahnuť moje dáta" onPress={() => { }} />
-                        <View style={st.divider} />
-                        <NavRow C={C} st={st} icon={<Trash2 size={18} color={C.red} />} iconBg="rgba(239,68,68,0.12)" label="Vymazať účet" onPress={handleDeleteAccount} danger />
-                    </View>
-                </View>
+                <Section label="DÁTA">
+                    <NavRow C={C} icon={<Download size={18} color={C.accent} strokeWidth={2} />} label="Stiahnuť moje dáta" onPress={() => { }} />
+                    <Divider />
+                    <NavRow C={C} icon={<Trash2 size={18} color={C.red} strokeWidth={2} />} tintBg="rgba(255,69,58,0.13)" label="Vymazať účet" onPress={handleDeleteAccount} danger />
+                </Section>
             </ScrollView>
         </SafeAreaView>
     );
 }
 
-const makeStyles = (C: AppColors) => StyleSheet.create({
-    container: { flex: 1, backgroundColor: C.bg },
+const styles = StyleSheet.create({
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 },
-    backBtn: { width: 42, height: 42, borderRadius: 14, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center' },
-    headerTitle: { fontSize: 18, fontWeight: '700', color: C.text },
-    section: { paddingHorizontal: 20, marginBottom: 28 },
-    sectionLabel: { fontSize: 13, fontWeight: '700', color: C.muted, letterSpacing: 1, marginBottom: 14, marginLeft: 4 },
-    menuGroup: { backgroundColor: C.surface, borderRadius: 18, borderWidth: 1, borderColor: C.border, overflow: 'hidden' },
-    divider: { height: 1, backgroundColor: C.border, marginLeft: 16 },
-    navIcon: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 14 },
+    headerTitle: { fontSize: 18, fontWeight: '800', letterSpacing: -0.3 },
+    section: { paddingHorizontal: 20, marginBottom: 26 },
+    sectionLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, marginBottom: 12, marginLeft: 4 },
 });

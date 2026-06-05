@@ -6,10 +6,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ChevronLeft, Send } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { supabase } from "@/lib/supabase";
-import { useColors } from "@/lib/useColors";
-import type { AppColors } from "@/lib/useColors";
+import { useClay } from "@/lib/useClay";
+import type { ClayColors } from "@/lib/useClay";
 import * as Haptics from "expo-haptics";
+import { ClaySurface, ClayInset } from "@/components/clay";
 
 interface Message {
     id: string; content: string; sender_id: string;
@@ -23,7 +25,7 @@ interface UserProfile {
 export default function ChatScreen() {
     const { userId, jobId } = useLocalSearchParams<{ userId: string; jobId?: string }>();
     const router = useRouter();
-    const C = useColors();
+    const C = useClay();
     const st = useMemo(() => makeStyles(C), [C]);
 
     const [messages, setMessages] = useState<Message[]>([]);
@@ -86,11 +88,12 @@ export default function ChatScreen() {
 
     const formatTime = (d: string) => new Date(d).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' });
     const initial = (otherUser?.display_name || otherUser?.name)?.charAt(0).toUpperCase() || '?';
+    const canSend = !!newMessage.trim() && !sending;
 
     if (loading) {
         return (
             <SafeAreaView style={st.container} edges={['top']}>
-                <View style={st.center}><ActivityIndicator size="large" color={C.purple} /></View>
+                <View style={st.center}><ActivityIndicator size="large" color={C.accent} /></View>
             </SafeAreaView>
         );
     }
@@ -99,15 +102,17 @@ export default function ChatScreen() {
         <SafeAreaView style={st.container} edges={['top']}>
             {/* Header */}
             <View style={st.chatHeader}>
-                <Pressable onPress={() => router.back()} style={({ pressed }) => [st.backBtn, pressed && { transform: [{ scale: 0.95 }] }]}>
-                    <ChevronLeft size={22} color={C.text} />
+                <Pressable onPress={() => router.back()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                        <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
+                    </ClaySurface>
                 </Pressable>
                 {otherUser?.avatar_url ? (
                     <Image source={{ uri: otherUser.avatar_url }} style={st.avatar} />
                 ) : (
-                    <View style={[st.avatar, { backgroundColor: C.purpleDim }]}>
-                        <Text style={[st.avatarLetter, { color: C.purple }]}>{initial}</Text>
-                    </View>
+                    <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={st.avatar}>
+                        <Text style={[st.avatarLetter, { color: C.onAccent }]}>{initial}</Text>
+                    </LinearGradient>
                 )}
                 <View style={{ flex: 1 }}>
                     <Text style={st.chatName}>{otherUser?.display_name || otherUser?.name}</Text>
@@ -116,14 +121,13 @@ export default function ChatScreen() {
             </View>
 
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }} keyboardVerticalOffset={0}>
-                {/* Messages */}
                 <ScrollView ref={scrollViewRef} style={{ flex: 1 }}
                     contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16 }}
                     showsVerticalScrollIndicator={false}
                     onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: false })}>
                     {messages.length === 0 ? (
                         <View style={{ alignItems: 'center', paddingVertical: 40 }}>
-                            <Text style={[st.emptyText, { color: C.tertiaryLabel }]}>Zatiaľ žiadne správy.{'\n'}Začnite konverzáciu!</Text>
+                            <Text style={[st.emptyText, { color: C.muted }]}>Zatiaľ žiadne správy.{'\n'}Začnite konverzáciu!</Text>
                         </View>
                     ) : (
                         messages.map((message, index) => {
@@ -131,16 +135,17 @@ export default function ChatScreen() {
                             const showTime = index === 0 || new Date(message.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() > 300000;
                             return (
                                 <View key={message.id} style={{ marginBottom: 8 }}>
-                                    {showTime && <Text style={[st.timestamp, { color: C.tertiaryLabel }]}>{formatTime(message.created_at)}</Text>}
+                                    {showTime && <Text style={[st.timestamp, { color: C.muted }]}>{formatTime(message.created_at)}</Text>}
                                     <View style={{ flexDirection: 'row', justifyContent: isSent ? 'flex-end' : 'flex-start' }}>
-                                        <View style={[
-                                            st.bubble,
-                                            isSent
-                                                ? { backgroundColor: C.purple, borderBottomRightRadius: 4 }
-                                                : { backgroundColor: C.surface, borderColor: C.separator, borderWidth: StyleSheet.hairlineWidth, borderBottomLeftRadius: 4 },
-                                        ]}>
-                                            <Text style={[st.bubbleText, { color: isSent ? '#FFF' : C.text }]}>{message.content}</Text>
-                                        </View>
+                                        {isSent ? (
+                                            <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={[st.bubble, { borderBottomRightRadius: 5 }]}>
+                                                <Text style={[st.bubbleText, { color: C.onAccent }]}>{message.content}</Text>
+                                            </LinearGradient>
+                                        ) : (
+                                            <ClaySurface radius={18} style={{ maxWidth: '78%' }} contentStyle={{ paddingHorizontal: 14, paddingVertical: 10 }}>
+                                                <Text style={[st.bubbleText, { color: C.text }]}>{message.content}</Text>
+                                            </ClaySurface>
+                                        )}
                                     </View>
                                 </View>
                             );
@@ -149,21 +154,24 @@ export default function ChatScreen() {
                 </ScrollView>
 
                 {/* Input */}
-                <View style={[st.inputBar, { backgroundColor: C.bg, borderTopColor: C.separator }]}>
-                    <View style={[st.inputWrap, { backgroundColor: C.surface }]}>
+                <View style={[st.inputBar, { backgroundColor: C.bg, borderTopColor: C.hair }]}>
+                    <ClayInset radius={22} style={{ flex: 1 }} contentStyle={{ paddingHorizontal: 16, paddingVertical: 10 }}>
                         <TextInput
                             value={newMessage} onChangeText={setNewMessage}
-                            placeholder="Napíšte správu..." placeholderTextColor={C.tertiaryLabel}
+                            placeholder="Napíšte správu..." placeholderTextColor={C.muted}
                             multiline maxLength={500}
                             style={[st.textInput, { color: C.text }]}
                         />
-                    </View>
-                    <Pressable onPress={sendMessage} disabled={!newMessage.trim() || sending}
-                        style={[st.sendBtn, { backgroundColor: (!newMessage.trim() || sending) ? C.surface2 : C.purple }]}>
-                        {sending ? (
-                            <ActivityIndicator size="small" color="#FFF" />
+                    </ClayInset>
+                    <Pressable onPress={sendMessage} disabled={!canSend}>
+                        {canSend ? (
+                            <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={st.sendBtn}>
+                                {sending ? <ActivityIndicator size="small" color={C.onAccent} /> : <Send size={18} color={C.onAccent} strokeWidth={2.2} />}
+                            </LinearGradient>
                         ) : (
-                            <Send size={18} color={(!newMessage.trim() || sending) ? C.tertiaryLabel as string : '#FFF'} />
+                            <View style={[st.sendBtn, { backgroundColor: C.cLo, borderWidth: 1, borderColor: C.hair }]}>
+                                <Send size={18} color={C.muted} strokeWidth={2} />
+                            </View>
                         )}
                     </Pressable>
                 </View>
@@ -172,27 +180,19 @@ export default function ChatScreen() {
     );
 }
 
-const makeStyles = (C: AppColors) => StyleSheet.create({
+const makeStyles = (C: ClayColors) => StyleSheet.create({
     container: { flex: 1, backgroundColor: C.bg },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    chatHeader: {
-        flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10,
-        borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.separator, gap: 12,
-    },
-    backBtn: { width: 42, height: 42, borderRadius: 14, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center' },
+    chatHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.hair, gap: 12 },
     avatar: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-    avatarLetter: { fontSize: 16, fontWeight: '700' },
-    chatName: { fontSize: 17, fontWeight: '700', color: C.text },
-    chatRole: { fontSize: 13, fontWeight: '500', color: C.purple },
-    emptyText: { textAlign: 'center', fontSize: 15 },
-    timestamp: { textAlign: 'center', fontSize: 11, marginBottom: 8 },
-    bubble: { maxWidth: '75%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 },
-    bubbleText: { fontSize: 15, lineHeight: 21 },
-    inputBar: {
-        flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12,
-        paddingVertical: 10, borderTopWidth: StyleSheet.hairlineWidth, gap: 8,
-    },
-    inputWrap: { flex: 1, borderRadius: 22, paddingHorizontal: 16, paddingVertical: 10 },
-    textInput: { fontSize: 15, maxHeight: 100 },
-    sendBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+    avatarLetter: { fontSize: 16, fontWeight: '800' },
+    chatName: { fontSize: 16.5, fontWeight: '800', color: C.text, letterSpacing: -0.3 },
+    chatRole: { fontSize: 12.5, fontWeight: '700', color: C.accent },
+    emptyText: { textAlign: 'center', fontSize: 14, fontWeight: '500', lineHeight: 21 },
+    timestamp: { textAlign: 'center', fontSize: 11, marginBottom: 8, fontWeight: '600' },
+    bubble: { maxWidth: '78%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 },
+    bubbleText: { fontSize: 14.5, lineHeight: 21, fontWeight: '500' },
+    inputBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderTopWidth: StyleSheet.hairlineWidth, gap: 8 },
+    textInput: { fontSize: 15, maxHeight: 100, fontWeight: '500' },
+    sendBtn: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
 });
