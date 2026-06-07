@@ -51,7 +51,8 @@ real-world validation. Legal-dependent parts are flagged (see [[Legal-Compliance
 
 ## Authentication — Supabase Auth (email/password for MVP)
 - **Why:** built-in, JWT integrates with RLS, already wired. Add OAuth (Apple/Google)
-  later. **KYC is separate** from auth — a Tier-2 stub now (A-17), real provider in V2.
+  later. **KYC is separate** from auth — now **real 3-layer via Stripe** (Connect KYC + optional
+  Stripe Identity + own Brigzy form for r.č./ZP at DoVP), not a stub (C-4, v2.7 §4; ADR-0004).
 - **Alternatives:** Clerk/Auth0 (extra cost/integration, unneeded now).
 - **Trade-offs:** must fix the existing dual session-tracking + profile-creation quirks.
 

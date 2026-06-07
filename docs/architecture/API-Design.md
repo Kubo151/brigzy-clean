@@ -1,11 +1,16 @@
 ---
-title: API Design — Brigzy.sk MVP
+title: API Design — Brigzy.sk
 type: architecture
-status: draft
-updated: 2026-06-02
+status: draft (reconciled to v2.7)
+updated: 2026-06-07
 ---
 
 # API Design — Brigzy.sk
+
+> **Reconciled to [[Brigzy-Spec-v2.7]] (2026-06-07).** KYC is now **real 3-layer via Stripe** (not
+> a demo stub); contracts add the **Dodatok** (addendum) flow + **OTP (AdES)** signing; cancellation
+> is **core** (B2C tiered refund + B2B 20%); new surfaces for **QR attendance**, **cross-sell**,
+> **Brigy coins**, and **referrals**.
 
 Two surfaces:
 1. **Data API** — Supabase auto-generated **PostgREST + Realtime** over tables, guarded
@@ -33,21 +38,31 @@ Each verifies the caller's JWT, checks authorization, writes an audit log, is id
 | `POST /bookings/confirm` | Poster confirms worker → create PaymentIntent (manual capture) for agreed amount + service fee → `escrow=pending`, `booking=escrow_pending`. |
 | `POST /bookings/recompute-escrow` | After an accepted price proposal → adjust/replace the held amount; booking not "binding" until fully covered. |
 | `POST /bookings/release` | Poster approves work → capture PI + credit worker `wallet_ledger` (minus fee) → `escrow=cleared`. **Gross/net split abstracted here (C-1).** |
-| `POST /bookings/cancel` | Cancellation rules (20% <12h = V2) → refund/partial via Stripe. |
+| `POST /bookings/cancel` | Cancellation rules (v2.7 §10.2): B2C tiered refund (>24h full / 12–24h 80% / <12h 50%, remainder = provable-cost/damage, **not a penalty**); B2B contractual penalty up to 20% → refund/partial via Stripe. |
+| `POST /bookings/cross-sell` | Re-hire same worker through escrow (v2.7 §9.5) → new booking with `parent_booking_id` + fresh contract. |
 | `POST /disputes/open` | Freeze escrow → `state=disputed`; create dispute row. |
 | `POST /payouts/request` | Balance ≥ €15 → Stripe Transfer→payout to connected acct → `payouts` row. |
 | `POST /stripe/webhook` | Verify signature; handle `payment_intent.*`, `transfer.*`, `payout.*`, account updates → advance state machine. |
 
-### Contracts  *(PROVISIONAL on C-1/C-3)*
-| `POST /contracts/generate` | Render template (type per legal model) with booking data → store PDF/HTML in Storage → `contracts` row. |
-| `POST /contracts/sign` | Record `signed_by_{worker,poster}_at`; when both signed + escrow covered → `booking=in_progress`. |
+### Contracts  *(PROVISIONAL on C-1/C-3/C-12 — templates pending lawyer)*
+| `POST /contracts/generate` | Render template (type per legal model + 350h check) with booking data → store PDF in Storage → `contracts` row. |
+| `POST /contracts/sign` | Record signature: **OTP (AdES)** verify or **BOK scan** upload; set `signed_by_{worker,poster}_at`; auto-deliver PDF copy to both; when both signed + escrow covered → `booking=in_progress`. |
+| `POST /contracts/addendum` | **Dodatok** for extra work (v2.7 §9.5): create `contract_addendums` row + extra PaymentIntent into escrow; same OTP/scan sign flow; extra funds not released until signed; roll hours into counter. Cannot change contract type. |
 
 ### Notifications  *(A-20)*
 | `POST /push/register` | Upsert `push_tokens`. |
 | `POST /notifications/send` | Internal: send Expo push + persist notification. Triggers: new nearby job, application accepted, escrow events, new message, review request, SOS (simplified fan-out). |
 
-### KYC  *(Tier-2 STUB for demo; real provider V2 — C-4)*
-| `POST /kyc/start`, `POST /kyc/mock-complete` | Drive the stub status (none→pending→verified) for the demo. |
+### KYC  *(real 3-layer via Stripe — C-4, v2.7 §4)*
+| `POST /kyc/connect-onboard` | Stripe Connect KYC (payments) — part of worker onboarding. |
+| `POST /kyc/identity-session` | Optional **Stripe Identity** session (doc+selfie) → store result. |
+| `POST /kyc/payroll-details` | Own Brigzy form at **DoVP creation**: rodné číslo + health insurer + permanent address + IBAN (encrypted in `contracts.payload_json`); never at registration. |
+
+### Attendance (QR) · Brigy · Referrals  *(v2.7 §9.4, §7, §8)*
+| `POST /attendance/scan` | Poster scans worker's dynamic QR → `attendance_events` (check_in/out + GPS) → updates `work_hours_counters`, Brigy earning. |
+| `POST /hours/seed` | Registration hours-input (0–349) → seed `work_hours_counters` per employer. |
+| `POST /brigy/earn`, `POST /brigy/spend` | Append `brigy_ledger` entries (earn rules / premium spend). **No EUR conversion/payout endpoint** (C-11/C-13). |
+| `POST /referrals/redeem` | Bind invitee to code; on hard conversion (first paid escrow job) credit +150 Brigy each, enforce 600 cap + anti-fraud match. |
 
 ## Escrow state machine (authoritative)
 ```

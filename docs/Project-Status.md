@@ -2,7 +2,7 @@
 title: Project Status — where we are / resume here
 type: status
 status: living
-updated: 2026-06-03
+updated: 2026-06-07
 ---
 
 # Project Status — Brigzy.sk
@@ -10,7 +10,7 @@ updated: 2026-06-03
 > Read this first on any new session. One-screen summary of where we are and what happens next.
 
 ## 🔑 Resume phrase (owner pastes this to start a new conversation)
-> *„Pokračujeme na Brigzy. Najprv si načítaj projektovú pamäť: `C:\WORK\brigzy-clean\docs\Project-Status.md` a `docs\00-INDEX.md`, plus `C:\Claude-memory\brigzy.md`. Sme vo fáze WAITING (právnik + účtovník) — nezačínaj kódiť. Keď potvrdia, plánujeme ako appka funguje/vyzerá a staviame. Zhrň kde sme a opýtaj sa čo ďalej."*
+> *„Pokračujeme na Brigzy. Najprv si načítaj projektovú pamäť: `C:\WORK\brigzy-clean\docs\Project-Status.md` a `docs\00-INDEX.md`, plus `C:\Claude-memory\brigzy.md`. Účtovník potvrdil, WAITING skončil — sme CLEARED TO BUILD (od právnika čakáme už len vzory zmlúv, non-blocking). Ideme detailne plánovať ako appka funguje/vyzerá a potom prerábame celú appku. Zhrň kde sme a opýtaj sa čo ďalej."*
 
 **Obsidian vault location (personal):** `C:\Claude-memory\` (note: `brigzy.md`).
 **Detailed project vault:** `C:\WORK\brigzy-clean\docs\` (this folder).
@@ -21,19 +21,27 @@ updated: 2026-06-03
 payer** yet). Workers find nearby jobs, agree in chat, and money is protected by
 **Stripe-based escrow**; trust via KYC, two-way reviews, XP. Full picture: [[Product-Summary]].
 
-## ⏸️ Current state (2026-06-03): WAITING
+## ▶️ Current state (2026-06-07): CLEARED TO BUILD
 - **Discovery:** done. **Design:** done & approved (claymorphism — Purple Clay light + Dark
   Clay dark; 10-screen mockups in [[Design-System]]).
 - **Architecture:** decided — Expo + Supabase + **Stripe (Connect for escrow, Stripe for
   KYC)**; Brigzy never holds funds. ADRs 0001–0005.
-- **Legal:** most items **RESEARCHED** (statute-cited) — see [[Legal-Compliance-Register]].
-- **Code:** intentionally **NOT started** (owner hold).
+- **Accountant: CONFIRMED.** Owner got the combined doc back from the účtovník (2026-06-07);
+  Part B (accounting/tax) + most of Part A working conclusions are validated. The waiting phase
+  is over — **no blocker remains.**
+- **Legal:** the only outstanding item is the **contract templates** (how DoVP/DoPČ/Zmluva o
+  dielo should be worded) from the lawyer — **non-blocking**, work proceeds in parallel.
+- **Code:** owner has green-lit the **full rebuild** of the app ("rebuild the entire app, like
+  we talked"). Next step = detailed planning pass, then build.
+- **Canonical spec: [[Brigzy-Spec-v2.7]]** (2026-06-07) — supersedes v2.5. Adds accountant
+  consultation outputs + 8 legal fixes (350h counter, 3-layer KYC, AdES signing, Brigy
+  non-convertibility, cross-sell/Dodatok, FinExpert insurance, two-tier fee). Section 13 = full
+  lawyer/accountant Q&A status (most ✅ answered in-doc).
 
-## ⛔ Blocked on (the only thing in the way)
-**Advokát + daňový poradca** (one person — the accountant is also a lawyer) — confirm the
-contract-type matrix (DoVP/DoPČ/Zmluva o dielo) + templates, intermediary + power-of-attorney
-model, e-sign level, GDPR package, VAT/odvody/invoicing/exports.
-→ hand over the single combined doc **`docs/discovery/Brigzy-Otazky-pravnik-uctovnik.docx`**
+## ⛔ Blocked on
+**Nothing blocking.** Only open item (parked, non-blocking): final **contract templates**
+(DoVP / DoPČ / Zmluva o dielo wording) from the lawyer. Everything else needed to start the
+rebuild is in place. Combined doc: **`docs/discovery/Brigzy-Otazky-pravnik-uctovnik.docx`**
 (Part A = právne, Part B = účtovné/daňové, Part C = demo). Source: [[Lawyer-Accountant-Questions-SK]].
 
 ## ▶️ What happens when they confirm

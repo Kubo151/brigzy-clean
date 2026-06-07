@@ -44,6 +44,10 @@ question lives here and is updated continuously during discovery and development
 
 **Decisions** (`adr/`)
 - [[ADR-0001-stack-reuse]] · [[ADR-0002-escrow-stripe-connect]] · [[ADR-0003-claymorphism-design-system]]
+  · [[ADR-0004-kyc-via-stripe]] · [[ADR-0005-employment-contract-model]]
+
+**Reference** (`reference/`)
+- [[Brigzy-Spec-v2.7]] — ⭐ **canonical product spec** (supersedes [[Brigzy-Spec-v2.5]])
 
 **Discovery / living**
 - [[Interview-Log]] — running Q&A from the grilling
@@ -53,23 +57,22 @@ question lives here and is updated continuously during discovery and development
 
 ## Discovery status
 
-**Phase:** ⏸️ **PAUSED** (2026-06-03) — awaiting external inputs before any build.
-**Blocked on:** final **advokát** sign-off (contract matrix + templates, intermediary/PoA)
-and **daňový poradca** (VAT/odvody). Most legal questions are now **RESEARCHED** (cited
-statutes) via `Brigzy research Report.docx` — see [[Legal-Compliance-Register]] — but not
-yet VERIFIED. **Payment + KYC architecture is locked: Stripe Connect + Stripe KYC** (no NBS
-licence; Brigzy never holds funds).
-**Design:** ✅ approved — Purple Clay (light) + Dark Clay (dark). Coding intentionally **not started** (A-24).
-**Planned on resume:** owner intends a **full remodel/rebuild** incorporating identity
-verification (KYC) + other items once the legal/accounting picture is complete.
-**Confidence toward 95% alignment:** ~88% (gap = legal/accounting answers).
-**Code:** No implementation changes. Existing prototype documented in `../CLAUDE.md`.
+**Phase:** ▶️ **CLEARED TO BUILD** (2026-06-07) — accountant confirmed; WAITING is over.
+**Blocked on:** nothing. Only open (non-blocking): lawyer **contract templates**
+(DoVP/DoPČ/ZoD wording) + selected wordings (splnomocnenie, VOP, GDPR consents) + **FinExpert**
+insurance licence question. **Payment + KYC architecture locked: Stripe Connect + Stripe
+Identity** (no NBS licence; Brigzy never holds funds).
+**Canonical spec:** [[Brigzy-Spec-v2.7]] (supersedes v2.5) — accountant outputs + 8 legal fixes.
+**Design:** ✅ approved — Purple Clay (light) + Dark Clay (dark). App code rebuild **not started yet**.
+**Planned next:** owner wants a **full remodel/rebuild** incorporating real KYC, escrow, 350h
+counter, contracts, Brigy, cross-sell — per v2.7.
+**Code:** No implementation changes yet. Existing prototype documented in `../CLAUDE.md`.
 
 ### To resume cleanly
-1. Owner returns with lawyer + accountant answers → update [[Legal-Compliance-Register]]
-   (C-x → VERIFIED) + write payment-model ADR.
-2. Re-confirm scope given the planned rebuild (KYC now likely promoted toward MVP).
-3. On owner's go: build the Purple/Dark claymorphism RN component kit, then reskin/rebuild.
+1. Detailed planning pass — how the app works + looks (full UX + flows, v2.7 features).
+2. Update [[Legal-Compliance-Register]] (RESEARCHED → VERIFIED where accountant confirmed) +
+   finalize payment-model ADR; keep lawyer template items open.
+3. Build the Purple/Dark claymorphism RN component kit, then reskin/rebuild.
 
 ## Deliverables to produce at end of discovery
 

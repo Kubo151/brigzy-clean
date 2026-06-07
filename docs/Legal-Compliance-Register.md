@@ -2,7 +2,7 @@
 title: Legal & Compliance Register — Brigzy.sk
 type: register
 status: living
-updated: 2026-06-03
+updated: 2026-06-07
 ---
 
 # Legal & Compliance Register
@@ -16,6 +16,15 @@ updated: 2026-06-03
 > + `Escrow+Inzercia.docx` (business model) + `Platenie odvodov Brigzy.docx` (odvody/registration
 > — confirms the model, no contradictions). The research explicitly requires final advokát +
 > daňový poradca sign-off (+ optional NBS Inovačný hub) before go-live.
+>
+> **Update 2026-06-07 — accountant confirmed.** Owner got the combined advisor doc back from the
+> **účtovník**; the accounting/tax working conclusions (VAT, escrow accounting, Wallet, reports,
+> odvody, registrations) are **confirmed**. Canonical spec is now [[Brigzy-Spec-v2.7]] (supersedes
+> v2.5; bakes in the 8 legal fixes + accountant outputs). **The only thing still owed is from the
+> lawyer: contract templates (DoVP/DoPČ/ZoD) + selected wordings (splnomocnenie, VOP, GDPR
+> consents) + the FinExpert insurance licence question (§186/2009).** None of these block building
+> the core. Status legend below: items the accountant confirmed are marked **ACCOUNTANT-CONFIRMED**;
+> lawyer-template items stay open but non-blocking.
 
 ## ✅ Locked strategic decision
 **Payment architecture = Stripe Connect; Brigzy NEVER holds user funds.** This single
@@ -88,15 +97,21 @@ through Stripe — escrow and KYC mainly" (owner, 2026-06-03). See [[ADR-0002-es
   registration** → collect **only when a DoVP arises**, never at onboarding. Not Art-9
   sensitive. Publishing it is forbidden.
 
-### C-12 — E-sign level: checkbox + audit log vs AdES · UNVERIFIED · MED (clarify)
-- Spec v2.5 relies on **checkbox + button + immutable audit log** (IP, timestamp, Device ID,
-  verified phone). Research (C-3) recommended **AdES**. Confirm with lawyer whether the
-  audit-log approach is sufficient for DoVP/DoPČ, or AdES is needed. *(in lawyer sheet)*
+### C-12 — E-sign level: checkbox + audit log vs AdES · RESEARCHED → spec'd AdES · MED (lawyer to confirm)
+- **v2.7 §3.3 commits to AdES** — SMS/e-mail **OTP** verification at signing (stronger than bare
+  SES checkbox), immutable audit log (IP, UTC timestamp, Device ID, doc-version hash, verified
+  phone, Stripe account ID), **PDF copy auto-delivered to both parties**, plus a physical-signature
+  (BOK scan) alternative. Without a confirmed signature the escrow is not locked. **Open (lawyer):**
+  formally confirm AdES+audit-log satisfies §40(4) OZ written form for DoVP/DoPČ.
 
-### C-11 / C-13 — Brigy coins (penalty + VAT/accounting) · ⏸️ PARKED
-- Brigy = in-app loyalty coins (not a € replacement). **Parked by owner** — mechanics TBD.
-  Revisit coin-related legal/accounting questions only when the owner defines them. Not in
-  the current advisor sheets. See [[Feature-Ideas]] IDEA-1.
+### C-11 / C-13 — Brigy coins · RESEARCHED (spec'd in v2.7 §7) · HIGH constraint · was ⏸️ PARKED
+- **No longer parked** — fully spec'd in v2.7 §7. Brigy = in-app loyalty currency, fixed
+  **100 Brigy = 1 €**, usable ONLY for premium services in-app (Premium, topovanie).
+- ⚠️ **CRITICAL legal constraint:** Brigy **MUST NOT be convertible to EUR / withdrawable to a
+  bank account.** Convertibility would make Brigzy an **electronic-money issuer → EMI licence
+  from NBS** (zák. 492/2009 §81). Non-transferable between accounts, no EUR refund right. Must be
+  stated in the Brigy coin rules + ToS. Earning/spending engines: see v2.7 §7.1–7.2.
+- Replaces the old void **20 % no-show penalty** with a coin/reputation mechanism (see C-6).
 
 ### C-6 — Cancellation 20% penalty · RESEARCHED · was MED → now a required change
 - **The 20%-of-escrow penalty against a worker-consumer is almost certainly ABSOLUTELY
@@ -106,7 +121,7 @@ through Stripe — escrow and KYC mainly" (owner, 2026-06-03). See [[ADR-0002-es
   reimbursement of **provably incurred costs** (not a flat %); symmetric cancellation rules.
   Vs **B2B posters**, a contractual penalty IS permissible (§544 OZ, court moderation §545a).
 
-### C-8 — VAT & invoicing · RESEARCHED · MED (daňový poradca to confirm)
+### C-8 — VAT & invoicing · ACCOUNTANT-CONFIRMED (2026-06-07) · was RESEARCHED/MED
 - **Service fee (2 € + 10 %)** = intermediary/electronic service → **base VAT 23 %** (raised
   20→23 % from 1.1.2025). Place of supply §15: B2B SK 23 %; B2B EU → reverse charge + recap
   statement; B2C SK 23 %.
@@ -116,6 +131,15 @@ through Stripe — escrow and KYC mainly" (owner, 2026-06-03). See [[ADR-0002-es
   the service fee yet; monitor turnover and register on crossing the threshold.
 - **Ads revenue:** 23 % (B2B EU reverse charge; outside EU place outside SK).
 - **Invoicing §71–74:** full requirements for B2B (both parties' IČ DPH, etc.).
+- **Two-tier service fee (v2.7 §6):** paušál (flat, up to a threshold) + % (above it). Exact
+  threshold + rates to be computed pre-MVP from avg job value, Stripe cost (~1.4 %+0.25 €), margin,
+  competition. VAT treatment identical (23 % once a payer). Open *business* item, not a legal blocker.
+
+### C-14 — Escrow / Wallet accounting + reports · ACCOUNTANT-CONFIRMED (2026-06-07) · LOW
+- **Money flowing through Stripe Connect = pass-through (cudzie prostriedky), NOT Brigzy revenue.**
+  Brigzy's only revenue = the service fee. Wallet balances sit on Stripe Connected accounts, not
+  on Brigzy's books. Worker PDF income summary + firm CSV/XML export (Pohoda/Kros) are planned
+  features; exact field lists per accountant. See v2.7 §5–6, §13 B2/B6/B7. (Closes old C-7 too.)
 
 ### C-9 — GDPR · RESEARCHED · HIGH
 - **GPS/location:** legitimate interest 6(1)(f) (balancing test) or (b); retain **shortest**
@@ -127,12 +151,18 @@ through Stripe — escrow and KYC mainly" (owner, 2026-06-03). See [[ADR-0002-es
   ALL processors — **Stripe**, maps (Google/Mapbox), cloud/hosting, e-sign, push/SMS;
   **SCC** for non-EU transfers; privacy policy; ROPA; data-subject rights.
 
-### C-5 — Liability insurance (FinExpert) · UNVERIFIED · MED
-- Not addressed by the research. Unchanged: needs a signed partner agreement; treat as
-  Future; no MVP feature may depend on it.
+### C-5 — Liability insurance (FinExpert / Universal) · UNVERIFIED · MED (lawyer — open)
+- v2.7 §10.1 specs an **integration with the Universal (FinExpert Group) system**: opt-out
+  checkbox (pre-selected) at job creation → job data auto-sent via API → e-mail confirmation to
+  both parties. ⚠️ **Promoting/intermediating insurance may require a financial-agent licence**
+  (zák. 186/2009). **Open (lawyer):** confirm whether Brigzy needs registration, or whether merely
+  *referring* users to FinExpert (without communicating the product) avoids it. **No build of this
+  feature — incl. an investor demo of it — before the lawyer clears it.** Still needs a signed
+  partner agreement.
 
-### C-7 — Tax/accounting reports (Pohoda/Kros) · UNVERIFIED → see accountant
-- Covered by [[Accountant-Questions-SK]]; pending daňový poradca.
+### C-7 — Tax/accounting reports (Pohoda/Kros) · ACCOUNTANT-CONFIRMED (2026-06-07) · folded into C-14
+- Worker PDF income summary + firm CSV/XML export are planned features; exact field lists per
+  accountant. See C-14 and v2.7 §13 B7.
 
 ### C-10 — Czech-market parity · UNVERIFIED · MED
 - Not addressed; do not assume SK = CZ. Future expansion.
@@ -153,6 +183,10 @@ through Stripe — escrow and KYC mainly" (owner, 2026-06-03). See [[ADR-0002-es
 4. **Before launch:** optional NBS Inovačný hub confirmation; implement **350h-per-employer
    counter** + limit warnings.
 
-## Still pending (do not treat RESEARCHED as final)
-Final advokát opinion on the contract matrix + intermediary/PoA model; daňový poradca on
-VAT/OSS; NBS confirmation that Stripe Connect setup needs no licence; insurance partner (C-5).
+## Still pending (2026-06-07 — narrowed; none block building the core)
+**Accountant: done.** Remaining items are all on the **lawyer** (non-blocking):
+- Contract templates DoVP/DoPČ/Zmluva o dielo + the auto-classification matrix sign-off (C-1).
+- Wordings: intermediary agreement + power of attorney for SP/ZP (C-1), separate B2B/B2C VOP,
+  GDPR consents/DPIA/DPA package (C-9), e-sign §40(4) confirmation (C-12).
+- **FinExpert insurance licence** question (C-5) — gates only the insurance feature, nothing else.
+- Optional/nice-to-have: NBS Inovačný hub written confirmation of the Stripe Connect model (C-2).

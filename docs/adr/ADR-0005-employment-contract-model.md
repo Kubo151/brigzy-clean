@@ -41,6 +41,21 @@ Supporting decisions:
   cases is forbidden** (švarcsystém). The contract auto-branch is one identical click for
   the user. *(Confirmed by `Platenie odvodov Brigzy.docx`, 2026-06-03.)*
 
+## Update 2026-06-07 (v2.7 + accountant confirmed)
+- **Accountant confirmed** the tax/levy side (no platform odvody/oznamovacie povinnosti; firm
+  withholds 19/25 %; pass-through accounting). Still **proposed** overall because the **lawyer
+  contract templates** + classification matrix sign-off remain open (non-blocking for build).
+- **E-signature is committed to AdES** (v2.7 §3.3): SMS/e-mail **OTP** at signing, immutable audit
+  log, **auto PDF copy to both parties**, with a **physical BOK-scan** alternative. Escrow does not
+  lock until a signature (OTP or scan) is recorded.
+- **Dodatok (addendum):** extra work on an active booking generates an automatic **Dodatok** to the
+  existing contract (same sign flow). A Dodatok may extend scope/pay but **must not change the
+  contract type** (DoVP↛DoPČ). Repeat hires (**cross-sell**) generate a fresh contract instead.
+- **350h counter is core, seeded at registration:** the worker enters prior hours per employer
+  (0–349) at signup; the counter warns at 315h and auto-blocks new DoVP at 350h → DoPČ.
+- **Three-layer KYC** (Stripe Connect / Stripe Identity / own Brigzy form for r.č.+ZP+IBAN at DoVP)
+  — see [[ADR-0004-kyc-via-stripe]] and v2.7 §4.
+
 ## Consequences
 - Contract generator + data model need a **type enum** (`dovp` / `dopc` / `zmluva_o_dielo`)
   and task-nature classification in the post-a-job UX.

@@ -1,8 +1,8 @@
 ---
-title: Data Model — Brigzy.sk MVP
+title: Data Model — Brigzy.sk
 type: architecture
-status: draft
-updated: 2026-06-02
+status: draft (reconciled to v2.7)
+updated: 2026-06-07
 ---
 
 # Data Model — Brigzy.sk (initial)
@@ -10,6 +10,12 @@ updated: 2026-06-02
 Postgres (Supabase). **Money = integer minor units (cents) + ISO currency** (never
 floats). All tables get `id uuid pk default gen_random_uuid()`, `created_at`,
 `updated_at`. RLS on every table. Legal-dependent fields flagged.
+
+> **Reconciled to [[Brigzy-Spec-v2.7]] (2026-06-07).** v2.7 promotes several things from
+> "deferred" into the core model: the **350h counter** (`work_hours_counters`), **QR check-in**
+> (`attendance_events`), **contract addendums / Dodatok** (`contract_addendums`), **cross-sell**
+> (`bookings.parent_booking_id`), and spec's the **Brigy coin ledger** (`brigy_ledger`) and
+> **referrals**. New tables are grouped under *“v2.7 additions”* below.
 
 > Convention: `*_amount_cents int`, `currency char(3) default 'EUR'`, timestamps `timestamptz`.
 
@@ -52,7 +58,9 @@ Stripe**, ADR-0004) · `xp int default 0` · `rank_tier` · `rating_avg numeric`
 `agreed_amount_cents` · `currency` · `service_fee_cents` ·
 `status` (draft|awaiting_signatures|escrow_pending|in_progress|completed|cleared|disputed|cancelled) ·
 `contract_id → contracts` · `escrow_id → escrow_transactions` ·
-`check_in_at` · `check_out_at` (QR = V2) · `created_at`
+`check_in_at` · `check_out_at` (set from `attendance_events`) ·
+`parent_booking_id → bookings` (null; set for **cross-sell** repeat hires, v2.7 §9.5) ·
+`created_at`
 > One booking per accepted worker (multi-slot job → multiple bookings).
 
 ## Money
@@ -84,6 +92,9 @@ poster×task, [[ADR-0005-employment-contract-model]]) · `rendered_url` (Storage
 > **rodné číslo** is captured **only here, at DoVP/DoPČ creation** — never on the `users`
 > row at registration (GDPR minimization, C-4). Store encrypted; never expose/publish.
 > Retention: payroll/accounting 10y; mzdový list 50y (mostly the zadávateľ's duty).
+> **SP/ZP payload (v2.7 §4):** the Brigzy KYC form at DoVP also collects **health insurer**
+> (`health_insurer`: vszp|dovera|union), **permanent address**, and **IBAN** — keep these in
+> `payload_json` (encrypted) so the one-click RLFO/SP/ZP XML can be generated for the firm.
 
 ### reviews  *(blind: hidden until both submitted)*
 `id` · `booking_id` · `from_user_id` · `to_user_id` · `rating int (1..5)` ·
@@ -120,10 +131,45 @@ poster×task, [[ADR-0005-employment-contract-model]]) · `rendered_url` (Storage
 `resolution_note` · `created_at`
 > Opening a dispute sets `escrow_transactions.state='disputed'` (funds frozen).
 
-## Deferred to V2/Future (not in MVP schema)
-multi-manager company users · QR check-in tokens · referral codes + anti-fraud
-signals (device_id, bank/phone hashes) · ads inventory · premium subscriptions ·
-insurance claims · accounting export jobs.
+## v2.7 additions
+
+### contract_addendums  *(Dodatok — extra work on an active booking, v2.7 §3.3/§9.5)*
+`id` · `contract_id → contracts` · `booking_id → bookings` · `seq int` (Dodatok č.) ·
+`description` · `extra_amount_cents` · `currency` · `rendered_url` (PDF) · `payload_json` ·
+`audit_log_json` · `signed_by_worker_at` · `signed_by_poster_at` · `created_at`
+> Same OTP/scan sign flow as the parent contract; extra escrow not released until signed.
+> **Cannot change the contract `type`** — only extend scope + pay. Hours roll into `work_hours_counters`.
+
+### work_hours_counters  *(350h DoVP limit, per employer×worker×year, v2.7 §3.1)*
+`id` · `poster_user_id → users` · `worker_user_id → users` · `year int` ·
+`seed_hours numeric` (entered at registration, 0–349) · `accrued_hours numeric` (from attendance) ·
+`total_hours generated` (= seed + accrued) · `created_at`  *(unique (poster,worker,year))*
+> Warn at 315h (90%), **block new DoVP at 350h** → suggest DoPČ. Per-employer, not global.
+
+### attendance_events  *(QR check-in/out — promoted from V2, v2.7 §9.4)*
+`id` · `booking_id → bookings` · `kind` (check_in|check_out) · `qr_nonce` · `scanned_at` ·
+`lat numeric` · `lng numeric` · `created_at`
+> Dynamic encrypted QR scanned by the poster. Source of truth for worked time → feeds
+> `work_hours_counters`, Brigy earning, and dispute evidence.
+
+### brigy_ledger  *(internal loyalty coins — append-only, v2.7 §7)*
+`id` · `user_id → users` · `entry_type` (earn|spend|adjust) · `delta int` (signed, coins) ·
+`reason` (hour|rating5|referral|monthly_bonus|premium|topup|...) · `ref_booking_id` ·
+`ref_referral_id` · `created_at`
+> Balance = sum of deltas. **100 Brigy = 1 €, NON-CONVERTIBLE to EUR / no payout** (C-11/C-13 —
+> convertibility ⇒ EMI licence). Spend only on in-app premium. Not transferable between accounts.
+
+### referrals  *(v2.7 §8)*
+`id` · `inviter_user_id → users` · `invitee_user_id → users` (null until signup) · `code` ·
+`status` (pending|converted|blocked) · `converted_booking_id → bookings` · `created_at`
+> Hard conversion: invitee completes + is paid a first real escrow job → +150 Brigy each.
+> Lifetime cap 600 Brigy/inviter (then XP only). Anti-fraud block on matching
+> IBAN / phone / device_id hash.
+
+## Deferred to V2/Future (not yet modeled)
+multi-manager company users · insurance records (FinExpert/Universal — C-5, licence-gated) ·
+ads inventory · premium subscriptions (entitlement table) · accounting export jobs (PDF/CSV/XML) ·
+two-tier-fee config table (paušál threshold + % — once rates are set, C-8).
 
 ## RLS principles
 - A user reads/writes only their own rows (worker sees own applications/bookings/ledger).

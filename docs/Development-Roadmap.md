@@ -1,16 +1,23 @@
 ---
 title: Development Roadmap — Brigzy.sk
 type: plan
-status: draft
-updated: 2026-06-02
+status: draft (superseded framing — rebuild plan pending)
+updated: 2026-06-07
 ---
 
 # Development Roadmap
 
-Phases per the brief. **Phase 1 is the 24-day demo sprint (→ 26.6.2026)**; later
-phases map to [[Feature-Breakdown]] V2/Future. 2 devs, parallelized:
-**Dev A = UI/redesign + screen integration**, **Dev B = backend/escrow/Edge Functions**.
-AI = design system + mockups + scaffolding + docs.
+> **⚠️ Reframed 2026-06-07.** This roadmap was written as a *24-day demo sprint with legal parked*.
+> Two things changed: **accountant confirmed → CLEARED TO BUILD** (legal no longer parked; only
+> lawyer contract templates remain, non-blocking), and the owner wants a **full rebuild of the
+> entire app** per [[Brigzy-Spec-v2.7]] — not a demo-only slice. The phase plan below is kept for
+> reference but its scoping is **provisional**; a fresh **rebuild build-plan** (sequence,
+> dependencies, what the 26.6 demo includes vs later) is the next planning deliverable. Note v2.7
+> **promotes** 350h counter, QR check-in and cancellation into the core, and **adds** cross-sell,
+> Dodatok, two-tier fee, Brigy engines, FinExpert insurance (licence-gated, C-5).
+
+Phases per the original brief. 2 devs, parallelized: **Dev A = UI/redesign + screen integration**,
+**Dev B = backend/escrow/Edge Functions**. AI = design system + mockups + scaffolding + docs.
 
 ## Phase 1 — MVP demo (24 days)
 
@@ -44,14 +51,17 @@ AI = design system + mockups + scaffolding + docs.
 
 **Phase-1 gates:** (1) design sign-off ~Day 3; (2) escrow happy-path green ~Day 10;
 (3) full loop demoable ~Day 16; (4) frozen + rehearsed ~Day 24.
-**Explicitly NOT in Phase 1:** real money, real KYC, SEPA payouts, ads, premium, AI bot,
-group jobs, QR, insurance, referral, accounting exports, web admin.
+**Explicitly NOT in Phase 1 (original framing):** real money, SEPA payouts, ads, premium, AI bot,
+insurance, accounting exports, web admin.
+> *v2.7 note: KYC is real-via-Stripe (3 layers), and 350h counter + QR check-in are now core, not
+> deferred. Re-decide demo scope in the rebuild build-plan.*
 
 ## Phase 2 — Growth features (post-demo, toward real-money launch)
-Gated by **lawyer outcome (C-1/C-2)**. Real KYC provider · real SEPA payouts + €15
-pooling · cancellation-policy enforcement · group/multi-slot + group chat · QR
-check-in/out · dispute/ticket console · premium subscription · referral + anti-fraud ·
-push priority timing. **Flip Stripe test→live only after legal sign-off.**
+Mostly **legally cleared** now (accountant done; lawyer owes only templates — C-1). Real SEPA
+payouts + €15 pooling · cancellation-policy enforcement · group/multi-slot + group chat ·
+dispute/ticket console · premium subscription · referral + anti-fraud (Brigy rewards) · cross-sell
++ Dodatok · push priority timing. **Flip Stripe test→live only after the lawyer signs off the
+contract templates + VOP/GDPR package.** Insurance stays gated by C-5 (FinExpert licence).
 
 ## Phase 3 — Marketplace scaling
 In-app ads (native/banner/interstitial) · AI support bot · accounting exports
