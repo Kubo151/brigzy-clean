@@ -48,6 +48,10 @@ question lives here and is updated continuously during discovery and development
 
 **Reference** (`reference/`)
 - [[Brigzy-Spec-v2.7]] — ⭐ **canonical product spec** (supersedes [[Brigzy-Spec-v2.5]])
+- `Brigzy_Sablony_Zmluv.docx` — example contract templates (DoVP/DoPČ/ZoD), **NOT verified** (C-1)
+
+**Design / UX**
+- [[Design-System]] — claymorphism tokens + mockups · [[UX-Spec]] — screen-by-screen UX plan (in progress)
 
 **Discovery / living**
 - [[Interview-Log]] — running Q&A from the grilling

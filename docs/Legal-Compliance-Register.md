@@ -61,6 +61,11 @@ through Stripe — escrow and KYC mainly" (owner, 2026-06-03). See [[ADR-0002-es
   stays with the firm. **Pure Zmluva o dielo for everything is NOT allowed** (švarcsystém).
   Implementation: app auto-branches contract type (B2C→DoVP/DoPČ, C2C→Zmluva o dielo) — for
   the user it's one identical click, but the correct document is generated.
+- **Example templates received (2026-06-07):** `docs/reference/Brigzy_Sablony_Zmluv.docx` — all
+  three types (DoVP §226, DoPČ §228a, Zmluva o dielo §631 OZ) with placeholders + clauses for
+  escrow, OTP/BOK signing (§40(4) OZ), 350h limit, Dodatok, GDPR čl.28. From David, **NOT
+  lawyer-verified** — example only. **C-1 stays open** until the advokát signs them off; treat as a
+  working draft for the contract generator, not legal truth.
 
 ### C-2 — Escrow / holding money · RESEARCHED → effectively resolved · was CRITICAL
 - **Finding:** Own wallet/escrow ⇒ NBS **payment-institution / EMI licence** (zák. 492/2009).

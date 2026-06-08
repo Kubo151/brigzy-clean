@@ -15,6 +15,17 @@ updated: 2026-06-07
 **Obsidian vault location (personal):** `C:\Claude-memory\` (note: `brigzy.md`).
 **Detailed project vault:** `C:\WORK\brigzy-clean\docs\` (this folder).
 
+## ▶️ RESUME HERE (next session — 2026-06-07 EOD)
+We're in **screen-by-screen UX planning** in [[UX-Spec]]. Done: Part A (nav/IA + full screen
+inventory) and **Part B — Worker flow (E1–E8 + W1–W17)**. Decisions locked: one switchable
+account; full v2.7 scope (long-term Verified + Brigy/Premium/Referral + insurance behind flag +
+invoicing/payroll exports); lazy Stripe Connect onboarding.
+**→ Continue with: Part B3 — Poster shell (P1–P11)**, same format
+(Účel · Obsah · Funkcie · Dáta · Stavy · ref); then B4 shared sheets, B5 gamification/long-term.
+**New input received (2026-06-07):** example **contract templates** (DoVP + DoPČ + Zmluva o dielo)
+from David in `docs/reference/Brigzy_Sablony_Zmluv.docx` — **NOT lawyer-verified** (example only;
+C-1 stays open). They already match our v2.7 model (escrow, OTP/BOK, 350h, Dodatok, QR, GDPR čl.28).
+
 ## What we're building
 **Brigzy.sk** — an on-demand short-term-work ("brigády") marketplace for Slovakia (a
 **Renewo** project, IČO **57476080**, lead **David Krescanko**; Renewo is **not a VAT
