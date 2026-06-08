@@ -72,7 +72,7 @@ export function ClayButton({ label, onPress, variant = 'primary', icon, style, f
                             colors={[C.accent2, C.accent]}
                             start={{ x: 0.2, y: 0 }}
                             end={{ x: 0.8, y: 1 }}
-                            style={[StyleSheet.absoluteFillObject, { borderRadius: 18 }]}
+                            style={[StyleSheet.absoluteFill, { borderRadius: 18 }]}
                         />
                         {/* specular top sheen */}
                         <LinearGradient

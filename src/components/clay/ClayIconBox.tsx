@@ -39,7 +39,7 @@ export function ClayIconBox({ children, size = 44, radius = 14, tintBg, style }:
                 colors={[C.sd, 'transparent']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0.5, y: 0.5 }}
-                style={[StyleSheet.absoluteFillObject, { opacity: C.isLight ? 0.35 : 0.5 }]}
+                style={[StyleSheet.absoluteFill, { opacity: C.isLight ? 0.35 : 0.5 }]}
                 pointerEvents="none"
             />
             {children}

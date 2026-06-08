@@ -31,7 +31,7 @@ export function ClaySurface({ children, radius = 22, style, contentStyle }: Prop
             {isIOS && (
                 <View
                     style={[
-                        StyleSheet.absoluteFillObject,
+                        StyleSheet.absoluteFill,
                         {
                             borderRadius: radius,
                             backgroundColor: C.cLo,
@@ -46,7 +46,7 @@ export function ClaySurface({ children, radius = 22, style, contentStyle }: Prop
             {/* dark depth shadow layer (also carries Android elevation) */}
             <View
                 style={[
-                    StyleSheet.absoluteFillObject,
+                    StyleSheet.absoluteFill,
                     {
                         borderRadius: radius,
                         backgroundColor: C.cLo,
@@ -68,7 +68,7 @@ export function ClaySurface({ children, radius = 22, style, contentStyle }: Prop
                 start={{ x: 0.1, y: 0 }}
                 end={{ x: 0.9, y: 1 }}
                 style={[
-                    StyleSheet.absoluteFillObject,
+                    StyleSheet.absoluteFill,
                     { borderRadius: radius, borderWidth: 1, borderColor: C.hair },
                 ]}
             />
@@ -99,7 +99,7 @@ export function ClayInset({ children, radius = 14, style, contentStyle }: Props)
                 colors={[C.sd, 'transparent']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0.35, y: 0.35 }}
-                style={[StyleSheet.absoluteFillObject, { opacity: C.isLight ? 0.5 : 0.6 }]}
+                style={[StyleSheet.absoluteFill, { opacity: C.isLight ? 0.5 : 0.6 }]}
                 pointerEvents="none"
             />
             <View style={contentStyle}>{children}</View>

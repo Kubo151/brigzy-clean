@@ -6,7 +6,7 @@ export function useColorScheme(): "light" | "dark" {
   const themeMode = useThemeStore((s) => s.themeMode);
 
   if (themeMode === "system") {
-    return systemColorScheme ?? "light";
+    return (systemColorScheme ?? "light") as "light" | "dark";
   }
 
   return themeMode;

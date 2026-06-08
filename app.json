@@ -24,7 +24,9 @@
           "locationWhenInUsePermission": "Brigzy potrebuje prístup k polohe na zobrazenie pracovných pozícií v okolí."
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-sharing",
+      "expo-status-bar"
     ]
   }
 }

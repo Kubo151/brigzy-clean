@@ -4,6 +4,7 @@ import { Tabs } from 'expo-router';
 import { Home, Heart, Plus, MessageSquare, User } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 import { useText } from '@/lib/useText';
 import { useClay } from '@/lib/useClay';
 import type { ClayColors } from '@/lib/useClay';
@@ -90,36 +91,48 @@ function TabButton({ item, focused, onPress, C, label }: {
     );
 }
 
-// ─── TAB BAR CONTAINER — clay capsule ───────────────
+// ─── TAB BAR CONTAINER — glass on iOS 26+, clay elsewhere ───
+const glassAvailable = Platform.OS === 'ios' && isLiquidGlassAvailable();
+
 function TabBarContainer({ C, children }: { C: ClayColors; children: React.ReactNode }) {
     return (
         <View style={styles.barWrapper} pointerEvents="box-none">
             <LinearGradient colors={['transparent', C.bg]} style={styles.fadeOverlay} pointerEvents="none" />
-            <View style={styles.capsuleOuter}>
-                {/* single soft downward depth shadow — no upward rim-light
-                    layer (it cast a bright full-width halo above the bar). */}
-                <View style={[StyleSheet.absoluteFillObject, {
-                    borderRadius: CAPSULE_RADIUS,
-                    backgroundColor: C.cLo,
-                    ...Platform.select({
-                        ios: {
-                            shadowColor: C.darkShadow.color,
-                            shadowOffset: { width: 0, height: 8 },
-                            shadowOpacity: C.isLight ? 0.18 : 0.4,
-                            shadowRadius: 14,
-                        },
-                        android: { elevation: 14 },
-                    }),
-                }]} />
-                {/* gradient face */}
-                <LinearGradient
-                    colors={[C.cHi, C.cLo]}
-                    start={{ x: 0.1, y: 0 }}
-                    end={{ x: 0.9, y: 1 }}
-                    style={[styles.capsuleFace, { borderColor: C.hair }]}
-                >
-                    {children}
-                </LinearGradient>
+            <View style={[styles.capsuleOuter, Platform.select({
+                ios: {
+                    shadowColor: C.darkShadow.color,
+                    shadowOffset: { width: 0, height: glassAvailable ? 12 : 8 },
+                    shadowOpacity: glassAvailable ? 0.22 : (C.isLight ? 0.18 : 0.4),
+                    shadowRadius: glassAvailable ? 20 : 14,
+                },
+                android: { elevation: 14 },
+            })]}>
+                {glassAvailable ? (
+                    <GlassView
+                        glassEffectStyle="regular"
+                        colorScheme="auto"
+                        isInteractive
+                        style={[styles.capsuleFace, styles.glassFace]}
+                    >
+                        {children}
+                    </GlassView>
+                ) : (
+                    <>
+                        {/* clay shadow backing */}
+                        <View style={[StyleSheet.absoluteFill, {
+                            borderRadius: CAPSULE_RADIUS,
+                            backgroundColor: C.cLo,
+                        }]} />
+                        <LinearGradient
+                            colors={[C.cHi, C.cLo]}
+                            start={{ x: 0.1, y: 0 }}
+                            end={{ x: 0.9, y: 1 }}
+                            style={[styles.capsuleFace, { borderColor: C.hair }]}
+                        >
+                            {children}
+                        </LinearGradient>
+                    </>
+                )}
             </View>
         </View>
     );
@@ -182,9 +195,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row', alignItems: 'center', height: TAB_BAR_H,
         borderRadius: CAPSULE_RADIUS, borderWidth: 1, paddingHorizontal: 6,
     },
+    glassFace: {
+        borderColor: 'rgba(255,255,255,0.18)', overflow: 'hidden',
+    },
     tabSlot: { flex: 1, alignItems: 'center', justifyContent: 'center', height: TAB_BAR_H },
     tabContent: { alignItems: 'center', justifyContent: 'center', position: 'relative', paddingVertical: 6, paddingHorizontal: 8 },
-    activeBlob: { ...StyleSheet.absoluteFillObject, borderRadius: 14 },
+    activeBlob: { ...StyleSheet.absoluteFill, borderRadius: 14 },
     tabLabel: { fontSize: 10, fontWeight: '800', marginTop: 2, letterSpacing: 0.1 },
     centerWrap: { marginTop: -22 },
     centerBtn: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
