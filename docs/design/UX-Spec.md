@@ -192,7 +192,7 @@ Poster: P4 Applicants ── select ──────▶ S5 Escrow confirm (Pen
 
 > Format per screen: **Účel · Obsah/layout · Funkcie (akcie) · Dáta (tables) · Stavy · Spec/legal ref**.
 > Order: **B1 Entry/Auth → B2 Worker → B3 Poster → B4 Shared sheets → B5 Gamification/long-term.**
-> Done so far: **B1, B2 (Worker)**. Next: B3 Poster, B4 shared, B5 gamification.
+> Done so far: **B1, B2 (Worker), B3 (Poster)**. Next: B4 shared sheets, B5 gamification.
 
 ## B1. Entry & Auth
 
@@ -342,3 +342,263 @@ Poster: P4 Applicants ── select ──────▶ S5 Escrow confirm (Pen
   to the employer. **Funkcie:** save (encrypted) → unblocks contract generation.
 - **Dáta:** `contracts.payload_json` (encrypted). **Stavy:** validation (r.č. format), consent-required.
 - **Ref:** v2.7 §4; legal C-4/C-9 (§78(4) z.18/2018) — minimization, just-in-time.
+
+---
+
+## B3. Poster shell (Zadávateľ — B2B firma & C2C jednotlivec)
+
+> B2B/C2C differences are called out inline. B2B = poster filled in IČO/company details;
+> C2C = individual without company. The contract matrix keys off this (v2.7 §3).
+
+### P1 — Dashboard
+
+- **Účel:** Poster's home — at-a-glance health of all active jobs, pending actions, escrow
+  held, and 350h warnings (B2B). Fast path to post a new job.
+- **Obsah/layout:** Top summary strip — `N aktívnych brigád` · `N čakajúcich uchádzačov` ·
+  `X € držané v escrow`; below: job cards (title, slots filled/total, status pill, applicant
+  badge if new); **B2B only:** amber warning banner per employer-worker pair approaching 315 h
+  (`"S [Meno] máte 318/350 h — zvážte DoPČ"`); center FAB `+ Pridať brigádu`.
+  Notifications bell top-right.
+- **Funkcie:** tap job card → P3; tap applicant badge → P4; tap escrow strip → P7;
+  tap warning banner → P4 (filtered to that worker); FAB → P2.
+- **Dáta:** `jobs` (poster_id = me, status active/draft), `applications` (count pending),
+  `escrow_transactions` (sum held), `work_hours_counters` (total_hours ≥ 315, B2B only).
+- **Stavy:** empty (no jobs yet — large CTA card "Zadaj svoju prvú brigádu" → P2); loading
+  skeletons; all-slots-filled jobs dimmed; expired jobs collapsed to "Archív" section.
+- **Ref:** v2.7 §3.4 (350h warning at 315h), §5 (escrow overview), §9.
+
+---
+
+### P2 — Post a job — wizard
+
+- **Účel:** Create a new job listing. Auto-derives contract type so the poster never has to
+  pick DoVP vs DoPČ vs Zmluva o dielo themselves — they just describe the task.
+- **Obsah/layout:** 7-step wizard with a progress bar and back/next nav:
+  1. **Kategória** — icon grid of job categories (upratovanie, sklad, gastro, stavba, IT,
+     ostatné…). Selection feeds into contract-type derivation.
+  2. **Popis úlohy** — title (max 60 chars), description, and a two-option toggle:
+     **Výsledok** (deliver a defined result) vs **Činnosť** (ongoing activity / repeated work).
+     This is the single key signal for DoVP vs DoPČ (B2B).
+  3. **Odmena** — hourly rate or fixed amount; real-time fee preview panel showing
+     gross → service fee (Pásmo 1 flat / Pásmo 2 %) → worker net (v2.7 §6 two-tier).
+  4. **Miesto** — map pin pick or address search; optional "remote / online" toggle.
+  5. **Počet miest & rozvrh** — slot count (1–N); date/time start + estimated duration;
+     recurring toggle (daily/weekly, for DoPČ). Slot count > 1 enables multi-slot group mode.
+  6. **Nastavenia** — SOS toggle (urgent, red badge, higher visibility); insurance opt-out
+     checkbox (pre-checked, label "Chcem poistenie cez FinExpert" — `⚠️ hidden by feature
+     flag C-5 until lawyer clears`); visibility (public / invite-only).
+  7. **Súhrn & publikovanie** — full preview of the listing with the **auto-derived contract
+     type** shown prominently (`"Zmluva: DoVP (§226 ZP)"` / `"DoPČ (§228a ZP)"` /
+     `"Zmluva o dielo (§631 OZ)"`), fee preview, confirm CTA.
+- **Contract-type derivation logic (auto, never shown as a user choice):**
+  - poster = B2B + result → **DoVP §226**
+  - poster = B2B + activity/repeated → **DoPČ §228a**
+  - poster = C2C → **Zmluva o dielo §631–643 OZ** (regardless of task nature)
+- **Funkcie:** draft auto-save after each step; back without data loss; publish → creates
+  `jobs` row (status = `active`) + triggers P3; edit draft → re-enter wizard at step N.
+- **Dáta:** `jobs`, `users` (poster type B2B/C2C from company details).
+- **Stavy:** field validation per step (max chars, pay range sanity check, date in future);
+  draft-saved indicator; publish-failed (network) with retry; 350h pre-check on publish
+  (B2B: if adding a DoVP for a worker already at 350h on this pair → block + suggest DoPČ,
+  but this check is at selection time P4, not here).
+- **Ref:** v2.7 §3 (contract matrix), §6 (two-tier fee), §9.2 (SOS), §9.3 (multi-slot),
+  §10.1 (insurance ⚠️ C-5 licence gate); C-1 (contract type auto-assignment).
+
+---
+
+### P3 — Job detail (Poster)
+
+- **Účel:** Manage one active listing — see who applied, track slots, edit or close.
+- **Obsah/layout:** Header (job title, status pill, `N/M miest obsadených`); two tabs:
+  **Uchádzači** (count badge, shortcut → P4) and **Rezervácie** (list of confirmed bookings
+  → P5); action bar: Edit · Boost (Brigy topovanie) · Close/Archive; for multi-slot jobs
+  a **Group chat** button (S1) appears once ≥2 slots filled; insurance status note (if opted
+  in, ⚠️ C-5 flag).
+- **Funkcie:** → P4 (applicants); → P5 (individual booking); Edit → P2 wizard pre-filled
+  (limited fields editable after first booking); Boost → spend Brigy for visibility; Close →
+  confirm sheet → status = `closed`, refund pending escrow; Group chat → S1.
+- **Dáta:** `jobs`, `applications`, `bookings`.
+- **Stavy:** no-applicants-yet (share prompt with copy link + native share); all-slots-filled
+  (applicant tab disabled, "Všetky miesta obsadené"); closed (read-only banner); expired
+  (auto-closed, show re-post CTA).
+- **Ref:** v2.7 §9.3 (multi-slot, group chat), §7 (Brigy topovanie).
+
+---
+
+### P4 — Applicants list
+
+- **Účel:** Browse, compare, and select workers for a job slot. The moment a poster selects
+  a worker, a booking is created and escrow funding is triggered.
+- **Obsah/layout:** Ranked list of applicants — each card: avatar, name, ★ rating,
+  XP rank badge, **Brigzy Verified** tick (if applicable), short bio snippet, applied-at
+  timestamp, chat preview (last message). Sort: recommended (XP + rating + verified) /
+  newest / pay preference.
+  **B2B multi-slot:** checkboxes on each card → select up to `slot_count` workers →
+  **"Vybrať N uchádzačov"** batch CTA at bottom.
+  **C2C / single slot:** single tap-to-select.
+  **350h gate (B2B):** if selecting a worker would push a DoVP pair over 350h → block with
+  inline error `"S týmto brigádnikom ste na 348/350 h — na ďalší DoVP nemáte kapacitu.
+  Zvážte DoPČ."` with a "Zmeniť typ" suggestion.
+- **Funkcie:** tap worker name/avatar → W13 (public profile, read-only); tap chat icon → S1
+  (existing thread); **select/bulk-select** → create `bookings` rows + open S5 (escrow fund
+  sheet); reject (soft — removes from view, no notification to worker); message shortcut.
+- **Dáta:** `applications`, `users`, `reviews` (avg rating), `bookings`,
+  `work_hours_counters` (350h gate, B2B).
+- **Stavy:** empty (no applications — share job prompt); all-rejected (re-open prompt);
+  selection-in-progress (batch counter chip); 350h-blocked inline (not a modal, inline on
+  the card); loading (skeleton cards).
+- **Ref:** v2.7 §3.4 (350h counter — warn 315h, block at 350h), §4 (KYC status visible as
+  badge), §2.2 (Brigzy Verified badge).
+
+---
+
+### P5 — Booking detail (Poster) ⭐ hub
+
+- **Účel:** Run one engagement end-to-end as the poster — fund escrow, co-sign contract,
+  scan QR at work, release payment, review. The mirror of W6.
+- **Obsah/layout:** Status timeline at top (5 states: `Vybraný → Financovaný → Podpísaný →
+  Prebieha → Dokončený`); worker card (avatar, name, rating, chat shortcut); below, action
+  cards that appear/disappear based on current state:
+  - **Escrow card** — amount held, status (Pending / Cleared / Disputed), "Financovať"
+    CTA (→ S5) or "Uvoľniť platbu" CTA when work approved.
+  - **Zmluva card** — contract type, "Zobraziť zmluvu" + sign status for both parties;
+    "Podpísať" CTA (→ S3) when unsigned.
+  - **Dochádzka card** — "Skenovať QR brigádnika" (→ S6) for check-in and check-out;
+    shows timestamps once scanned.
+  - **"+ Práca navyše" button** — active during `in_progress`; triggers Dodatok flow (→ S4).
+  - **Dokončiť prácu CTA** — appears after check-out; "Potvrdiť dokončenie" → releases
+    escrow (Cleared) → S7 review prompt → P6 cross-sell prompt.
+  - **Disputed banner** — if S8 dispute raised, freezes all CTAs, shows support contact.
+- **Funkcie:** fund escrow (S5); sign contract (S3); scan QR (S6); add Dodatok (S4);
+  approve & release escrow; open review (S7); raise dispute (S8); open chat (S1).
+- **Dáta:** `bookings`, `contracts`, `escrow_transactions`, `attendance_events`,
+  `contract_addendums`.
+- **Stavy:** awaiting-funding (escrow card highlighted, others locked); awaiting-signatures
+  (contract card highlighted); in-progress (QR card active, + práca navyše visible);
+  dodatok-pending (extra escrow card for the addendum); awaiting-poster-approval (release
+  CTA highlighted); disputed (frozen, support banner); completed (all cards collapsed,
+  cross-sell prompt shown as sticky banner).
+- **Ref:** v2.7 §5 (escrow state machine Pending→Cleared→Disputed); §3.3 (contract + OTP
+  sign); §9.4 (QR attendance); §9.6 (Dodatok — cannot change contract type, hours roll into
+  350h counter); C-3/C-12 (AdES signing).
+
+---
+
+### P6 — Cross-sell prompt
+
+- **Účel:** Immediately after a booking completes, offer the poster to re-hire the same
+  worker — reducing churn and locking in the next job while satisfaction is peak.
+- **Obsah/layout:** Sticky bottom sheet (auto-shown after escrow release + review submit):
+  worker avatar + name + ★ rating just earned; headline `"Páčil sa ti [Meno]? Pridaj mu
+  ďalšiu brigádu!"` ; two CTAs: **"Zadať znovu"** (re-hire same worker, pre-fills P2 with
+  same category + location, skips applicants step) and **"Nová brigáda"** (blank P2);
+  dismiss X.
+- **Funkcie:** "Zadať znovu" → creates a new `jobs` row (status = `pending_worker_accept`)
+  linked to the previous booking via `parent_booking_id`; worker gets a notification with
+  direct accept CTA; → P5 for new booking; dismiss → stays on P5 completed view.
+  "Nová brigáda" → P2 wizard blank.
+- **Dáta:** `bookings` (`parent_booking_id` FK for cross-sell chain), `jobs`, `users`.
+- **Stavy:** only shown once per completed booking (localStorage flag prevents re-show);
+  worker-deactivated edge case (CTA hidden, "Brigádnik momentálne nie je dostupný").
+- **Ref:** v2.7 §9.5 (cross-sell re-hire via escrow); each re-hire = new DoVP/DoPČ, 350h
+  counter continues accumulating.
+
+---
+
+### P7 — Escrow / payments
+
+- **Účel:** Financial overview for the poster — all escrow positions across all bookings,
+  fund / refund actions, card management.
+- **Obsah/layout:** Summary banner (total held in escrow across all bookings); below: tabs
+  **Aktívne** (funded, in-progress) · **Dokončené** (cleared, paid out) · **Spory**
+  (disputed); each booking row: worker name, job title, amount, status pill, action button.
+  Bottom: **"Pridať kartu"** / "Spravovať platobné metódy" (Stripe Payment Methods).
+  **B2B only:** "Platiť faktúrou" toggle (invoice-based payment for enterprise).
+- **Funkcie:** tap booking row → P5; "Financovať" → S5 (card charge); "Vrátiť" →
+  cancellation/refund flow (tiered: >24h full / 12–24h 80% / <12h 50% of escrow per B2C
+  rules; B2B: 20% contractual penalty applies); manage cards → Stripe hosted UI.
+- **Dáta:** `escrow_transactions`, `bookings`, `payments`.
+- **Stavy:** no-escrow-yet (empty, CTA to P2); payment-failed (retry banner + reason);
+  dispute-active row highlighted in red; refund-in-progress chip.
+- **Ref:** v2.7 §5 (escrow state machine, payout timing); C-2 (Brigzy never holds funds —
+  all through Stripe Connect); C-6 (B2C refund tiers — 20% flat penalty void for consumer,
+  replaced by tiered refund + reputation).
+
+---
+
+### P8 — Invoices — B2B only
+
+- **Účel:** Service-fee invoices issued by Brigzy to the B2B poster for accounting/DPH
+  reconciliation. **Hidden from C2C posters.**
+- **Obsah/layout:** Invoice list (date, invoice number, amount excl./incl. VAT, status
+  Zaplatená/Čakajúca, PDF icon); filter by period; **"Exportovať všetky"** (ZIP of PDFs);
+  at top: current VAT status note ("Brigzy nie je platcom DPH — faktúry bez DPH" or
+  "Brigzy je platcom DPH 23 %" after threshold).
+- **Funkcie:** tap row → open PDF (in-app viewer or share sheet); export ZIP; filter.
+- **Dáta:** `invoices` (service-fee invoices, Brigzy → poster).
+- **Stavy:** no-invoices-yet; export-loading (progress indicator); missing-ICO warning
+  (nudge to complete company profile P10 for proper invoice data).
+- **Ref:** v2.7 §6.3; C-8 (VAT 23% once Renewo crosses €50k/yr threshold; currently not a
+  VAT payer — invoices issued without DPH for now); C-14.
+
+---
+
+### P9 — Mzdové podklady export — B2B only
+
+- **Účel:** One-click generation of payroll documentation for the employer's accounting
+  software (Pohoda / Kros), plus RLFO/SP/ZP XML under the poster's power of attorney.
+  **Hidden from C2C posters.**
+- **Obsah/layout:** Period picker (month/quarter); worker list for the period with
+  completeness indicator (green = KYC payroll data collected, amber = pending); per-worker
+  detail: gross pay, contract type, hours, SP/ZP base; export format selector **CSV
+  (Pohoda)** / **XML (Kros)** / **SP/ZP RLFO XML**; "Generovať" CTA.
+- **Funkcie:** generate → Edge Function pulls encrypted KYC payroll data from
+  `contracts.payload_json`, builds the export, returns download link; "Vyžiadať údaje"
+  (for workers with missing KYC data) → sends in-app notification to worker to complete W17;
+  download/share exported file.
+- **Dáta:** `contracts` (payload_json: rodné číslo, ZP, IBAN — encrypted),
+  `bookings`, `users`, `work_hours_counters`.
+- **Stavy:** missing-kyc-for-worker (amber row, "Vyžiadať" CTA, export blocked for that
+  worker); export-generating (spinner); empty period (no completed bookings in range);
+  PoA-not-signed edge (block export, nudge to sign intermediary agreement — future lawyer
+  item C-1).
+- **Ref:** v2.7 §4 (KYC layer 3 — own Brigzy payroll form), §13 B7 (accountant confirmed
+  field list); C-1 (SP/ZP XML under PoA); C-14 (accountant confirmed worker PDF + firm
+  CSV/XML); C-9 (GDPR — payroll data 10y retention, encrypt at rest).
+
+---
+
+### P10 — Company profile — B2B only
+
+- **Účel:** Company identity and billing info. Completing this unlocks B2B features:
+  DoVP/DoPČ contracts, invoicing, mzdové podklady export. **C2C posters see P11 instead.**
+- **Obsah/layout:** Fields: company name, **IČO** (with auto-lookup via
+  orsr.sk/finstat API — prefills name + address), DIČ, **IČ DPH** (if VAT payer),
+  billing address, contact person (name + phone), company logo upload; save button.
+  Below: "Splnomocnenie & intermediárska zmluva" section (download/sign — future C-1 item,
+  shown as locked placeholder for now).
+- **Funkcie:** IČO lookup → auto-fill; save → updates `users` company fields;
+  upload logo → `avatars` bucket; link to intermediary agreement (future).
+- **Dáta:** `users` (ico, dic, ic_dph, company_name, billing_address fields).
+- **Stavy:** incomplete nudge (amber strip "Doplňte IČO pre správne faktúry") on P1
+  dashboard until saved; IČO-not-found (manual entry fallback); IČ DPH validation (SK
+  format check).
+- **Ref:** v2.7 §2.3 (B2B poster); C-8 (IČ DPH on invoices required once VAT payer);
+  C-1 (intermediary agreement placeholder — lawyer item).
+
+---
+
+### P11 — Individual profile — C2C
+
+- **Účel:** Individual poster's identity card — simpler than B2B, no company fields.
+  Only Zmluva o dielo (§631–643 OZ) available as contract type.
+- **Obsah/layout:** Avatar, display name, **★ rating as poster** (average from worker
+  reviews), short bio, history of jobs posted (count + categories), member since date;
+  "Upraviť profil" CTA. Note strip: `"Ako jednotlivec môžeš zadávať len Zmluvu o dielo
+  (§631 OZ). Pre DoVP/DoPČ potrebuješ firemný účet."` — with "Pridať firmu" link → P10.
+- **Funkcie:** edit name/bio/avatar; view public profile (as seen by workers);
+  "Pridať firmu" → opens P10 and adds B2B hat to account.
+- **Dáta:** `users`, `reviews` (poster_id = me), `jobs` (poster_id = me).
+- **Stavy:** no-history; no-rating-yet ("Zatiaľ žiadne hodnotenia"); avatar-placeholder.
+- **Ref:** v2.7 §2.3 (C2C poster); §3 (ZoD only for C2C — pure činnosť with dependent-work
+  signs = švarcsystém risk, shown as info note); C-1.
