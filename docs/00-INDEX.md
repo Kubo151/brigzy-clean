@@ -28,6 +28,7 @@ question lives here and is updated continuously during discovery and development
 ## Notes
 
 **Synthesis / deliverables**
+- [[Demo-Build-Plan-26-06]] — ⭐ 14-dňový rez na demo 26.6. (IN/OUT scope + harmonogram + gates)
 - [[Product-Summary]] — executive summary
 - [[Product-Understanding]] — what Brigzy is, roles, core loop
 - [[Feature-Breakdown]] — MVP (Tier-1/Tier-2) / V2 / Future split
@@ -52,6 +53,10 @@ question lives here and is updated continuously during discovery and development
 
 **Design / UX**
 - [[Design-System]] — claymorphism tokens + mockups · [[UX-Spec]] — screen-by-screen UX plan (in progress)
+- [[Admin-Panel-Spec]] — interný web admin panel (Next.js + Supabase; spory, support, štatistiky, feature flags)
+
+**Review**
+- [[Spec-Audit-2026-06-11]] — ⚠️ nálezy z revízie po dokončení UX-Spec (Stripe capture limit, fund/sign rozpor, Data-Model drift, demo rez) — **opravy zatiaľ neaplikované**
 
 **Discovery / living**
 - [[Interview-Log]] — running Q&A from the grilling

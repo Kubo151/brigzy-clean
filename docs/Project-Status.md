@@ -15,16 +15,18 @@ updated: 2026-06-07
 **Obsidian vault location (personal):** `C:\Claude-memory\` (note: `brigzy.md`).
 **Detailed project vault:** `C:\WORK\brigzy-clean\docs\` (this folder).
 
-## ▶️ RESUME HERE (next session — 2026-06-07 EOD)
-We're in **screen-by-screen UX planning** in [[UX-Spec]]. Done: Part A (nav/IA + full screen
-inventory) and **Part B — Worker flow (E1–E8 + W1–W17)**. Decisions locked: one switchable
-account; full v2.7 scope (long-term Verified + Brigy/Premium/Referral + insurance behind flag +
-invoicing/payroll exports); lazy Stripe Connect onboarding.
-**→ Continue with: Part B3 — Poster shell (P1–P11)**, same format
-(Účel · Obsah · Funkcie · Dáta · Stavy · ref); then B4 shared sheets, B5 gamification/long-term.
-**New input received (2026-06-07):** example **contract templates** (DoVP + DoPČ + Zmluva o dielo)
-from David in `docs/reference/Brigzy_Sablony_Zmluv.docx` — **NOT lawyer-verified** (example only;
-C-1 stays open). They already match our v2.7 model (escrow, OTP/BOK, 350h, Dodatok, QR, GDPR čl.28).
+## ▶️ RESUME HERE (2026-06-12)
+**[[UX-Spec]] is COMPLETE** — B1 Entry/Auth · B2 Worker · B3 Poster · B4 Shared sheets
+(S9 insurance ⏸ paused pending FinExpert agreement) · B5 Gamification/Verified ·
+Part C → [[Admin-Panel-Spec]] (interný Next.js admin web).
+**Spec audit done + fixes applied (2026-06-11/12)** — [[Spec-Audit-2026-06-11]]:
+escrow prepnutý na okamžitý charge + delayed transfer (7-dňový limit manual capture),
+poradie **fund → sign** zjednotené (A6/S3/S5/API), [[Data-Model]] rekoncilovaný
+k UX-Spec B4/B5/Part C, admin audit log (`admin_actions`) povýšený do MVP.
+**→ Next: potvrdiť [[Demo-Build-Plan-26-06]]** (14-dňový rez na demo 26.6.) s Davidom
+a začať stavať — Day 1–2 = i18n rozhodnutie + DB migrácie + Stripe spike + route tree.
+**Contract templates (2026-06-07):** `docs/reference/Brigzy_Sablony_Zmluv.docx` — example
+only, NOT lawyer-verified (C-1 open); demo ich používa s vodoznakom „VZOR".
 
 ## What we're building
 **Brigzy.sk** — an on-demand short-term-work ("brigády") marketplace for Slovakia (a

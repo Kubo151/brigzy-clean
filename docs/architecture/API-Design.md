@@ -35,9 +35,9 @@ Each verifies the caller's JWT, checks authorization, writes an audit log, is id
 | Function | Purpose |
 |----------|---------|
 | `POST /connect/onboard-worker` | Create Stripe Connect Express acct + return onboarding link; store `stripe_account_id`. |
-| `POST /bookings/confirm` | Poster confirms worker → create PaymentIntent (manual capture) for agreed amount + service fee → `escrow=pending`, `booking=escrow_pending`. |
-| `POST /bookings/recompute-escrow` | After an accepted price proposal → adjust/replace the held amount; booking not "binding" until fully covered. |
-| `POST /bookings/release` | Poster approves work → capture PI + credit worker `wallet_ledger` (minus fee) → `escrow=cleared`. **Gross/net split abstracted here (C-1).** |
+| `POST /bookings/confirm` | Poster confirms worker → create PaymentIntent (**immediate capture** — funds charged to the platform balance; ⚠️ NOT manual capture, auth expires in ~7 days) for agreed amount + service fee → `escrow=pending`, `booking=escrow_pending`. |
+| `POST /bookings/recompute-escrow` | After an accepted price proposal → charge the difference / partial refund; booking not "binding" until fully covered. |
+| `POST /bookings/release` | Poster approves work → **Transfer** to worker's connected account + credit worker `wallet_ledger` (minus fee) → `escrow=cleared`. **Gross/net split abstracted here (C-1).** |
 | `POST /bookings/cancel` | Cancellation rules (v2.7 §10.2): B2C tiered refund (>24h full / 12–24h 80% / <12h 50%, remainder = provable-cost/damage, **not a penalty**); B2B contractual penalty up to 20% → refund/partial via Stripe. |
 | `POST /bookings/cross-sell` | Re-hire same worker through escrow (v2.7 §9.5) → new booking with `parent_booking_id` + fresh contract. |
 | `POST /disputes/open` | Freeze escrow → `state=disputed`; create dispute row. |
@@ -65,15 +65,22 @@ Each verifies the caller's JWT, checks authorization, writes an audit log, is id
 | `POST /referrals/redeem` | Bind invitee to code; on hard conversion (first paid escrow job) credit +150 Brigy each, enforce 600 cap + anti-fraud match. |
 
 ## Escrow state machine (authoritative)
+
+> **Ordering fixed 2026-06-11: FUND → SIGN.** The poster funds escrow at selection
+> (S5, right after picking the worker); the contract is signed after funding (S3).
+> This matches the A6 spine + P5 timeline in [[UX-Spec]]. Funding first = the poster
+> proves intent before the worker commits; cancel-before-sign = trivial full refund.
+
 ```
-booking: draft → awaiting_signatures → escrow_pending → in_progress → completed → cleared
-                                            │                                  └─(dispute)→ disputed
-                                            └─(cancel)→ cancelled
-escrow:  created → pending ──(release)──> cleared
-                      │  └────(dispute)──> disputed ──(resolve)──> cleared|refunded
-                      └────(cancel)──────> refunded
+booking: draft → escrow_pending → awaiting_signatures → in_progress → completed → cleared
+                      │                   │                                    └─(dispute)→ disputed
+                      └─(cancel)→ cancelled (full refund — nothing signed yet)
+escrow:  created → pending ──(release = Transfer)──> cleared
+                      │  └────(dispute)──> disputed ──(resolve)──> cleared|refunded|split
+                      └────(cancel)──────> refunded (full pre-sign; tiered post-sign)
 ```
 All transitions happen **only** in Edge Functions, are **logged**, and are reconciled by webhooks.
+Admin-panel manual actions (release/refund) call these same functions — never direct DB writes.
 
 ## Conventions
 - Errors: structured `{ error: { code, message } }`; never leak Stripe/PII in client errors.

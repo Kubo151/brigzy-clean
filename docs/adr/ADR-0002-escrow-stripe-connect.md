@@ -29,13 +29,23 @@ Implement escrow with **Stripe Connect** using the **separate-charges-and-transf
 pattern, run in **TEST MODE** for the demo:
 
 1. Workers onboard as **Stripe Connect Express** connected accounts (test).
-2. On poster confirm → create a **PaymentIntent (manual capture)** charging the
-   poster to the **platform** account → state **Pending** (funds held/authorized).
-3. On price re-negotiation → recompute required amount before the job is "binding".
-4. On poster approval → **capture** + record a **credit in the internal wallet
-   ledger** for the worker (minus service fee) → state **Cleared**.
-5. **Payout** (≥ €15, pooled) → **Transfer** to worker's connected account → payout.
-6. Dispute → freeze (no capture/transfer) → state **Disputed**.
+2. On poster confirm → create a **PaymentIntent with immediate capture** charging the
+   poster to the **platform** account → state **Pending** (funds actually charged and
+   held on the platform balance).
+   > ⚠️ **NOT manual capture** (fixed 2026-06-11): an uncaptured authorization expires
+   > after ~7 days, which breaks any job scheduled further out, multi-day jobs, or a
+   > poster approving late. We charge immediately; "escrow" = the funds sit on the
+   > platform balance until release. Cancellation = a real **Refund** (full or tiered
+   > per the cancellation policy), not a void of authorization.
+3. On price re-negotiation → recompute required amount before the job is "binding"
+   (charge the difference / partially refund).
+4. On poster approval → **Transfer** to the worker's connected account is *scheduled*
+   + record a **credit in the internal wallet ledger** for the worker (minus service
+   fee) → state **Cleared**.
+5. **Payout** (≥ €15, pooled) → payout from the connected account balance to the
+   worker's bank (manual payout schedule on the connected account).
+6. Dispute → freeze (no transfer) → state **Disputed** → resolve = transfer /
+   refund / split.
 
 The **"release" step and the gross-vs-net split are abstracted behind one service
 function** so the legal outcome (contractor gross vs. employment net) can be slotted
