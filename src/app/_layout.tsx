@@ -4,24 +4,32 @@ import { useFonts } from 'expo-font';
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import { MANROPE_FONTS, patchTextWithManrope } from '../lib/fonts';
+import useAppStore from '../lib/state/app-store';
 
 export default function RootLayout() {
     const [session, setSession] = useState<Session | null>(null);
     const [fontsLoaded] = useFonts(MANROPE_FONTS);
+    const setCurrentUser = useAppStore((s) => s.setCurrentUser);
 
     useEffect(() => {
         if (fontsLoaded) patchTextWithManrope();
     }, [fontsLoaded]);
 
     useEffect(() => {
-        // Get initial session
+        const syncUser = async (userId: string | undefined) => {
+            if (!userId) { setCurrentUser(null); return; }
+            const { data } = await supabase.from('users').select('*').eq('id', userId).single();
+            if (data) setCurrentUser(data as any);
+        };
+
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
+            syncUser(session?.user?.id);
         });
 
-        // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
+            syncUser(session?.user?.id);
         });
 
         return () => subscription.unsubscribe();

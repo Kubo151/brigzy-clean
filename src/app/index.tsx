@@ -8,11 +8,19 @@ import { useClay } from '@/lib/useClay';
 export default function Index() {
     const router = useRouter();
     const C = useClay();
-    const hasCompletedRoleSelection = useAppStore((s) => s.hasCompletedRoleSelection);
 
     useEffect(() => {
-        supabase.auth.getUser().then(({ data: { user } }) => {
+        const route = async () => {
+            // Wait for Zustand to hydrate from AsyncStorage/localStorage before reading state.
+            // Without this, the closure always sees the pre-hydration default (false) on web refresh.
+            if (!useAppStore.persist.hasHydrated()) {
+                await new Promise<void>(resolve => {
+                    const unsub = useAppStore.persist.onFinishHydration(() => { unsub(); resolve(); });
+                });
+            }
+            const { data: { user } } = await supabase.auth.getUser();
             if (user) {
+                const { hasCompletedRoleSelection } = useAppStore.getState();
                 if (hasCompletedRoleSelection) {
                     router.replace('/(tabs)');
                 } else {
@@ -21,7 +29,8 @@ export default function Index() {
             } else {
                 router.replace('/login');
             }
-        });
+        };
+        route();
     }, []);
 
     return (
