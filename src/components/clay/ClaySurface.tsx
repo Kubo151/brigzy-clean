@@ -26,7 +26,11 @@ export function ClaySurface({ children, radius = 22, style, contentStyle }: Prop
     const isIOS = Platform.OS === 'ios';
 
     return (
-        <View style={[{ borderRadius: radius }, style]}>
+        <View style={[
+            { borderRadius: radius },
+            Platform.OS === 'web' ? ({ boxShadow: `7px 7px 16px ${C.sd}, -5px -5px 12px ${C.sl}` } as any) : undefined,
+            style,
+        ]}>
             {/* iOS: light rim-light shadow layer (top-left) */}
             {isIOS && (
                 <View
@@ -89,9 +93,9 @@ export function ClayInset({ children, radius = 14, style, contentStyle }: Props)
                     backgroundColor: C.cLo,
                     borderWidth: 1,
                     borderColor: C.hairIn,
-                    // approximate inset depth with an inner top hairline + subtle border
                     overflow: 'hidden',
                 },
+                Platform.OS === 'web' ? ({ boxShadow: `inset 4px 4px 9px ${C.sd}, inset -4px -4px 9px ${C.sl}` } as any) : undefined,
                 style,
             ]}
         >

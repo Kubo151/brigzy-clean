@@ -54,6 +54,7 @@ function TabButton({ item, focused, onPress, C }: {
                                 shadowRadius: 14,
                             },
                             android: { elevation: 8 },
+                            web: { boxShadow: `0 6px 16px ${C.accentSd}` } as any,
                         })]}
                     >
                         <LinearGradient
@@ -101,6 +102,7 @@ function TabBarContainer({ C, children }: { C: ClayColors; children: React.React
                     shadowRadius: glassAvailable ? 20 : 14,
                 },
                 android: { elevation: 14 },
+                web: { boxShadow: `0 8px 20px ${C.sd}, 0 -2px 8px ${C.sl}` } as any,
             })]}>
                 {glassAvailable ? (
                     <GlassView

@@ -44,6 +44,7 @@ export function ClayPill({ label, active, onPress, icon }: Props) {
                                       shadowRadius: 10,
                                   },
                                   android: { elevation: 4 },
+                                  web: { boxShadow: `3px 4px 10px ${C.accentSd}` },
                               }),
                           }
                         : {
@@ -58,6 +59,7 @@ export function ClayPill({ label, active, onPress, icon }: Props) {
                                       shadowRadius: 7,
                                   },
                                   android: { elevation: 2 },
+                                  web: { boxShadow: `3px 3px 7px ${C.sd}, -2px -2px 5px ${C.sl}` },
                               }),
                           },
                     { transform: [{ scale }] },

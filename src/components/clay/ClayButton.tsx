@@ -46,6 +46,7 @@ export function ClayButton({ label, onPress, variant = 'primary', icon, style, f
                                       shadowRadius: C.accentShadow.radius,
                                   },
                                   android: { elevation: 6 },
+                                  web: { boxShadow: `3px 4px 12px ${C.accentSd}, 0 1px 0 rgba(255,255,255,0.25) inset` },
                               }),
                           }
                         : {
@@ -60,6 +61,7 @@ export function ClayButton({ label, onPress, variant = 'primary', icon, style, f
                                       shadowRadius: 9,
                                   },
                                   android: { elevation: 3 },
+                                  web: { boxShadow: `4px 5px 9px ${C.sd}, -3px -3px 7px ${C.sl}` },
                               }),
                           },
                     { transform: [{ scale }] },
