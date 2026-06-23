@@ -41,7 +41,7 @@ export default function WelcomeScreen() {
     setCurrentRole(role);
     setRoleSelectionComplete(true);
     setTimeout(() => {
-      router.replace(role === "worker" ? "/(tabs)" : "/(tabs)/post");
+      router.replace('/(tabs)');
     }, 300);
   };
 

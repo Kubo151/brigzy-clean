@@ -1,33 +1,31 @@
 import React, { useRef } from 'react';
 import { View, Pressable, Text, Animated, StyleSheet, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
-import { Home, Heart, Plus, MessageSquare, User } from 'lucide-react-native';
+import { Home, Briefcase, Plus, MessageSquare, User, Search, Heart } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
+import { GlassView, isLiquidGlassAvailable } from '@/lib/glassEffect';
 import { useText } from '@/lib/useText';
 import { useClay } from '@/lib/useClay';
+import useAppStore from '@/lib/state/app-store';
 import type { ClayColors } from '@/lib/useClay';
 
 const TAB_BAR_H = 66;
 const CAPSULE_RADIUS = 26;
 const CAPSULE_INSET = 16;
 
-// ─── TAB CONFIG ──────────────────────────────────────
-const TAB_ITEMS = [
-    { name: 'index', icon: Home, labelKey: 'home' as const },
-    { name: 'favorites', icon: Heart, labelKey: 'favorites' as const },
-    { name: 'add', icon: Plus, labelKey: null },
-    { name: 'messages', icon: MessageSquare, labelKey: 'messages' as const },
-    { name: 'account', icon: User, labelKey: 'profile' as const },
-];
+type TabItem = {
+    name: string;
+    icon: any;
+    label: string;
+    isCenter?: boolean;
+};
 
 // ─── TAB BUTTON ──────────────────────────────────────
-function TabButton({ item, focused, onPress, C, label }: {
-    item: typeof TAB_ITEMS[0]; focused: boolean; onPress: () => void; C: ClayColors; label: string;
+function TabButton({ item, focused, onPress, C }: {
+    item: TabItem; focused: boolean; onPress: () => void; C: ClayColors;
 }) {
     const scaleAnim = useRef(new Animated.Value(1)).current;
-    const isCenter = item.name === 'add';
     const Icon = item.icon;
 
     const handlePress = () => {
@@ -40,8 +38,7 @@ function TabButton({ item, focused, onPress, C, label }: {
         onPress();
     };
 
-    // ── Center Plus button (raised accent) ──
-    if (isCenter) {
+    if (item.isCenter) {
         return (
             <Pressable onPress={handlePress} style={styles.tabSlot}>
                 <Animated.View style={[styles.centerWrap, { transform: [{ scale: scaleAnim }] }]}>
@@ -65,14 +62,13 @@ function TabButton({ item, focused, onPress, C, label }: {
                             end={{ x: 0.5, y: 0.6 }}
                             style={styles.centerSpecular}
                         />
-                        <Plus size={24} color={C.onAccent} strokeWidth={2.6} />
+                        <Icon size={24} color={C.onAccent} strokeWidth={2.6} />
                     </LinearGradient>
                 </Animated.View>
             </Pressable>
         );
     }
 
-    // ── Regular tab ──
     return (
         <Pressable onPress={handlePress} style={styles.tabSlot}>
             <Animated.View style={[styles.tabContent, { transform: [{ scale: scaleAnim }] }]}>
@@ -81,17 +77,16 @@ function TabButton({ item, focused, onPress, C, label }: {
                     size={22}
                     color={focused ? C.accent : C.muted}
                     strokeWidth={focused ? 2.2 : 1.8}
-                    fill={item.name === 'favorites' && focused ? C.accent : 'transparent'}
                 />
                 {focused && (
-                    <Text numberOfLines={1} style={[styles.tabLabel, { color: C.accent }]}>{label}</Text>
+                    <Text numberOfLines={1} style={[styles.tabLabel, { color: C.accent }]}>{item.label}</Text>
                 )}
             </Animated.View>
         </Pressable>
     );
 }
 
-// ─── TAB BAR CONTAINER — glass on iOS 26+, clay elsewhere ───
+// ─── TAB BAR CONTAINER ───────────────────────────────
 const glassAvailable = Platform.OS === 'ios' && isLiquidGlassAvailable();
 
 function TabBarContainer({ C, children }: { C: ClayColors; children: React.ReactNode }) {
@@ -118,11 +113,7 @@ function TabBarContainer({ C, children }: { C: ClayColors; children: React.React
                     </GlassView>
                 ) : (
                     <>
-                        {/* clay shadow backing */}
-                        <View style={[StyleSheet.absoluteFill, {
-                            borderRadius: CAPSULE_RADIUS,
-                            backgroundColor: C.cLo,
-                        }]} />
+                        <View style={[StyleSheet.absoluteFill, { borderRadius: CAPSULE_RADIUS, backgroundColor: C.cLo }]} />
                         <LinearGradient
                             colors={[C.cHi, C.cLo]}
                             start={{ x: 0.1, y: 0 }}
@@ -139,14 +130,13 @@ function TabBarContainer({ C, children }: { C: ClayColors; children: React.React
 }
 
 // ─── FLOATING TAB BAR ───────────────────────────────
-function FloatingTabBar({ state, navigation, C, text }: any) {
+function FloatingTabBar({ state, navigation, C, tabs }: { state: any; navigation: any; C: ClayColors; tabs: TabItem[] }) {
     return (
         <TabBarContainer C={C}>
             {state.routes.map((route: any, index: number) => {
                 const focused = state.index === index;
-                const item = TAB_ITEMS[index];
+                const item = tabs[index];
                 if (!item) return null;
-                const label = item.labelKey ? (text as any)[item.labelKey] || item.name : '';
                 return (
                     <TabButton
                         key={route.key}
@@ -157,7 +147,6 @@ function FloatingTabBar({ state, navigation, C, text }: any) {
                             if (!focused && !event.defaultPrevented) navigation.navigate(route.name);
                         }}
                         C={C}
-                        label={label}
                     />
                 );
             })}
@@ -169,10 +158,31 @@ function FloatingTabBar({ state, navigation, C, text }: any) {
 export default function TabLayout() {
     const text = useText();
     const C = useClay();
+    const currentRole = useAppStore((s) => s.currentRole);
+    const isWorker = currentRole === 'worker';
+
+    const workerTabs: TabItem[] = [
+        { name: 'index', icon: Home, label: text.home },
+        { name: 'favorites', icon: Heart, label: text.savedJobs },
+        { name: 'add', icon: Search, label: '', isCenter: true },
+        { name: 'messages', icon: MessageSquare, label: text.messages },
+        { name: 'account', icon: User, label: text.profile },
+    ];
+
+    const posterTabs: TabItem[] = [
+        { name: 'index', icon: Home, label: text.home },
+        { name: 'favorites', icon: Briefcase, label: text.myJobs },
+        { name: 'add', icon: Plus, label: '', isCenter: true },
+        { name: 'messages', icon: MessageSquare, label: text.messages },
+        { name: 'account', icon: User, label: text.profile },
+    ];
+
+    const tabs = isWorker ? workerTabs : posterTabs;
+
     return (
         <Tabs
             screenOptions={{ headerShown: false }}
-            tabBar={(props) => <FloatingTabBar {...props} C={C} text={text} />}
+            tabBar={(props) => <FloatingTabBar {...props} C={C} tabs={tabs} />}
         >
             <Tabs.Screen name="index" />
             <Tabs.Screen name="favorites" />
@@ -195,9 +205,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row', alignItems: 'center', height: TAB_BAR_H,
         borderRadius: CAPSULE_RADIUS, borderWidth: 1, paddingHorizontal: 6,
     },
-    glassFace: {
-        borderColor: 'rgba(255,255,255,0.18)', overflow: 'hidden',
-    },
+    glassFace: { borderColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
     tabSlot: { flex: 1, alignItems: 'center', justifyContent: 'center', height: TAB_BAR_H },
     tabContent: { alignItems: 'center', justifyContent: 'center', position: 'relative', paddingVertical: 6, paddingHorizontal: 8 },
     activeBlob: { ...StyleSheet.absoluteFill, borderRadius: 14 },

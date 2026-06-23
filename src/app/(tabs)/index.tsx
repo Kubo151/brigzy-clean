@@ -44,6 +44,7 @@ import useThemeStore from "@/lib/state/theme-store";
 import { useClay } from "@/lib/useClay";
 import type { ClayColors } from "@/lib/useClay";
 import { ClaySurface, ClayInset, ClayPill, ClayIconBox } from "@/components/clay";
+import { PosterDashboard } from "@/components/PosterDashboard";
 
 // ─── CATEGORY CONFIG ────────────────────────────────
 const CATEGORIES: (JobCategory | "all")[] = [
@@ -230,6 +231,11 @@ export default function HomeScreen() {
   const C = useClay();
 
   const currentUser = useAppStore((s) => s.currentUser);
+  const currentRole = useAppStore((s) => s.currentRole);
+
+  if (currentRole === 'employer') {
+    return <PosterDashboard />;
+  }
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);

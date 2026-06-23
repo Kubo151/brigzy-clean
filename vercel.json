@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npx expo export --platform web",
+  "outputDirectory": "dist",
+  "installCommand": "npm install --legacy-peer-deps",
+  "rewrites": [
+    { "source": "/job/:id", "destination": "/job/[id].html" },
+    { "source": "/apply/:id", "destination": "/apply/[id].html" },
+    { "source": "/messages/:userId", "destination": "/messages/[userId].html" },
+    { "source": "/job-employer/:id", "destination": "/job-employer/[id].html" }
+  ]
+}

@@ -6,8 +6,13 @@
     "scheme": "brigzy",
     "platforms": [
       "ios",
-      "android"
+      "android",
+      "web"
     ],
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
     "android": {
       "package": "com.brigzy.app"
     },

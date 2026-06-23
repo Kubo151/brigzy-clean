@@ -55,6 +55,25 @@ export default function AddJobScreen() {
     const C = useClay();
     const text = useText();
     const currentUser = useAppStore((s) => s.currentUser);
+    const currentRole = useAppStore((s) => s.currentRole);
+
+    // Workers: redirect to home instead of showing post form
+    if (currentRole !== 'employer') {
+        return (
+            <View style={[styles.center, { backgroundColor: C.bg, flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 }]}>
+                <Briefcase size={40} color={C.muted} strokeWidth={1.5} />
+                <Text style={{ fontSize: 18, fontWeight: '800', color: C.text, marginTop: 16, marginBottom: 8, textAlign: 'center' }}>
+                    Táto sekcia je pre zadávateľov
+                </Text>
+                <Text style={{ fontSize: 14, color: C.muted, textAlign: 'center', marginBottom: 24, lineHeight: 20 }}>
+                    Prepnite na rolu Zadávateľa v profile a budete môcť pridávať brigády.
+                </Text>
+                <Pressable onPress={() => router.push('/(tabs)')} style={{ backgroundColor: C.accentDim, paddingHorizontal: 22, paddingVertical: 12, borderRadius: 16 }}>
+                    <Text style={{ color: C.accent, fontWeight: '800', fontSize: 15 }}>Späť na domov</Text>
+                </Pressable>
+            </View>
+        );
+    }
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");

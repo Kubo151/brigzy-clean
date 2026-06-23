@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import {
     Settings, ChevronRight, CreditCard, User, UserCheck,
-    Bell, Lock, HelpCircle, LogOut, Pencil, Star,
+    Bell, Lock, HelpCircle, LogOut, Pencil, Star, ArrowLeftRight, Briefcase, Search,
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useText } from "@/lib/useText";
@@ -24,6 +24,7 @@ export default function ProfileScreen() {
     const currentUser = useAppStore((s) => s.currentUser);
     const logout = useAppStore((s) => s.logout);
     const currentRole = useAppStore((s) => s.currentRole);
+    const setCurrentRole = useAppStore((s) => s.setCurrentRole);
 
     const [stats, setStats] = useState({ completedJobs: 0, rating: 0, reviews: 0, earned: 0 });
 
@@ -111,6 +112,35 @@ export default function ProfileScreen() {
                                 <Text style={[styles.statLabel, { color: C.muted }]}>Zarobené</Text>
                             </View>
                         </View>
+
+                        {/* Role switch pill */}
+                        <Pressable
+                            onPress={() => {
+                                const next = currentRole === 'worker' ? 'employer' : 'worker';
+                                setCurrentRole(next);
+                            }}
+                            style={({ pressed }) => [{
+                                marginTop: 18,
+                                flexDirection: 'row' as const,
+                                alignItems: 'center' as const,
+                                gap: 8,
+                                paddingHorizontal: 16,
+                                paddingVertical: 10,
+                                borderRadius: 20,
+                                backgroundColor: C.accentDim,
+                            }, pressed && { opacity: 0.8, transform: [{ scale: 0.97 }] }]}
+                        >
+                            {currentRole === 'worker'
+                                ? <Search size={15} color={C.accent} strokeWidth={2.2} />
+                                : <Briefcase size={15} color={C.accent} strokeWidth={2.2} />}
+                            <Text style={{ fontSize: 13.5, fontWeight: '800', color: C.accent }}>
+                                {currentRole === 'worker' ? 'Brigádnik' : 'Zadávateľ'}
+                            </Text>
+                            <ArrowLeftRight size={13} color={C.muted} strokeWidth={2.2} />
+                            <Text style={{ fontSize: 13, fontWeight: '600', color: C.muted }}>
+                                {currentRole === 'worker' ? 'prepnúť na Zadávateľa' : 'prepnúť na Brigádnika'}
+                            </Text>
+                        </Pressable>
                     </ClaySurface>
                 </View>
 
