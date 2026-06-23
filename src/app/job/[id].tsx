@@ -73,13 +73,14 @@ export default function JobDetailScreen() {
 
     const isSaved = job ? savedJobIds.includes(job.id) : false;
 
-    useEffect(() => { loadJobDetails(); checkIfApplied(); }, [id]);
+    useEffect(() => { loadJobDetails(); }, [id]);
+    useEffect(() => { checkIfApplied(); }, [id, currentUser?.id]);
 
     const checkIfApplied = async () => {
         if (!id || !currentUser?.id) return;
         try {
             const { data } = await supabase.from('applications').select('id')
-                .eq('job_id', id).eq('worker_id', currentUser.id).single();
+                .eq('job_id', id).eq('worker_id', currentUser.id).maybeSingle();
             setIsApplied(!!data);
         } catch { setIsApplied(false); }
     };

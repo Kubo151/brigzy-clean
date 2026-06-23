@@ -95,7 +95,7 @@ export default function ApplyScreen() {
             addAppliedJob(job.id);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             setShowSuccess(true);
-            setTimeout(() => { router.back(); }, 2000);
+            setTimeout(() => { router.replace('/my-applications'); }, 2000);
         } catch (error) {
             console.error("Exception:", error);
             Alert.alert("Chyba", "Nepodarilo sa odoslať aplikáciu");
