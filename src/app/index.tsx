@@ -20,12 +20,7 @@ export default function Index() {
             }
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                const { hasCompletedRoleSelection } = useAppStore.getState();
-                if (hasCompletedRoleSelection) {
-                    router.replace('/(tabs)');
-                } else {
-                    router.replace('/welcome');
-                }
+                router.replace('/(tabs)');
             } else {
                 router.replace('/login');
             }
