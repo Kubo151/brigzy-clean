@@ -68,6 +68,7 @@ function SubmitButton({ label, onPress, loading, C }: {
         <Pressable onPress={onPress} disabled={loading} style={({ pressed }) => [styles.submitBtn, Platform.select({
             ios: { shadowColor: C.accentShadow.color, shadowOffset: { width: 0, height: 6 }, shadowOpacity: C.accentShadow.opacity, shadowRadius: 14 },
             android: { elevation: 6 },
+            web: { boxShadow: `3px 6px 16px ${C.accentSd}` } as any,
         }), { opacity: loading ? 0.6 : pressed ? 0.9 : 1 }]}>
             <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.submitGradient}>
                 <LinearGradient colors={['rgba(255,255,255,0.28)', 'transparent']} style={styles.submitSheen} />
