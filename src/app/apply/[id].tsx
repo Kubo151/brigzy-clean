@@ -187,6 +187,7 @@ export default function ApplyScreen() {
                     <Pressable onPress={handleSubmit} disabled={!canSubmit} style={({ pressed }) => [styles.submitBtn, Platform.select({
                         ios: { shadowColor: C.accentShadow.color, shadowOffset: { width: 0, height: 6 }, shadowOpacity: canSubmit ? C.accentShadow.opacity : 0, shadowRadius: 14 },
                         android: { elevation: canSubmit ? 6 : 0 },
+                        web: { boxShadow: canSubmit ? `3px 6px 16px ${C.accentSd}` : 'none' } as any,
                     }), { opacity: pressed && canSubmit ? 0.9 : canSubmit ? 1 : 0.5 }]}>
                         <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.submitGradient}>
                             <LinearGradient colors={['rgba(255,255,255,0.28)', 'transparent']} style={styles.submitSheen} />

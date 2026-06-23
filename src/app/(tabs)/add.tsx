@@ -216,6 +216,7 @@ export default function AddJobScreen() {
                     <Pressable onPress={handleSubmit} disabled={!isFormValid || isSubmitting} style={({ pressed }) => [styles.submitBtn, Platform.select({
                         ios: { shadowColor: C.accentShadow.color, shadowOffset: { width: 0, height: 6 }, shadowOpacity: isFormValid ? C.accentShadow.opacity : 0, shadowRadius: 14 },
                         android: { elevation: isFormValid ? 6 : 0 },
+                        web: { boxShadow: isFormValid ? `3px 6px 16px ${C.accentSd}` : 'none' } as any,
                     }), { opacity: (!isFormValid || isSubmitting) ? 0.45 : pressed ? 0.9 : 1 }]}>
                         <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.submitGradient}>
                             <LinearGradient colors={['rgba(255,255,255,0.28)', 'transparent']} style={styles.submitSheen} />
