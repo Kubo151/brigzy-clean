@@ -36,14 +36,25 @@ export default function ChatScreen() {
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [otherUser, setOtherUser] = useState<UserProfile | null>(null);
     const scrollViewRef = useRef<ScrollView>(null);
+    // The realtime callback must read the CURRENT user id — a state value would
+    // be captured as null in the closure created before the session loads.
+    const currentUserIdRef = useRef<string | null>(null);
 
-    useEffect(() => { loadUserAndMessages(); setupRealtimeSubscription(); }, [userId]);
+    useEffect(() => {
+        let cleanup: (() => void) | undefined;
+        (async () => {
+            await loadUserAndMessages();
+            cleanup = setupRealtimeSubscription();
+        })();
+        return () => cleanup?.();
+    }, [userId]);
 
     const loadUserAndMessages = async () => {
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) { goBack(); return; }
             setCurrentUserId(session.user.id);
+            currentUserIdRef.current = session.user.id;
             const { data: userProfile } = await supabase.from('users')
                 .select('id, name, display_name, avatar_url, role').eq('id', userId).single();
             if (userProfile) setOtherUser(userProfile);
@@ -63,9 +74,10 @@ export default function ChatScreen() {
         const channel = supabase.channel(`chat-${userId}`)
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
                 const newMsg = payload.new as Message;
-                if ((newMsg.sender_id === userId && newMsg.receiver_id === currentUserId) ||
-                    (newMsg.sender_id === currentUserId && newMsg.receiver_id === userId)) {
-                    setMessages(prev => [...prev, newMsg]);
+                const me = currentUserIdRef.current;
+                if ((newMsg.sender_id === userId && newMsg.receiver_id === me) ||
+                    (newMsg.sender_id === me && newMsg.receiver_id === userId)) {
+                    setMessages(prev => prev.some(m => m.id === newMsg.id) ? prev : [...prev, newMsg]);
                     scrollViewRef.current?.scrollToEnd({ animated: true });
                 }
             }).subscribe();
@@ -77,12 +89,17 @@ export default function ChatScreen() {
         setSending(true);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         try {
-            const { error } = await supabase.from('messages').insert({
+            const { data: inserted, error } = await supabase.from('messages').insert({
                 sender_id: currentUserId, receiver_id: userId,
                 content: newMessage.trim(), job_id: jobId || null, read: false,
-            });
+            }).select().single();
             if (error) { alert('Chyba pri odosielaní správy'); }
-            else { setNewMessage(""); setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100); }
+            else {
+                // Append immediately — don't rely on the realtime event for own messages
+                if (inserted) setMessages(prev => prev.some(m => m.id === inserted.id) ? prev : [...prev, inserted as Message]);
+                setNewMessage("");
+                setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
+            }
         } catch (e) { console.error('Error:', e); }
         finally { setSending(false); }
     };
