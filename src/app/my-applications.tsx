@@ -13,6 +13,7 @@ import useAppStore from "@/lib/state/app-store";
 import { useClay } from "@/lib/useClay";
 import type { ClayColors } from "@/lib/useClay";
 import { ClaySurface, ClayInset, ClayIconBox, ClayButton } from "@/components/clay";
+import { goBack } from '@/lib/nav';
 
 type ApplicationStatus = "pending" | "accepted" | "rejected" | "completed";
 type TabType = "pending" | "accepted" | "history";
@@ -109,7 +110,7 @@ export default function MyApplicationsScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+        <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
           <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
             <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
           </ClaySurface>

@@ -11,6 +11,8 @@ import { supabase } from '@/lib/supabase';
 import { useClay } from '@/lib/useClay';
 import type { ClayColors } from '@/lib/useClay';
 import { ClaySurface, ClayInset, ClayIconBox } from '@/components/clay';
+import { goBack } from '@/lib/nav';
+import { showAlert } from '@/lib/notify';
 
 const SK_BANKS = [
     'Slovenská sporiteľňa', 'VÚB banka', 'Tatra banka', 'ČSOB', 'mBank',
@@ -57,10 +59,10 @@ export default function BankAccountScreen() {
     const handleSave = async () => {
         const cleanIban = iban.replace(/\s/g, '');
         if (!isValidSKIBAN(cleanIban)) {
-            Alert.alert('Neplatný IBAN', 'Zadaj platný slovenský IBAN (SK + 22 číslic)');
+            showAlert('Neplatný IBAN', 'Zadaj platný slovenský IBAN (SK + 22 číslic)');
             return;
         }
-        if (!bankName) { Alert.alert('Chýba banka', 'Vyber svoju banku'); return; }
+        if (!bankName) { showAlert('Chýba banka', 'Vyber svoju banku'); return; }
         setSaving(true);
         try {
             const { data: { user } } = await supabase.auth.getUser();
@@ -68,10 +70,10 @@ export default function BankAccountScreen() {
             const { error } = await supabase
                 .from('users').update({ bank_iban: cleanIban, bank_name: bankName }).eq('id', user.id);
             if (error) throw error;
-            Alert.alert('Uložené', 'Bankový účet bol uložený', [{ text: 'OK', onPress: () => router.back() }]);
+            showAlert('Uložené', 'Bankový účet bol uložený', [{ text: 'OK', onPress: () => goBack() }]);
         } catch (e) {
             console.error('Error saving bank data:', e);
-            Alert.alert('Chyba', 'Nepodarilo sa uložiť údaje');
+            showAlert('Chyba', 'Nepodarilo sa uložiť údaje');
         } finally {
             setSaving(false);
         }
@@ -83,7 +85,7 @@ export default function BankAccountScreen() {
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                <Pressable onPress={() => goBack()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
                     <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
                         <ArrowLeft size={22} color={C.text} strokeWidth={2} />
                     </ClaySurface>

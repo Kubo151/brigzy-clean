@@ -15,6 +15,8 @@ import { supabase } from '../lib/supabase';
 import useAuthStore from '../lib/state/auth-store';
 import Avatar from '../components/Avatar';
 import { ClaySurface } from '@/components/clay';
+import { goBack } from '@/lib/nav';
+import { showAlert } from '@/lib/notify';
 
 /* ─── Types ─── */
 interface UserProfile {
@@ -78,12 +80,12 @@ export default function AccountSettings() {
             const { status } = useCamera
                 ? await ImagePicker.requestCameraPermissionsAsync()
                 : await ImagePicker.requestMediaLibraryPermissionsAsync();
-            if (status !== 'granted') { Alert.alert(text.error, 'Permission required!'); return; }
+            if (status !== 'granted') { showAlert(text.error, 'Permission required!'); return; }
             const result = useCamera
                 ? await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.5 })
                 : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.5 });
             if (!result.canceled && result.assets[0]) await uploadAvatar(result.assets[0].uri);
-        } catch { Alert.alert(text.error, text.failedToUploadPhoto); }
+        } catch { showAlert(text.error, text.failedToUploadPhoto); }
     };
 
     const uploadAvatar = async (uri: string) => {
@@ -91,7 +93,7 @@ export default function AccountSettings() {
             setUploadingPhoto(true);
             const response = await fetch(uri);
             const blob = await response.blob();
-            if (blob.size > 2 * 1024 * 1024) { Alert.alert(text.error, text.fileTooLarge); return; }
+            if (blob.size > 2 * 1024 * 1024) { showAlert(text.error, text.fileTooLarge); return; }
             const { data: { user: u } } = await supabase.auth.getUser();
             if (!u) throw new Error('No user');
             const ext = uri.split('.').pop();
@@ -103,8 +105,8 @@ export default function AccountSettings() {
             const { error: updErr } = await supabase.auth.updateUser({ data: { avatar_url: publicUrl } });
             if (updErr) throw updErr;
             updateField('avatar_url', `${publicUrl}?t=${Date.now()}`);
-            Alert.alert(text.ok, text.photoSuccessfullyChanged);
-        } catch { Alert.alert(text.error, text.failedToUploadPhoto); }
+            showAlert(text.ok, text.photoSuccessfullyChanged);
+        } catch { showAlert(text.error, text.failedToUploadPhoto); }
         finally { setUploadingPhoto(false); }
     };
 
@@ -116,7 +118,7 @@ export default function AccountSettings() {
                 (i) => { if (i === 1) pickImage(true); else if (i === 2) pickImage(false); },
             );
         } else {
-            Alert.alert(text.selectPhoto, '', [
+            showAlert(text.selectPhoto, '', [
                 { text: text.cancel, style: 'cancel' },
                 { text: text.takePhoto, onPress: () => pickImage(true) },
                 { text: text.selectPhoto, onPress: () => pickImage(false) },
@@ -126,7 +128,7 @@ export default function AccountSettings() {
 
     const handleSave = async () => {
         if (!profile.name.trim() || !profile.display_name.trim()) {
-            Alert.alert(text.error, text.allFieldsRequired); return;
+            showAlert(text.error, text.allFieldsRequired); return;
         }
         setIsLoading(true);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -144,9 +146,9 @@ export default function AccountSettings() {
                 phone: profile.phone, country: profile.country, bio: profile.bio,
             }).eq('id', u.id);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            Alert.alert(text.ok, text.profileUpdated);
-            router.back();
-        } catch { Alert.alert(text.error, text.failedToSaveChanges); }
+            showAlert(text.ok, text.profileUpdated);
+            goBack();
+        } catch { showAlert(text.error, text.failedToSaveChanges); }
         finally { setIsLoading(false); }
     };
 
@@ -176,7 +178,7 @@ export default function AccountSettings() {
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
                 {/* Header */}
                 <View style={styles.header}>
-                    <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                    <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
                         <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
                             <ArrowLeft size={20} color={C.text} strokeWidth={2} />
                         </ClaySurface>

@@ -12,6 +12,7 @@ import { useClay } from "@/lib/useClay";
 import type { ClayColors } from "@/lib/useClay";
 import * as Haptics from "expo-haptics";
 import { ClaySurface, ClayInset } from "@/components/clay";
+import { goBack } from '@/lib/nav';
 
 interface Message {
     id: string; content: string; sender_id: string;
@@ -41,7 +42,7 @@ export default function ChatScreen() {
     const loadUserAndMessages = async () => {
         try {
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { router.back(); return; }
+            if (!session) { goBack(); return; }
             setCurrentUserId(session.user.id);
             const { data: userProfile } = await supabase.from('users')
                 .select('id, name, display_name, avatar_url, role').eq('id', userId).single();
@@ -102,7 +103,7 @@ export default function ChatScreen() {
         <SafeAreaView style={st.container} edges={['top']}>
             {/* Header */}
             <View style={st.chatHeader}>
-                <Pressable onPress={() => router.back()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                <Pressable onPress={() => goBack()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
                     <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
                         <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
                     </ClaySurface>

@@ -23,6 +23,7 @@ import { useClay } from "@/lib/useClay";
 import type { ClayColors } from "@/lib/useClay";
 import { ClaySurface, ClayInset, ClayButton, ClayPill, ClayIconBox } from "@/components/clay";
 import JobLocationMap from "@/components/JobLocationMap";
+import { goBack } from '@/lib/nav';
 
 const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -163,7 +164,7 @@ export default function JobDetailScreen() {
         return (
             <SafeAreaView style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
                 <Text style={{ fontSize: 18, fontWeight: '800', color: C.text, marginBottom: 16 }}>{error || "Pozícia sa nenašla"}</Text>
-                <ClayButton label="Späť" onPress={() => router.back()} />
+                <ClayButton label="Späť" onPress={() => goBack()} />
             </SafeAreaView>
         );
     }
@@ -198,7 +199,7 @@ export default function JobDetailScreen() {
             <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
                 {/* Header */}
                 <View style={styles.header}>
-                    <ClayIconButton onPress={() => router.back()} C={C}>
+                    <ClayIconButton onPress={() => goBack()} C={C}>
                         <ChevronLeft size={20} color={C.text} strokeWidth={2.2} />
                     </ClayIconButton>
                     <View style={{ flexDirection: 'row', gap: 10 }}>

@@ -10,6 +10,7 @@ import {
   Image,
   StyleSheet,
 } from "react-native";
+import { goBack } from '@/lib/nav';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import {
@@ -248,7 +249,7 @@ export default function AccountScreen() {
       <Pressable
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          router.back();
+          goBack();
         }}
         style={({ pressed }) => [
           styles.backBtn,
@@ -288,7 +289,7 @@ export default function AccountScreen() {
             Nepodarilo sa načítať údaje účtu.
           </Text>
           <Pressable
-            onPress={() => router.back()}
+            onPress={() => goBack()}
             style={({ pressed }) => [styles.retryBtn, { opacity: pressed ? 0.85 : 1 }]}
           >
             <LinearGradient

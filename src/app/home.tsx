@@ -6,6 +6,7 @@ import { useClay } from '@/lib/useClay';
 import { Search, Briefcase, ChevronRight, Zap } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ClaySurface, ClayIconBox } from '@/components/clay';
+import { showAlert } from '@/lib/notify';
 
 export default function Home() {
     const router = useRouter();
@@ -59,7 +60,7 @@ export default function Home() {
 
             router.replace('/(tabs)');
         } catch (error: any) {
-            Alert.alert('Chyba', error.message);
+            showAlert('Chyba', error.message);
         } finally {
             setLoading(false);
         }

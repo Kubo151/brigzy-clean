@@ -17,6 +17,7 @@ import * as Haptics from 'expo-haptics';
 import { Mail, Lock, UserCircle, Phone, ChevronDown, AtSign, Eye, EyeOff, Zap } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 import { ClaySurface, ClayInset } from '@/components/clay';
+import { showAlert } from '@/lib/notify';
 
 // ── Reusable input field ──
 function InputField({ icon: Icon, placeholder, value, onChangeText, secure, keyboard, editable = true, C, loading }: {
@@ -152,7 +153,7 @@ export default function Login() {
     // ── Forgot password ──
     const handleForgotPassword = async () => {
         if (!email) {
-            Alert.alert('Zadajte email', 'Najprv vyplňte emailovú adresu a potom kliknite na "Zabudli ste heslo?"');
+            showAlert('Zadajte email', 'Najprv vyplňte emailovú adresu a potom kliknite na "Zabudli ste heslo?"');
             return;
         }
         setLoading(true);
@@ -161,15 +162,15 @@ export default function Login() {
                 redirectTo: 'brigzy://reset-password',
             });
             if (error) throw error;
-            Alert.alert('Email odoslaný', `Na adresu ${email} sme vám poslali odkaz na obnovenie hesla.`);
+            showAlert('Email odoslaný', `Na adresu ${email} sme vám poslali odkaz na obnovenie hesla.`);
         } catch (error: any) {
-            Alert.alert('Chyba', error.message);
+            showAlert('Chyba', error.message);
         } finally { setLoading(false); }
     };
 
     // ── Login ──
     const handleLogin = async () => {
-        if (!email || !password) { Alert.alert('Chyba', 'Vyplňte email a heslo'); return; }
+        if (!email || !password) { showAlert('Chyba', 'Vyplňte email a heslo'); return; }
         setLoading(true);
         try {
             const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -190,20 +191,20 @@ export default function Login() {
             }
             router.replace('/(tabs)');
         } catch (error: any) {
-            Alert.alert('Chyba', error.message);
+            showAlert('Chyba', error.message);
         } finally { setLoading(false); }
     };
 
     // ── Sign Up ──
     const handleSignUp = async () => {
         if (!name || !surname || !displayName || !regEmail || !regPassword || !confirmPassword || !phoneNumber) {
-            Alert.alert('Chyba', 'Vyplňte všetky polia'); return;
+            showAlert('Chyba', 'Vyplňte všetky polia'); return;
         }
         if (regPassword !== confirmPassword) {
-            Alert.alert('Chyba', 'Heslá sa nezhodujú'); return;
+            showAlert('Chyba', 'Heslá sa nezhodujú'); return;
         }
         if (regPassword.length < 6) {
-            Alert.alert('Chyba', 'Heslo musí mať aspoň 6 znakov'); return;
+            showAlert('Chyba', 'Heslo musí mať aspoň 6 znakov'); return;
         }
         setLoading(true);
         try {
@@ -238,7 +239,7 @@ export default function Login() {
             }
             router.replace('/(tabs)');
         } catch (error: any) {
-            Alert.alert('Chyba', error.message);
+            showAlert('Chyba', error.message);
         } finally { setLoading(false); }
     };
 
@@ -321,8 +322,8 @@ export default function Login() {
 
                 {/* Social logins */}
                 <View style={styles.socialGroup}>
-                    <SocialButton label="Sign in with Apple" iconType="apple" C={C} onPress={() => Alert.alert('Čoskoro', 'Prihlásenie cez Apple bude dostupné čoskoro.')} />
-                    <SocialButton label="Sign in with Google" iconType="google" C={C} onPress={() => Alert.alert('Čoskoro', 'Prihlásenie cez Google bude dostupné čoskoro.')} />
+                    <SocialButton label="Sign in with Apple" iconType="apple" C={C} onPress={() => showAlert('Čoskoro', 'Prihlásenie cez Apple bude dostupné čoskoro.')} />
+                    <SocialButton label="Sign in with Google" iconType="google" C={C} onPress={() => showAlert('Čoskoro', 'Prihlásenie cez Google bude dostupné čoskoro.')} />
                 </View>
 
                 {/* Terms */}

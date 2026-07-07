@@ -12,6 +12,7 @@ import useAppStore from "@/lib/state/app-store";
 import { useClay } from "@/lib/useClay";
 import type { JobCategory } from "@/lib/types";
 import { ClaySurface, ClayIconBox, ClayButton } from "@/components/clay";
+import { goBack } from '@/lib/nav';
 
 type JobStatus = "open" | "in_progress" | "completed" | "cancelled";
 
@@ -84,7 +85,7 @@ export default function MyJobsScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
       <View style={styles.header}>
-        <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+        <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
           <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
             <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
           </ClaySurface>

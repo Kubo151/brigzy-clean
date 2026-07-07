@@ -13,6 +13,8 @@ import { supabase } from "@/lib/supabase";
 import useAppStore from "@/lib/state/app-store";
 import { ClaySurface, ClayIconBox } from "@/components/clay";
 import { EscrowConfirmSheet, type EscrowBooking } from "@/components/EscrowConfirmSheet";
+import { goBack } from '@/lib/nav';
+import { showAlert } from '@/lib/notify';
 
 interface Applicant {
     id: string;
@@ -92,7 +94,7 @@ export default function EmployerJobDetailScreen() {
             ]);
             if (jobRes.error) {
                 console.error("❌ [EmployerJobDetail] Error:", jobRes.error);
-                Alert.alert(text.error, text.failedToLoadJob);
+                showAlert(text.error, text.failedToLoadJob);
             } else {
                 setJob(jobRes.data as JobDetail);
             }
@@ -125,7 +127,7 @@ export default function EmployerJobDetailScreen() {
             await loadJobDetail();
         } catch (error) {
             console.error("❌ [EmployerJobDetail] Select failed:", error);
-            Alert.alert(text.error, text.selectionFailed);
+            showAlert(text.error, text.selectionFailed);
         } finally {
             setSelectingId(null);
         }
@@ -153,7 +155,7 @@ export default function EmployerJobDetailScreen() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         } catch (error) {
             console.error("❌ [EmployerJobDetail] Error updating status:", error);
-            Alert.alert(text.error, text.failedToUpdateStatus);
+            showAlert(text.error, text.failedToUpdateStatus);
         }
     };
 
@@ -204,7 +206,7 @@ export default function EmployerJobDetailScreen() {
         <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={["top"]}>
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
                     <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
                         <ChevronLeft size={20} color={C.text} strokeWidth={2.2} />
                     </ClaySurface>

@@ -15,6 +15,7 @@ import { supabase } from "@/lib/supabase";
 import { useClay } from "@/lib/useClay";
 import type { ClayColors } from "@/lib/useClay";
 import { ClaySurface, ClayIconBox } from "@/components/clay";
+import { showAlert } from '@/lib/notify';
 
 // ─── PROFILE SCREEN ─────────────────────────────────
 export default function ProfileScreen() {
@@ -52,7 +53,7 @@ export default function ProfileScreen() {
         if (Platform.OS === 'web') {
             if (window.confirm('Naozaj sa chcete odhlásiť?')) doLogout();
         } else {
-            Alert.alert('Odhlásiť sa', 'Naozaj sa chcete odhlásiť?', [
+            showAlert('Odhlásiť sa', 'Naozaj sa chcete odhlásiť?', [
                 { text: 'Zrušiť', style: 'cancel' },
                 { text: 'Odhlásiť', style: 'destructive', onPress: doLogout },
             ]);

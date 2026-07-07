@@ -8,8 +8,10 @@ import {
     ActivityIndicator,
     Alert,
 } from 'react-native';
+import { goBack } from '@/lib/nav';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { supabase } from '../lib/supabase';
+import { showAlert } from '@/lib/notify';
 
 interface Job {
     id: string;
@@ -50,7 +52,7 @@ export default function JobDetail() {
             setJob(data);
         } catch (error) {
             console.error('Error loading job:', error);
-            Alert.alert('Chyba', 'Nepodarilo sa načítať prácu');
+            showAlert('Chyba', 'Nepodarilo sa načítať prácu');
         } finally {
             setLoading(false);
         }
@@ -79,7 +81,7 @@ export default function JobDetail() {
             setApplying(true);
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
-                Alert.alert('Chyba', 'Musíte byť prihlásený');
+                showAlert('Chyba', 'Musíte byť prihlásený');
                 return;
             }
 
@@ -95,13 +97,13 @@ export default function JobDetail() {
             if (error) throw error;
 
             setHasApplied(true);
-            Alert.alert(
+            showAlert(
                 'Úspech! 🎉',
                 'Vaša prihláška bola odoslaná. Zamestnávateľ vás bude kontaktovať.',
-                [{ text: 'OK', onPress: () => router.back() }]
+                [{ text: 'OK', onPress: () => goBack() }]
             );
         } catch (error: any) {
-            Alert.alert('Chyba', error.message);
+            showAlert('Chyba', error.message);
         } finally {
             setApplying(false);
         }
@@ -119,7 +121,7 @@ export default function JobDetail() {
         return (
             <View style={styles.errorContainer}>
                 <Text style={styles.errorText}>Práca sa nenašla</Text>
-                <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                <TouchableOpacity style={styles.backButton} onPress={() => goBack()}>
                     <Text style={styles.backButtonText}>Späť</Text>
                 </TouchableOpacity>
             </View>
@@ -129,7 +131,7 @@ export default function JobDetail() {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+                <TouchableOpacity onPress={() => goBack()} style={styles.backBtn}>
                     <Text style={styles.backIcon}>←</Text>
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Detail práce</Text>

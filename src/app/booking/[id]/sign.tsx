@@ -10,6 +10,7 @@ import { useClay } from '@/lib/useClay';
 import { useText } from '@/lib/useText';
 import { supabase } from '@/lib/supabase';
 import { ClaySurface, ClayButton, ClayIconBox, ClayInset } from '@/components/clay';
+import { goBack } from '@/lib/nav';
 
 // S3 — contract preview + mock-OTP sign. Full screen per UX-Spec (not a sheet).
 
@@ -99,7 +100,7 @@ export default function ContractSignScreen() {
     return (
         <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={['top']}>
             <View style={styles.header}>
-                <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
                     <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
                         <ChevronLeft size={20} color={C.text} strokeWidth={2.2} />
                     </ClaySurface>
@@ -113,7 +114,7 @@ export default function ContractSignScreen() {
                         <CheckCircle size={36} color={C.green} strokeWidth={1.8} />
                     </ClayIconBox>
                     <Text style={[styles.successTitle, { color: C.text }]}>{text.done}</Text>
-                    <ClayButton label={text.done} onPress={() => router.back()} style={{ alignSelf: 'stretch', marginTop: 16 }} />
+                    <ClayButton label={text.done} onPress={() => goBack()} style={{ alignSelf: 'stretch', marginTop: 16 }} />
                 </View>
             ) : (
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>

@@ -7,6 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useClay } from '@/lib/useClay';
 import type { ClayColors } from '@/lib/useClay';
 import { ClaySurface } from '@/components/clay';
+import { goBack } from '@/lib/nav';
 
 type TransactionStatus = 'pending' | 'cleared' | 'withdrawn';
 type FilterType = 'all' | 'cleared' | 'withdrawn' | 'pending';
@@ -89,7 +90,7 @@ export default function HistoryScreen() {
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                <Pressable onPress={() => goBack()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
                     <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
                         <ArrowLeft size={22} color={C.text} strokeWidth={2} />
                     </ClaySurface>

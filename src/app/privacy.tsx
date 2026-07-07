@@ -6,6 +6,8 @@ import { ChevronLeft, ChevronRight, Eye, Phone, Mail, Lock, ShieldCheck, Downloa
 import { useClay } from "@/lib/useClay";
 import type { ClayColors } from "@/lib/useClay";
 import { ClaySurface, ClayIconBox } from "@/components/clay";
+import { goBack } from '@/lib/nav';
+import { showAlert } from '@/lib/notify';
 
 function ToggleRow({ C, label, icon, value, onToggle }: {
     C: ClayColors; label: string; icon: React.ReactNode; value: boolean; onToggle: (v: boolean) => void;
@@ -41,7 +43,7 @@ export default function PrivacyScreen() {
     const [showEmail, setShowEmail] = useState(true);
 
     const handleDeleteAccount = () => {
-        Alert.alert('Vymazať účet', 'Táto akcia je nevratná. Naozaj chcete vymazať svoj účet?', [
+        showAlert('Vymazať účet', 'Táto akcia je nevratná. Naozaj chcete vymazať svoj účet?', [
             { text: 'Zrušiť', style: 'cancel' },
             { text: 'Vymazať', style: 'destructive', onPress: () => { } },
         ]);
@@ -58,7 +60,7 @@ export default function PrivacyScreen() {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                <Pressable onPress={() => goBack()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
                     <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
                         <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
                     </ClaySurface>

@@ -9,6 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { useClay } from '@/lib/useClay';
 import type { ClayColors } from '@/lib/useClay';
+import { goBack } from '@/lib/nav';
 
 const PRESET_AMOUNTS = [20, 50, 100];
 
@@ -206,7 +207,7 @@ export default function WalletScreen() {
         <SafeAreaView style={styles.container} edges={['top']}>
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.iconBtn}>
+                <Pressable onPress={() => goBack()} style={styles.iconBtn}>
                     <ArrowLeft size={22} color={C.text} strokeWidth={2} />
                 </Pressable>
                 <Text style={styles.headerTitle}>Peňaženka</Text>

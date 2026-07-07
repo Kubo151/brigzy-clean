@@ -14,6 +14,8 @@ import { useClay } from "@/lib/useClay";
 import { useText } from "@/lib/useText";
 import type { Job } from "@/lib/types";
 import { ClaySurface, ClayInset, ClayIconBox } from "@/components/clay";
+import { goBack } from '@/lib/nav';
+import { showAlert } from '@/lib/notify';
 
 export default function ApplyScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -38,8 +40,8 @@ export default function ApplyScreen() {
                 .from("jobs").select("*").eq("id", id).single();
             if (error) {
                 console.error("Error fetching job:", error);
-                Alert.alert("Chyba", "Nepodarilo sa načítať brigádu");
-                router.back();
+                showAlert("Chyba", "Nepodarilo sa načítať brigádu");
+                goBack();
                 return;
             }
             if (jobData) {
@@ -57,8 +59,8 @@ export default function ApplyScreen() {
             }
         } catch (error) {
             console.error("Exception loading job:", error);
-            Alert.alert("Chyba", "Nepodarilo sa načítať brigádu");
-            router.back();
+            showAlert("Chyba", "Nepodarilo sa načítať brigádu");
+            goBack();
         } finally {
             setIsLoading(false);
         }
@@ -67,7 +69,7 @@ export default function ApplyScreen() {
     const handleSubmit = async () => {
         if (!job || !currentUser) return;
         if (message.trim().length < 20) {
-            Alert.alert("Chyba", "Správa musí mať aspoň 20 znakov");
+            showAlert("Chyba", "Správa musí mať aspoň 20 znakov");
             return;
         }
         setIsSubmitting(true);
@@ -77,7 +79,7 @@ export default function ApplyScreen() {
                 .from("applications").select("id")
                 .eq("job_id", job.id).eq("worker_id", currentUser.id).single();
             if (existingApp) {
-                Alert.alert("Už ste aplikovali", "Na túto brigádu ste už aplikovali");
+                showAlert("Už ste aplikovali", "Na túto brigádu ste už aplikovali");
                 setIsSubmitting(false);
                 return;
             }
@@ -87,7 +89,7 @@ export default function ApplyScreen() {
             });
             if (error) {
                 console.error("Error creating application:", error);
-                Alert.alert("Chyba", "Nepodarilo sa odoslať aplikáciu");
+                showAlert("Chyba", "Nepodarilo sa odoslať aplikáciu");
                 setIsSubmitting(false);
                 return;
             }
@@ -97,7 +99,7 @@ export default function ApplyScreen() {
             setTimeout(() => { router.replace('/my-applications'); }, 2000);
         } catch (error) {
             console.error("Exception:", error);
-            Alert.alert("Chyba", "Nepodarilo sa odoslať aplikáciu");
+            showAlert("Chyba", "Nepodarilo sa odoslať aplikáciu");
             setIsSubmitting(false);
         }
     };
@@ -136,7 +138,7 @@ export default function ApplyScreen() {
         <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={["top"]}>
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                <Pressable onPress={() => goBack()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
                     <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
                         <ArrowLeft size={20} color={C.text} strokeWidth={2} />
                     </ClaySurface>

@@ -15,6 +15,7 @@ import { SUPPORTED_LANGUAGES } from "@/lib/texts";
 import { useClay } from "@/lib/useClay";
 import type { ClayColors } from "@/lib/useClay";
 import { ClaySurface, ClayIconBox } from "@/components/clay";
+import { goBack } from '@/lib/nav';
 
 const themeOptions: { mode: ThemeMode; icon: any; label: string }[] = [
   { mode: 'light', icon: Sun, label: 'Svetlý' },
@@ -36,7 +37,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+        <Pressable onPress={() => goBack()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
           <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
             <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
           </ClaySurface>

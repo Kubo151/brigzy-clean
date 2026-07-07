@@ -12,6 +12,8 @@ import { useText } from '@/lib/useText';
 import { supabase } from '@/lib/supabase';
 import { ClaySurface, ClayButton, ClayIconBox, ClayTimeline, type TimelineStep } from '@/components/clay';
 import { EscrowConfirmSheet, type EscrowBooking } from '@/components/EscrowConfirmSheet';
+import { goBack } from '@/lib/nav';
+import { showAlert } from '@/lib/notify';
 
 // P5 (poster) / W6 (worker) — booking hub. One screen, role decided by which
 // side of the booking the signed-in user is on.
@@ -108,7 +110,7 @@ export default function BookingHubScreen() {
             await load();
         } catch (e) {
             console.error('❌ [BookingHub] attendance failed:', e);
-            Alert.alert(text.error, text.selectionFailed);
+            showAlert(text.error, text.selectionFailed);
         } finally {
             setIsAttending(false);
         }
@@ -127,7 +129,7 @@ export default function BookingHubScreen() {
             await load();
         } catch (e) {
             console.error('❌ [BookingHub] release failed:', e);
-            Alert.alert(text.error, text.selectionFailed);
+            showAlert(text.error, text.selectionFailed);
         } finally {
             setIsReleasing(false);
         }
@@ -191,7 +193,7 @@ export default function BookingHubScreen() {
     return (
         <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={['top']}>
             <View style={styles.header}>
-                <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
                     <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
                         <ChevronLeft size={20} color={C.text} strokeWidth={2.2} />
                     </ClaySurface>

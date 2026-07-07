@@ -12,6 +12,7 @@ import {
 import { useClay } from '@/lib/useClay';
 import type { ClayColors } from '@/lib/useClay';
 import { ClaySurface, ClayIconBox } from '@/components/clay';
+import { goBack } from '@/lib/nav';
 
 // ─── MOCK ACTIVITY DATA ─────────────────────────────
 const MOCK_ACTIVITY = [
@@ -82,7 +83,7 @@ export default function ActivityScreen() {
     const handleItemPress = (item: typeof MOCK_ACTIVITY[0]) => {
         setActivities(prev => prev.map(a => a.id === item.id ? { ...a, read: true } : a));
         if (item.type === 'new_message') router.push('/messages');
-        else if (item.type === 'new_job') router.back();
+        else if (item.type === 'new_job') goBack();
         else if (item.type === 'application_accepted' || item.type === 'application_rejected') router.push('/my-applications');
     };
 
@@ -95,7 +96,7 @@ export default function ActivityScreen() {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 }}>
-                <IconBtn onPress={() => router.back()}><ChevronLeft size={22} color={C.text} strokeWidth={2.2} /></IconBtn>
+                <IconBtn onPress={() => goBack()}><ChevronLeft size={22} color={C.text} strokeWidth={2.2} /></IconBtn>
                 <Text style={{ fontSize: 18, fontWeight: '800', color: C.text, letterSpacing: -0.3 }}>Aktivita</Text>
                 <IconBtn onPress={() => router.push('/notifications')}><Settings size={18} color={C.text} strokeWidth={2} /></IconBtn>
             </View>

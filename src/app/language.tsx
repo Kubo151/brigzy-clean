@@ -7,6 +7,7 @@ import * as Haptics from "expo-haptics";
 import useThemeStore from "@/lib/state/theme-store";
 import { useClay } from "@/lib/useClay";
 import { ClaySurface } from "@/components/clay";
+import { goBack } from '@/lib/nav';
 
 const LANGUAGES = [
     { code: 'sk' as const, name: 'Slovenčina', flag: '🇸🇰' },
@@ -22,7 +23,7 @@ export default function LanguageScreen() {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
+                <Pressable onPress={() => goBack()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
                     <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
                         <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
                     </ClaySurface>
