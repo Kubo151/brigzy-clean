@@ -86,13 +86,15 @@ function PostJobForm() {
     const [description, setDescription] = useState("");
     const [location, setLocation] = useState("");
     const [salary, setSalary] = useState("");
+    const [estimatedHours, setEstimatedHours] = useState("");
     const [duration, setDuration] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<JobCategory | null>(null);
     const [salaryType, setSalaryType] = useState<SalaryType>("hourly");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
-    const isFormValid = title.trim() && description.trim() && location.trim() && salary.trim() && duration.trim() && selectedCategory;
+    const isFormValid = title.trim() && description.trim() && location.trim() && salary.trim() && duration.trim() && selectedCategory
+        && (salaryType !== 'hourly' || parseFloat(estimatedHours.replace(',', '.')) > 0);
 
     const handleSubmit = async () => {
         if (!isFormValid) return;
@@ -114,6 +116,7 @@ function PostJobForm() {
                 category: selectedCategory,
                 pay_type: salaryType,
                 pay_amount: parseFloat(salary) || 0,
+                estimated_hours: salaryType === 'hourly' ? parseFloat(estimatedHours.replace(',', '.')) || null : null,
                 duration: duration.trim(),
                 is_urgent: false,
                 requires_introduction: false,
@@ -129,7 +132,7 @@ function PostJobForm() {
             setTimeout(() => {
                 setShowSuccess(false);
                 setTitle(""); setDescription(""); setLocation("");
-                setSalary(""); setDuration(""); setSelectedCategory(null);
+                setSalary(""); setEstimatedHours(""); setDuration(""); setSelectedCategory(null);
                 router.push("/(tabs)");
             }, 2000);
         } catch (error) {
@@ -191,6 +194,14 @@ function PostJobForm() {
                     </View>
 
                     <FormInput icon={Euro} label={salaryType === "hourly" ? text.hourlyRate : text.fixedAmount} value={salary} onChangeText={setSalary} placeholder="napr. 10" C={C} keyboardType="numeric" />
+                    {salaryType === 'hourly' && (
+                        <View>
+                            <FormInput icon={Clock} label={text.estimatedHoursLabel} value={estimatedHours} onChangeText={setEstimatedHours} placeholder="napr. 6" C={C} keyboardType="numeric" />
+                            <Text style={{ color: C.muted, fontSize: 12, fontWeight: '500', marginTop: -10, marginBottom: 16, paddingHorizontal: 4 }}>
+                                {text.estimatedHoursHint}
+                            </Text>
+                        </View>
+                    )}
                     <FormInput icon={Clock} label={text.duration} value={duration} onChangeText={setDuration} placeholder={text.durationPlaceholder} C={C} />
 
                     {/* Category Selection */}

@@ -249,6 +249,13 @@ interface TextMap {
   bookingCancelled: string;
   bookingDisputed: string;
   waitingForRelease: string;
+  checkInWorker: string;
+  checkOutWorker: string;
+  workedTime: string;
+  workingSince: string;
+  estimatedHoursLabel: string;
+  estimatedHoursHint: string;
+  perHourShort: string;
 
   // Job Detail Screen
   jobNotFound: string;
@@ -560,6 +567,13 @@ const texts: Record<Language, TextMap> = {
     bookingCancelled: 'Booking cancelled',
     bookingDisputed: 'Booking in dispute',
     waitingForRelease: 'Waiting for the poster to approve the work',
+    checkInWorker: 'Check in worker',
+    checkOutWorker: 'Check out worker',
+    workedTime: 'Worked',
+    workingSince: 'Working since',
+    estimatedHoursLabel: 'Estimated hours',
+    estimatedHoursHint: 'Used to reserve the payment in escrow (rate × hours)',
+    perHourShort: 'h',
 
     // Job Detail Screen
     jobNotFound: 'Job not found',
@@ -869,6 +883,13 @@ const texts: Record<Language, TextMap> = {
     bookingCancelled: 'Rezervácia zrušená',
     bookingDisputed: 'Rezervácia v spore',
     waitingForRelease: 'Čaká sa na schválenie práce zadávateľom',
+    checkInWorker: 'Check-in brigádnika',
+    checkOutWorker: 'Check-out brigádnika',
+    workedTime: 'Odpracované',
+    workingSince: 'Pracuje od',
+    estimatedHoursLabel: 'Odhadovaný počet hodín',
+    estimatedHoursHint: 'Použije sa na rezerváciu platby v úschove (sadzba × hodiny)',
+    perHourShort: 'h',
 
     // Job Detail Screen
     jobNotFound: 'Práca nenájdená',

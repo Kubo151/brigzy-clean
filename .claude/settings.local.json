@@ -77,7 +77,15 @@
       "PowerShell(\\(Get-Content supabase\\\\functions\\\\sign-contract\\\\index.ts -Raw -Encoding utf8\\).Length; \\(Get-Content supabase\\\\functions\\\\release-escrow\\\\index.ts -Raw -Encoding utf8\\).Length)",
       "mcp__claude_ai_Supabase__deploy_edge_function",
       "PowerShell(npx expo export --platform web)",
-      "PowerShell(git add *)"
+      "PowerShell(git add *)",
+      "PowerShell(git push *)",
+      "mcp__claude_ai_Vercel__deploy_to_vercel",
+      "PowerShell(git config user.email)",
+      "PowerShell(git config --global user.email)",
+      "PowerShell(git config --global user.email \"nemcikjakub5@gmail.com\")",
+      "PowerShell($r = Invoke-WebRequest -Uri 'https://brigzy.vercel.app' -UseBasicParsing -Method Get; Write-Output \\(\"Status: \" + $r.StatusCode\\); Write-Output \\($r.Content.Substring\\(0, [Math]::Min\\(300, $r.Content.Length\\)\\)\\))",
+      "Skill(claude-in-chrome)",
+      "PowerShell($js = \\(Invoke-WebRequest -Uri 'https://brigzy.vercel.app/_expo/static/js/web/entry-cfa9c258a4b31a7475430fff100c4a64.js' -UseBasicParsing\\).Content; $m = [regex]::Matches\\($js, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9[^\"]{0,250}'\\); foreach \\($x in $m | Select-Object -First 3\\) { $s = $x.Value; Write-Output \\(\"LEN=\" + $s.Length\\); $bad = @\\(\\); for \\($i=0; $i -lt $s.Length; $i++\\) { $c = [int][char]$s[$i]; if \\($c -gt 255\\) { $bad += \"pos $i U+\" + $c.ToString\\('X4'\\) + \" '\" + $s[$i] + \"'\" } }; if \\($bad.Count\\) { Write-Output \\(\"BAD CHARS: \" + \\($bad -join ', '\\)\\) } else { Write-Output \"no >255 chars\" }; Write-Output \\($s.Substring\\(0, [Math]::Min\\(80, $s.Length\\)\\)\\); Write-Output '---' })"
     ]
   }
 }

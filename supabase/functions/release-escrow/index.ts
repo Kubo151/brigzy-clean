@@ -33,7 +33,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: booking, error: bookingError } = await admin
       .from('bookings')
-      .select('id, job_id, worker_user_id, poster_user_id, status, agreed_amount_cents, currency, escrow_id')
+      .select('id, job_id, worker_user_id, poster_user_id, status, agreed_amount_cents, currency, escrow_id, check_in_at, check_out_at')
       .eq('id', booking_id)
       .maybeSingle();
     if (bookingError) throw bookingError;
@@ -56,9 +56,30 @@ Deno.serve(async (req: Request) => {
 
     const now = new Date().toISOString();
 
+    const { data: job } = await admin
+      .from('jobs')
+      .select('title, pay_type, pay_amount_cents, pay_amount')
+      .eq('id', booking.job_id)
+      .maybeSingle();
+
+    // Hourly + recorded attendance → prorate: rate × actual hours (rounded UP
+    // to a started 15-minute block), capped at the escrowed amount. The
+    // remainder stays with the poster (Stripe partial refund once live).
+    // Hours beyond the estimate are the S4 Dodatok case (post-demo).
+    let payoutCents = escrow.amount_cents;
+    let actualHours: number | null = null;
+    if (job?.pay_type === 'hourly' && booking.check_in_at && booking.check_out_at) {
+      const rateCents = job.pay_amount_cents ?? Math.round((job.pay_amount ?? 0) * 100);
+      const minutes = (new Date(booking.check_out_at).getTime() - new Date(booking.check_in_at).getTime()) / 60000;
+      if (rateCents > 0 && minutes > 0) {
+        actualHours = Math.max(Math.ceil(minutes / 15) * 0.25, 0.25);
+        payoutCents = Math.min(Math.round(rateCents * actualHours), escrow.amount_cents);
+      }
+    }
+
     const { error: releaseError } = await admin
       .from('escrow_transactions')
-      .update({ state: 'cleared', released_at: now, released_amount_cents: escrow.amount_cents })
+      .update({ state: 'cleared', released_at: now, released_amount_cents: payoutCents })
       .eq('id', escrow.id);
     if (releaseError) throw releaseError;
 
@@ -68,26 +89,24 @@ Deno.serve(async (req: Request) => {
       .eq('id', booking.id);
     if (statusError) throw statusError;
 
-    const { data: job } = await admin
-      .from('jobs')
-      .select('title')
-      .eq('id', booking.job_id)
-      .maybeSingle();
-
     const { error: ledgerError } = await admin.from('wallet_ledger').insert({
       user_id: booking.worker_user_id,
       entry_type: 'credit',
-      amount_cents: escrow.amount_cents,
+      amount_cents: payoutCents,
       currency: escrow.currency,
       ref_booking_id: booking.id,
-      description: job?.title ?? 'Brigáda',
+      description: actualHours !== null
+        ? `${job?.title ?? 'Brigáda'} · ${actualHours} h`
+        : job?.title ?? 'Brigáda',
     });
     if (ledgerError) throw ledgerError;
 
     return jsonResponse({
       booking_id: booking.id,
       escrow_state: 'cleared',
-      released_amount_cents: escrow.amount_cents,
+      released_amount_cents: payoutCents,
+      refunded_to_poster_cents: escrow.amount_cents - payoutCents,
+      actual_hours: actualHours,
       currency: escrow.currency,
     });
   } catch (e) {

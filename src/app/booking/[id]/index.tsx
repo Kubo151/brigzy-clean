@@ -27,10 +27,22 @@ interface BookingDetail {
     currency: string;
     escrow_id: string | null;
     contract_id: string | null;
-    job: { title: string | null; company_name: string | null } | null;
+    check_in_at: string | null;
+    check_out_at: string | null;
+    job: { title: string | null; company_name: string | null; pay_type: string | null } | null;
     worker: { display_name: string | null } | null;
     poster: { display_name: string | null } | null;
 }
+
+const formatTime = (iso: string) =>
+    new Date(iso).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' });
+
+const workedLabel = (checkIn: string, checkOut: string) => {
+    const minutes = Math.max(Math.round((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 60000), 0);
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return h > 0 ? `${h} h ${m} min` : `${m} min`;
+};
 
 interface ContractState {
     signed_by_poster_at: string | null;
@@ -50,6 +62,7 @@ export default function BookingHubScreen() {
     const [myUserId, setMyUserId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isReleasing, setIsReleasing] = useState(false);
+    const [isAttending, setIsAttending] = useState(false);
     const [s5Visible, setS5Visible] = useState(false);
 
     const load = useCallback(async () => {
@@ -61,7 +74,7 @@ export default function BookingHubScreen() {
             const [bookingRes, contractRes] = await Promise.all([
                 supabase
                     .from('bookings')
-                    .select('id, job_id, worker_user_id, poster_user_id, status, agreed_amount_cents, service_fee_cents, currency, escrow_id, contract_id, job:job_id(title, company_name), worker:worker_user_id(display_name), poster:poster_user_id(display_name)')
+                    .select('id, job_id, worker_user_id, poster_user_id, status, agreed_amount_cents, service_fee_cents, currency, escrow_id, contract_id, check_in_at, check_out_at, job:job_id(title, company_name, pay_type), worker:worker_user_id(display_name), poster:poster_user_id(display_name)')
                     .eq('id', id)
                     .maybeSingle(),
                 supabase
@@ -81,6 +94,25 @@ export default function BookingHubScreen() {
     }, [id]);
 
     useFocusEffect(useCallback(() => { load(); }, [load]));
+
+    const handleAttendance = async (action: 'check_in' | 'check_out') => {
+        if (!booking || isAttending) return;
+        setIsAttending(true);
+        try {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            const { data, error } = await supabase.functions.invoke('attendance', {
+                body: { booking_id: booking.id, action },
+            });
+            if (error || data?.error) throw error ?? new Error(data.error);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            await load();
+        } catch (e) {
+            console.error('❌ [BookingHub] attendance failed:', e);
+            Alert.alert(text.error, text.selectionFailed);
+        } finally {
+            setIsAttending(false);
+        }
+    };
 
     const handleRelease = async () => {
         if (!booking || isReleasing) return;
@@ -135,7 +167,16 @@ export default function BookingHubScreen() {
             done: contractDone,
             active: status === 'awaiting_signatures',
         },
-        { label: text.stepWork, sublabel: text.qrComingSoon, done: released, active: status === 'in_progress' },
+        {
+            label: text.stepWork,
+            sublabel: booking.check_in_at && booking.check_out_at
+                ? `${text.workedTime}: ${workedLabel(booking.check_in_at, booking.check_out_at)}`
+                : booking.check_in_at
+                    ? `${text.workingSince} ${formatTime(booking.check_in_at)}`
+                    : text.qrComingSoon,
+            done: released || !!booking.check_out_at,
+            active: status === 'in_progress' && !booking.check_out_at,
+        },
         { label: text.stepRelease, done: released, active: status === 'completed' },
     ];
 
@@ -225,8 +266,28 @@ export default function BookingHubScreen() {
 
                 {(status === 'in_progress' || status === 'completed') && (
                     isPoster ? (
-                        isReleasing ? (
+                        (isReleasing || isAttending) ? (
                             <ActivityIndicator size="large" color={C.accent} style={{ marginVertical: 14 }} />
+                        ) : !booking.check_in_at ? (
+                            <ClayButton
+                                label={text.checkInWorker}
+                                icon={<QrCode size={18} color={C.onAccent} strokeWidth={2.2} />}
+                                onPress={() => handleAttendance('check_in')}
+                            />
+                        ) : !booking.check_out_at ? (
+                            <View style={{ gap: 12 }}>
+                                <View style={[styles.infoBox, { backgroundColor: C.accentDim }]}>
+                                    <QrCode size={18} color={C.accent} strokeWidth={2} />
+                                    <Text style={[styles.infoText, { color: C.text }]}>
+                                        {text.workingSince} {formatTime(booking.check_in_at)}
+                                    </Text>
+                                </View>
+                                <ClayButton
+                                    label={text.checkOutWorker}
+                                    icon={<QrCode size={18} color={C.onAccent} strokeWidth={2.2} />}
+                                    onPress={() => handleAttendance('check_out')}
+                                />
+                            </View>
                         ) : (
                             <ClayButton
                                 label={text.approveAndRelease}
@@ -237,7 +298,11 @@ export default function BookingHubScreen() {
                     ) : (
                         <View style={[styles.infoBox, { backgroundColor: C.accentDim }]}>
                             <QrCode size={18} color={C.accent} strokeWidth={2} />
-                            <Text style={[styles.infoText, { color: C.text }]}>{text.waitingForRelease}</Text>
+                            <Text style={[styles.infoText, { color: C.text }]}>
+                                {booking.check_in_at && !booking.check_out_at
+                                    ? `${text.workingSince} ${formatTime(booking.check_in_at)}`
+                                    : text.waitingForRelease}
+                            </Text>
                         </View>
                     )
                 )}

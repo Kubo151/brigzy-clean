@@ -48,7 +48,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: job, error: jobError } = await admin
       .from('jobs')
-      .select('id, poster_user_id, employer_id, pay_amount_cents, pay_amount, currency, status')
+      .select('id, poster_user_id, employer_id, pay_amount_cents, pay_amount, pay_type, estimated_hours, currency, status')
       .eq('id', app.job_id)
       .maybeSingle();
     if (jobError) throw jobError;
@@ -70,10 +70,17 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: 'booking_already_exists', booking_id: existing.id, status: existing.status }, 409);
     }
 
-    const amountCents = app.negotiated_rate_cents
+    const rateCents = app.negotiated_rate_cents
       ?? job.pay_amount_cents
       ?? Math.round((job.pay_amount ?? 0) * 100);
-    if (!amountCents || amountCents <= 0) return jsonResponse({ error: 'invalid_job_amount' }, 422);
+    if (!rateCents || rateCents <= 0) return jsonResponse({ error: 'invalid_job_amount' }, 422);
+
+    // Hourly jobs escrow the planned total: rate × estimated hours.
+    // Actual payout is prorated from attendance at release time.
+    const plannedHours = job.pay_type === 'hourly'
+      ? Math.max(Number(job.estimated_hours) || 1, 0.25)
+      : 1;
+    const amountCents = Math.round(rateCents * plannedHours);
     const serviceFeeCents = FEE_FIXED_CENTS + Math.round(amountCents * FEE_PCT);
 
     const { data: booking, error: bookingError } = await admin
