@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { View, Text, Pressable, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { ArrowLeft, Hourglass, CheckCircle, Building2 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { supabase } from '@/lib/supabase';
 import { useClay } from '@/lib/useClay';
 import type { ClayColors } from '@/lib/useClay';
 import { ClaySurface } from '@/components/clay';
@@ -12,15 +13,20 @@ import { goBack } from '@/lib/nav';
 type TransactionStatus = 'pending' | 'cleared' | 'withdrawn';
 type FilterType = 'all' | 'cleared' | 'withdrawn' | 'pending';
 
-const ALL_TRANSACTIONS = [
-    { id: '1', title: 'Pomocník v sklade', company: 'Logistika SK', date: 'dnes', amount: 40.00, status: 'pending' as TransactionStatus },
-    { id: '2', title: 'Brigáda — kaviareň', company: 'Café Modrý Kameň', date: '5. feb', amount: 67.50, status: 'cleared' as TransactionStatus },
-    { id: '3', title: 'Výber na účet', company: 'IBAN •••• 4821', date: '3. feb', amount: -60.00, status: 'withdrawn' as TransactionStatus },
-    { id: '4', title: 'Upratovanie kancelárie', company: 'CleanPro s.r.o.', date: '1. feb', amount: 55.00, status: 'cleared' as TransactionStatus },
-    { id: '5', title: 'Výber na účet', company: 'IBAN •••• 4821', date: '28. jan', amount: -45.00, status: 'withdrawn' as TransactionStatus },
-    { id: '6', title: 'Event staff — koncert', company: 'LiveEvents SK', date: '25. jan', amount: 92.00, status: 'cleared' as TransactionStatus },
-    { id: '7', title: 'Doručovanie balíkov', company: 'QuickDeliver', date: '20. jan', amount: 48.00, status: 'pending' as TransactionStatus },
-];
+type TxItem = {
+    id: string;
+    title: string;
+    company: string;
+    date: string;
+    amount: number; // EUR, signed
+    status: TransactionStatus;
+};
+
+const formatTxDate = (iso: string): string => {
+    const d = new Date(iso);
+    if (d.toDateString() === new Date().toDateString()) return 'dnes';
+    return d.toLocaleDateString('sk-SK', { day: 'numeric', month: 'short' });
+};
 
 const FILTERS: { key: FilterType; label: string }[] = [
     { key: 'all', label: 'Všetky' },
@@ -33,10 +39,60 @@ export default function HistoryScreen() {
     const C = useClay();
     const styles = useMemo(() => makeStyles(C), [C]);
     const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+    const [transactions, setTransactions] = useState<TxItem[]>([]);
+
+    const loadHistory = useCallback(async () => {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+            const [ledgerRes, pendingRes] = await Promise.all([
+                supabase
+                    .from('wallet_ledger')
+                    .select('id, entry_type, amount_cents, description, created_at, booking:ref_booking_id(job:job_id(title, company_name))')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false }),
+                supabase
+                    .from('bookings')
+                    .select('id, agreed_amount_cents, created_at, job:job_id(title, company_name)')
+                    .eq('worker_user_id', user.id)
+                    .in('status', ['awaiting_signatures', 'in_progress', 'completed']),
+            ]);
+            type LedgerRow = {
+                id: string; entry_type: string; amount_cents: number;
+                description: string | null; created_at: string;
+                booking: { job: { title: string | null; company_name: string | null } | null } | null;
+            };
+            type PendingRow = {
+                id: string; agreed_amount_cents: number; created_at: string;
+                job: { title: string | null; company_name: string | null } | null;
+            };
+            const pendingTx: TxItem[] = ((pendingRes.data ?? []) as unknown as PendingRow[]).map((b) => ({
+                id: `pending-${b.id}`,
+                title: b.job?.title || 'Brigáda',
+                company: b.job?.company_name || 'Brigzy',
+                date: formatTxDate(b.created_at),
+                amount: b.agreed_amount_cents / 100,
+                status: 'pending',
+            }));
+            const ledgerTx: TxItem[] = ((ledgerRes.data ?? []) as unknown as LedgerRow[]).map((r) => ({
+                id: r.id,
+                title: r.entry_type === 'payout' ? 'Výber na účet' : r.booking?.job?.title || r.description || 'Transakcia',
+                company: r.entry_type === 'payout' ? (r.description || 'Bankový účet') : r.booking?.job?.company_name || 'Brigzy',
+                date: formatTxDate(r.created_at),
+                amount: r.amount_cents / 100,
+                status: r.amount_cents < 0 ? 'withdrawn' : 'cleared',
+            }));
+            setTransactions([...pendingTx, ...ledgerTx]);
+        } catch (e) {
+            console.error('❌ [WalletHistory] load failed:', e);
+        }
+    }, []);
+
+    useFocusEffect(useCallback(() => { loadHistory(); }, [loadHistory]));
 
     const filteredTransactions = activeFilter === 'all'
-        ? ALL_TRANSACTIONS
-        : ALL_TRANSACTIONS.filter(t => t.status === activeFilter);
+        ? transactions
+        : transactions.filter(t => t.status === activeFilter);
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -63,7 +119,7 @@ export default function HistoryScreen() {
         }
     };
 
-    const renderTransaction = ({ item }: { item: typeof ALL_TRANSACTIONS[0] }) => {
+    const renderTransaction = ({ item }: { item: TxItem }) => {
         const StatusIcon = getStatusIcon(item.status);
         const isNegative = item.amount < 0;
         return (

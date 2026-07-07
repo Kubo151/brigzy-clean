@@ -54,21 +54,27 @@ export default function AccountSettings() {
             if (!fetchedUser) return;
             currentUser = fetchedUser;
         }
-        const { data: { user: userData } } = await supabase.auth.getUser();
-        if (!userData?.user_metadata) return;
-        const m = userData.user_metadata;
+        // The profile lives in public.users; auth metadata is only a fallback
+        // (seeded/admin-created accounts have no metadata at all).
+        const { data: row } = await supabase
+            .from('users')
+            .select('display_name, name, surname, email, phone, country, avatar_url, dob')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+        const m = currentUser.user_metadata ?? {};
+        const dob = row?.dob || m.date_of_birth || null;
         setProfile({
-            display_name: m.display_name || m.name || '',
-            name: m.first_name || m.name || '',
-            surname: m.last_name || m.surname || '',
-            email: currentUser?.email || '',
-            phone: m.phone_number || '',
-            country: m.country || '',
-            avatar_url: m.avatar_url || null,
+            display_name: row?.display_name || m.display_name || m.name || '',
+            name: row?.name || m.first_name || m.name || '',
+            surname: row?.surname || m.last_name || m.surname || '',
+            email: row?.email || currentUser?.email || '',
+            phone: row?.phone || m.phone_number || '',
+            country: row?.country || m.country || '',
+            avatar_url: row?.avatar_url || m.avatar_url || null,
             bio: m.bio || '',
-            date_of_birth: m.date_of_birth || null,
+            date_of_birth: dob,
         });
-        if (m.date_of_birth) setDatePickerDate(new Date(m.date_of_birth));
+        if (dob) setDatePickerDate(new Date(dob));
     };
 
     const updateField = (key: keyof UserProfile, value: string) => {
@@ -141,10 +147,11 @@ export default function AccountSettings() {
                     phone_number: profile.phone, country: profile.country, bio: profile.bio, date_of_birth: profile.date_of_birth,
                 },
             });
-            await supabase.from('users').update({
+            const { error: rowError } = await supabase.from('users').update({
                 name: profile.name, surname: profile.surname, display_name: profile.display_name,
-                phone: profile.phone, country: profile.country, bio: profile.bio,
+                phone: profile.phone, country: profile.country, dob: profile.date_of_birth,
             }).eq('id', u.id);
+            if (rowError) throw rowError;
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             showAlert(text.ok, text.profileUpdated);
             goBack();
