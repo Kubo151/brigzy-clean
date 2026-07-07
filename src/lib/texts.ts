@@ -269,6 +269,15 @@ interface TextMap {
   peopleSection: string;
   viewProfile: string;
 
+  // S7 blind review
+  leaveReviewTitle: string;
+  reviewCommentPlaceholder: string;
+  submitReview: string;
+  reviewThanks: string;
+  reviewBlindNote: string;
+  reviewRevealedNote: string;
+  reviewFailed: string;
+
   // Job Detail Screen
   jobNotFound: string;
   aboutThisJob: string;
@@ -599,6 +608,15 @@ const texts: Record<Language, TextMap> = {
     peopleSection: 'People',
     viewProfile: 'View profile',
 
+    // S7 blind review
+    leaveReviewTitle: 'Rate your experience',
+    reviewCommentPlaceholder: 'Write a short review…',
+    submitReview: 'Submit review',
+    reviewThanks: 'Thanks for your review!',
+    reviewBlindNote: 'Reviews are revealed once both sides have rated.',
+    reviewRevealedNote: 'Both reviews are now public.',
+    reviewFailed: 'Could not submit the review. Please try again.',
+
     // Job Detail Screen
     jobNotFound: 'Job not found',
     aboutThisJob: 'About This Job',
@@ -926,6 +944,15 @@ const texts: Record<Language, TextMap> = {
     ratingLabel: 'Hodnotenie',
     peopleSection: 'Ľudia',
     viewProfile: 'Zobraziť profil',
+
+    // S7 blind review
+    leaveReviewTitle: 'Ohodnoť spoluprácu',
+    reviewCommentPlaceholder: 'Napíš krátku recenziu…',
+    submitReview: 'Odoslať hodnotenie',
+    reviewThanks: 'Ďakujeme za hodnotenie!',
+    reviewBlindNote: 'Recenzie sa odhalia, keď ohodnotia obe strany.',
+    reviewRevealedNote: 'Obe recenzie sú teraz verejné.',
+    reviewFailed: 'Hodnotenie sa nepodarilo odoslať. Skús to znova.',
 
     // Job Detail Screen
     jobNotFound: 'Práca nenájdená',

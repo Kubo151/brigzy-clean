@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import {
-    View, Text, ScrollView, Pressable, ActivityIndicator, Alert, StyleSheet,
+    View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, Alert, StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
-import { ChevronLeft, ShieldCheck, FileSignature, QrCode, CheckCircle, XCircle } from 'lucide-react-native';
+import { ChevronLeft, ShieldCheck, FileSignature, QrCode, CheckCircle, XCircle, Star } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useClay } from '@/lib/useClay';
@@ -51,6 +51,12 @@ interface ContractState {
     signed_by_worker_at: string | null;
 }
 
+interface MyReview {
+    id: string;
+    rating_overall: number | null;
+    revealed_at: string | null;
+}
+
 const eur = (cents: number) => `€${(cents / 100).toFixed(2)}`;
 
 export default function BookingHubScreen() {
@@ -66,6 +72,10 @@ export default function BookingHubScreen() {
     const [isReleasing, setIsReleasing] = useState(false);
     const [isAttending, setIsAttending] = useState(false);
     const [s5Visible, setS5Visible] = useState(false);
+    const [myReview, setMyReview] = useState<MyReview | null>(null);
+    const [reviewStars, setReviewStars] = useState(0);
+    const [reviewComment, setReviewComment] = useState('');
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
     const load = useCallback(async () => {
         if (!id) return;
@@ -73,7 +83,7 @@ export default function BookingHubScreen() {
             const { data: { user } } = await supabase.auth.getUser();
             setMyUserId(user?.id ?? null);
 
-            const [bookingRes, contractRes] = await Promise.all([
+            const [bookingRes, contractRes, reviewRes] = await Promise.all([
                 supabase
                     .from('bookings')
                     .select('id, job_id, worker_user_id, poster_user_id, status, agreed_amount_cents, service_fee_cents, currency, escrow_id, contract_id, check_in_at, check_out_at, job:job_id(title, company_name, pay_type), worker:worker_user_id(display_name), poster:poster_user_id(display_name)')
@@ -84,10 +94,19 @@ export default function BookingHubScreen() {
                     .select('signed_by_poster_at, signed_by_worker_at')
                     .eq('booking_id', id)
                     .maybeSingle(),
+                user
+                    ? supabase
+                        .from('reviews')
+                        .select('id, rating_overall, revealed_at')
+                        .eq('booking_id', id)
+                        .eq('from_user_id', user.id)
+                        .maybeSingle()
+                    : Promise.resolve({ data: null }),
             ]);
             if (bookingRes.error) throw bookingRes.error;
             setBooking(bookingRes.data as unknown as BookingDetail);
             setContract((contractRes.data as ContractState) ?? null);
+            setMyReview((reviewRes.data as MyReview) ?? null);
         } catch (e) {
             console.error('❌ [BookingHub] load failed:', e);
         } finally {
@@ -113,6 +132,25 @@ export default function BookingHubScreen() {
             showAlert(text.error, text.selectionFailed);
         } finally {
             setIsAttending(false);
+        }
+    };
+
+    const handleSubmitReview = async () => {
+        if (!booking || isSubmittingReview || reviewStars < 1) return;
+        setIsSubmittingReview(true);
+        try {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            const { data, error } = await supabase.functions.invoke('submit-review', {
+                body: { booking_id: booking.id, rating: reviewStars, comment: reviewComment },
+            });
+            if (error || data?.error) throw error ?? new Error(data.error);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            await load();
+        } catch (e) {
+            console.error('❌ [BookingHub] review failed:', e);
+            showAlert(text.error, text.reviewFailed);
+        } finally {
+            setIsSubmittingReview(false);
         }
     };
 
@@ -318,6 +356,54 @@ export default function BookingHubScreen() {
                         <Text style={[styles.releasedNote, { color: C.muted }]}>{text.paymentReleasedNote}</Text>
                     </View>
                 )}
+
+                {/* S7 — blind two-way review */}
+                {released && !myReview && (
+                    <ClaySurface radius={20} style={{ marginTop: 8 }} contentStyle={{ padding: 18 }}>
+                        <Text style={[styles.reviewTitle, { color: C.text }]}>
+                            {text.leaveReviewTitle} · {otherName}
+                        </Text>
+                        <View style={styles.starsRow}>
+                            {[1, 2, 3, 4, 5].map((s) => (
+                                <Pressable key={s} onPress={() => { Haptics.selectionAsync(); setReviewStars(s); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.9 }] }]}>
+                                    <Star
+                                        size={34}
+                                        color={C.star}
+                                        strokeWidth={1.8}
+                                        fill={s <= reviewStars ? C.star : 'transparent'}
+                                    />
+                                </Pressable>
+                            ))}
+                        </View>
+                        <TextInput
+                            value={reviewComment}
+                            onChangeText={setReviewComment}
+                            placeholder={text.reviewCommentPlaceholder}
+                            placeholderTextColor={C.muted}
+                            multiline
+                            style={[styles.reviewInput, { color: C.text, backgroundColor: C.cLo, borderColor: C.hair }]}
+                        />
+                        {isSubmittingReview ? (
+                            <ActivityIndicator size="large" color={C.accent} style={{ marginVertical: 10 }} />
+                        ) : (
+                            <ClayButton
+                                label={text.submitReview}
+                                icon={<Star size={17} color={C.onAccent} strokeWidth={2.2} />}
+                                onPress={handleSubmitReview}
+                                style={reviewStars < 1 ? { opacity: 0.5 } : undefined}
+                            />
+                        )}
+                        <Text style={[styles.blindNote, { color: C.muted }]}>{text.reviewBlindNote}</Text>
+                    </ClaySurface>
+                )}
+                {released && myReview && (
+                    <View style={[styles.infoBox, { backgroundColor: C.greenDim ?? C.green + '1E', marginTop: 8 }]}>
+                        <Star size={18} color={C.star} strokeWidth={2} fill={C.star} />
+                        <Text style={[styles.infoText, { color: C.text }]}>
+                            {text.reviewThanks} {myReview.revealed_at ? text.reviewRevealedNote : text.reviewBlindNote}
+                        </Text>
+                    </View>
+                )}
             </ScrollView>
 
             {/* S5 — fund sheet (poster, escrow_pending) */}
@@ -353,4 +439,8 @@ const styles = StyleSheet.create({
     releasedWrap: { alignItems: 'center', gap: 10, paddingVertical: 18 },
     releasedTitle: { fontSize: 18, fontWeight: '800', letterSpacing: -0.4 },
     releasedNote: { fontSize: 13.5, fontWeight: '500', textAlign: 'center' },
+    reviewTitle: { fontSize: 16, fontWeight: '800', letterSpacing: -0.3, marginBottom: 14 },
+    starsRow: { flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 16 },
+    reviewInput: { borderRadius: 14, borderWidth: 1, padding: 13, fontSize: 14, minHeight: 76, textAlignVertical: 'top', marginBottom: 14 },
+    blindNote: { fontSize: 12, fontWeight: '600', textAlign: 'center', marginTop: 12 },
 });
