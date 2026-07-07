@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  View, Text, ScrollView, Pressable, RefreshControl,
+  View, Text, ScrollView, Pressable, RefreshControl, AppState,
   Image, TextInput, StyleSheet, ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -74,19 +74,46 @@ export default function MessagesScreen() {
 
   useEffect(() => {
     loadConversations();
+
+    // Same resilience as the chat thread: resubscribe on channel failure,
+    // refetch on foreground, quiet polling as fallback.
     let channel: ReturnType<typeof supabase.channel> | null = null;
-    const setupRealtimeSubscription = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+    let disposed = false;
+
+    const subscribe = () => {
+      if (disposed) return;
+      if (channel) supabase.removeChannel(channel);
       channel = supabase
-        .channel('all-messages')
+        .channel(`all-messages-${Date.now()}`)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
           loadConversations();
         })
-        .subscribe();
+        .subscribe((status) => {
+          if (disposed) return;
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+            if (retryTimer) clearTimeout(retryTimer);
+            retryTimer = setTimeout(subscribe, 3000);
+          }
+        });
     };
-    setupRealtimeSubscription();
-    return () => { if (channel) supabase.removeChannel(channel); };
+    subscribe();
+
+    const appStateSub = AppState.addEventListener('change', (state) => {
+      if (state === 'active' && !disposed) {
+        loadConversations();
+        subscribe();
+      }
+    });
+    const pollTimer = setInterval(() => { if (!disposed) loadConversations(); }, 15000);
+
+    return () => {
+      disposed = true;
+      appStateSub.remove();
+      clearInterval(pollTimer);
+      if (retryTimer) clearTimeout(retryTimer);
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {

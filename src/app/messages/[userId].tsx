@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import {
-    View, Text, ScrollView, TextInput, Pressable,
+    View, Text, ScrollView, TextInput, Pressable, AppState,
     KeyboardAvoidingView, Platform, Image, ActivityIndicator, StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -41,12 +41,57 @@ export default function ChatScreen() {
     const currentUserIdRef = useRef<string | null>(null);
 
     useEffect(() => {
-        let cleanup: (() => void) | undefined;
+        // Realtime sockets die silently (mobile browsers kill them in the
+        // background and they don't always come back), so belt & braces:
+        // 1. resubscribe whenever the channel reports failure,
+        // 2. refetch + resubscribe when the app returns to the foreground,
+        // 3. quiet polling as the last-resort fallback.
+        let channel: ReturnType<typeof supabase.channel> | null = null;
+        let retryTimer: ReturnType<typeof setTimeout> | null = null;
+        let disposed = false;
+
+        const subscribe = () => {
+            if (disposed) return;
+            if (channel) supabase.removeChannel(channel);
+            channel = supabase.channel(`chat-${userId}-${Date.now()}`)
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+                    const newMsg = payload.new as Message;
+                    const me = currentUserIdRef.current;
+                    if ((newMsg.sender_id === userId && newMsg.receiver_id === me) ||
+                        (newMsg.sender_id === me && newMsg.receiver_id === userId)) {
+                        setMessages(prev => prev.some(m => m.id === newMsg.id) ? prev : [...prev, newMsg]);
+                        scrollViewRef.current?.scrollToEnd({ animated: true });
+                    }
+                })
+                .subscribe((status) => {
+                    if (disposed) return;
+                    if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+                        if (retryTimer) clearTimeout(retryTimer);
+                        retryTimer = setTimeout(subscribe, 3000);
+                    }
+                });
+        };
+
         (async () => {
             await loadUserAndMessages();
-            cleanup = setupRealtimeSubscription();
+            subscribe();
         })();
-        return () => cleanup?.();
+
+        const appStateSub = AppState.addEventListener('change', (state) => {
+            if (state === 'active' && !disposed) {
+                loadUserAndMessages();
+                subscribe();
+            }
+        });
+        const pollTimer = setInterval(() => { if (!disposed) loadUserAndMessages(); }, 10000);
+
+        return () => {
+            disposed = true;
+            appStateSub.remove();
+            clearInterval(pollTimer);
+            if (retryTimer) clearTimeout(retryTimer);
+            if (channel) supabase.removeChannel(channel);
+        };
     }, [userId]);
 
     const loadUserAndMessages = async () => {
@@ -68,20 +113,6 @@ export default function ChatScreen() {
             }
         } catch (e) { console.error('Error:', e); }
         finally { setLoading(false); }
-    };
-
-    const setupRealtimeSubscription = () => {
-        const channel = supabase.channel(`chat-${userId}`)
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
-                const newMsg = payload.new as Message;
-                const me = currentUserIdRef.current;
-                if ((newMsg.sender_id === userId && newMsg.receiver_id === me) ||
-                    (newMsg.sender_id === me && newMsg.receiver_id === userId)) {
-                    setMessages(prev => prev.some(m => m.id === newMsg.id) ? prev : [...prev, newMsg]);
-                    scrollViewRef.current?.scrollToEnd({ animated: true });
-                }
-            }).subscribe();
-        return () => { supabase.removeChannel(channel); };
     };
 
     const sendMessage = async () => {
