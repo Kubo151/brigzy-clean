@@ -31,7 +31,7 @@ export default function CategoryPill({ category, isSelected, onPress, isDark = f
   };
 
   const categoryData = JOB_CATEGORIES.find((cat) => cat.id === category);
-  const emoji = category === "all" ? "📋" : categoryData?.emoji || "📋";
+  const emoji = category === "all" ? "📋" : categoryData?.icon || "📋";
   const label = category === "all"
     ? (language === "sk" ? "Všetky" : "All")
     : (language === "sk" && categoryData?.name_sk ? categoryData.name_sk : categoryData?.name || category);

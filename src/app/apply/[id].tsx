@@ -52,7 +52,6 @@ export default function ApplyScreen() {
                     postedAt: new Date(jobData.created_at).toISOString().split("T")[0],
                     employerId: jobData.employer_id, isUrgent: jobData.is_urgent,
                     applicantsCount: 0, requirements: [],
-                    createdAt: jobData.created_at,
                 };
                 setJob(mappedJob);
             }

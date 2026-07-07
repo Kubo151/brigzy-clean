@@ -4,7 +4,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, MapPin, Clock, Users, CheckCircle, XCircle } from "lucide-react-native";
+import { ChevronLeft, MapPin, Clock, Users, XCircle, Star, Zap, BadgeCheck, ShieldCheck } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { useClay } from "@/lib/useClay";
@@ -12,14 +12,38 @@ import { useText } from "@/lib/useText";
 import { supabase } from "@/lib/supabase";
 import useAppStore from "@/lib/state/app-store";
 import { ClaySurface, ClayIconBox } from "@/components/clay";
+import { EscrowConfirmSheet, type EscrowBooking } from "@/components/EscrowConfirmSheet";
 
 interface Applicant {
     id: string;
     status: "pending" | "accepted" | "rejected";
     message: string;
     created_at: string;
-    worker: { id: string; display_name: string; avatar_url?: string; };
+    worker: {
+        id: string;
+        display_name: string;
+        avatar_url?: string;
+        xp?: number;
+        rating_avg?: number;
+        rating_count?: number;
+        brigzy_verified?: boolean;
+    };
 }
+
+interface JobBooking {
+    id: string;
+    worker_user_id: string;
+    status: string;
+    agreed_amount_cents: number;
+    service_fee_cents: number;
+    currency: string;
+}
+
+// P4 ranking (spec: XP + rating + verified)
+const rankScore = (a: Applicant) =>
+    (a.worker.brigzy_verified ? 500 : 0) +
+    (a.worker.rating_avg ?? 0) * 100 +
+    (a.worker.xp ?? 0);
 
 interface JobDetail {
     id: string;
@@ -45,27 +69,79 @@ export default function EmployerJobDetailScreen() {
     const [job, setJob] = useState<JobDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedTab, setSelectedTab] = useState<"new" | "accepted" | "rejected">("new");
+    const [bookingsByWorker, setBookingsByWorker] = useState<Record<string, JobBooking>>({});
+    const [selectingId, setSelectingId] = useState<string | null>(null);
+    const [s5Visible, setS5Visible] = useState(false);
+    const [s5Booking, setS5Booking] = useState<EscrowBooking | null>(null);
 
     useEffect(() => { loadJobDetail(); }, [id]);
 
     const loadJobDetail = async () => {
         if (!id) return;
         try {
-            const { data, error } = await supabase
-                .from("jobs")
-                .select(`*, applications( id, status, message, created_at, worker:worker_id(id, display_name, avatar_url) )`)
-                .eq("id", id).single();
-            if (error) {
-                console.error("❌ [EmployerJobDetail] Error:", error);
+            const [jobRes, bookingsRes] = await Promise.all([
+                supabase
+                    .from("jobs")
+                    .select(`*, applications( id, status, message, created_at, worker:worker_id(id, display_name, avatar_url, xp, rating_avg, rating_count, brigzy_verified) )`)
+                    .eq("id", id).single(),
+                supabase
+                    .from("bookings")
+                    .select("id, worker_user_id, status, agreed_amount_cents, service_fee_cents, currency")
+                    .eq("job_id", id)
+                    .neq("status", "cancelled"),
+            ]);
+            if (jobRes.error) {
+                console.error("❌ [EmployerJobDetail] Error:", jobRes.error);
                 Alert.alert(text.error, text.failedToLoadJob);
             } else {
-                setJob(data as JobDetail);
+                setJob(jobRes.data as JobDetail);
+            }
+            if (bookingsRes.error) {
+                console.error("❌ [EmployerJobDetail] Bookings error:", bookingsRes.error);
+            } else {
+                const map: Record<string, JobBooking> = {};
+                for (const b of (bookingsRes.data ?? []) as JobBooking[]) map[b.worker_user_id] = b;
+                setBookingsByWorker(map);
             }
         } catch (error) {
             console.error("❌ [EmployerJobDetail] Exception:", error);
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // P4 select → creates booking server-side, then opens S5 escrow sheet
+    const selectApplicant = async (applicant: Applicant) => {
+        if (selectingId) return;
+        setSelectingId(applicant.id);
+        try {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            const { data, error } = await supabase.functions.invoke("select-applicant", {
+                body: { application_id: applicant.id },
+            });
+            if (error || data?.error) throw error ?? new Error(data.error);
+            setS5Booking(data as EscrowBooking);
+            setS5Visible(true);
+            await loadJobDetail();
+        } catch (error) {
+            console.error("❌ [EmployerJobDetail] Select failed:", error);
+            Alert.alert(text.error, text.selectionFailed);
+        } finally {
+            setSelectingId(null);
+        }
+    };
+
+    // Re-open S5 for an existing unfunded booking
+    const openFundSheet = (booking: JobBooking) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        setS5Booking({
+            booking_id: booking.id,
+            amount_cents: booking.agreed_amount_cents,
+            service_fee_cents: booking.service_fee_cents,
+            total_cents: booking.agreed_amount_cents + booking.service_fee_cents,
+            currency: booking.currency,
+        });
+        setS5Visible(true);
     };
 
     const updateApplicationStatus = async (applicationId: string, newStatus: "accepted" | "rejected") => {
@@ -83,10 +159,14 @@ export default function EmployerJobDetailScreen() {
 
     const getFilteredApplicants = () => {
         if (!job) return [];
+        const byStatus = (s: Applicant["status"]) =>
+            job.applications
+                .filter((app) => app.status === s)
+                .sort((a, b) => rankScore(b) - rankScore(a));
         switch (selectedTab) {
-            case "new": return job.applications.filter((app) => app.status === "pending");
-            case "accepted": return job.applications.filter((app) => app.status === "accepted");
-            case "rejected": return job.applications.filter((app) => app.status === "rejected");
+            case "new": return byStatus("pending");
+            case "accepted": return byStatus("accepted");
+            case "rejected": return byStatus("rejected");
             default: return [];
         }
     };
@@ -178,35 +258,95 @@ export default function EmployerJobDetailScreen() {
                             <Text style={[styles.emptyText, { color: C.muted }]}>{text.noApplicantsInCategory}</Text>
                         </View>
                     ) : (
-                        filteredApplicants.map((applicant) => (
-                            <ClaySurface key={applicant.id} radius={18} style={{ marginBottom: 12 }} contentStyle={{ padding: 16 }}>
-                                <View style={styles.applicantHeader}>
-                                    <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.applicantAvatar}>
-                                        <Text style={[styles.applicantInitial, { color: C.onAccent }]}>{applicant.worker.display_name?.[0]?.toUpperCase() || "?"}</Text>
-                                    </LinearGradient>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={[styles.applicantName, { color: C.text }]}>{applicant.worker.display_name || "Unknown"}</Text>
-                                        <Text style={[styles.applicantDate, { color: C.muted }]}>{text.applied} {new Date(applicant.created_at).toLocaleDateString()}</Text>
+                        filteredApplicants.map((applicant) => {
+                            const booking = bookingsByWorker[applicant.worker.id];
+                            const isSelecting = selectingId === applicant.id;
+                            return (
+                                <ClaySurface key={applicant.id} radius={18} style={{ marginBottom: 12 }} contentStyle={{ padding: 16 }}>
+                                    <View style={styles.applicantHeader}>
+                                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.applicantAvatar}>
+                                            <Text style={[styles.applicantInitial, { color: C.onAccent }]}>{applicant.worker.display_name?.[0]?.toUpperCase() || "?"}</Text>
+                                        </LinearGradient>
+                                        <View style={{ flex: 1 }}>
+                                            <View style={styles.nameRow}>
+                                                <Text style={[styles.applicantName, { color: C.text }]}>{applicant.worker.display_name || "Unknown"}</Text>
+                                                {applicant.worker.brigzy_verified && (
+                                                    <BadgeCheck size={17} color={C.accent} strokeWidth={2.2} />
+                                                )}
+                                            </View>
+                                            <Text style={[styles.applicantDate, { color: C.muted }]}>{text.applied} {new Date(applicant.created_at).toLocaleDateString()}</Text>
+                                        </View>
                                     </View>
-                                </View>
-                                {applicant.message && <Text style={[styles.applicantMsg, { color: C.muted }]}>{applicant.message}</Text>}
-                                {applicant.status === "pending" && (
-                                    <View style={styles.actionRow}>
-                                        <Pressable onPress={() => updateApplicationStatus(applicant.id, "accepted")} style={({ pressed }) => [styles.actionBtn, { backgroundColor: C.green }, pressed && { opacity: 0.85 }]}>
-                                            <CheckCircle size={18} color="#FFFFFF" strokeWidth={2} />
-                                            <Text style={styles.actionBtnText}>{text.accept}</Text>
-                                        </Pressable>
-                                        <Pressable onPress={() => updateApplicationStatus(applicant.id, "rejected")} style={({ pressed }) => [styles.actionBtn, { backgroundColor: C.cLo, borderWidth: 1, borderColor: C.hair }, pressed && { opacity: 0.85 }]}>
-                                            <XCircle size={18} color={C.text} strokeWidth={2} />
-                                            <Text style={[styles.actionBtnText, { color: C.text }]}>{text.reject}</Text>
-                                        </Pressable>
+
+                                    {/* P4 rank stats: rating · XP · verified */}
+                                    <View style={styles.statsRow}>
+                                        <View style={[styles.statChip, { backgroundColor: C.star + '1E' }]}>
+                                            <Star size={13} color={C.star} strokeWidth={2.4} fill={C.star} />
+                                            <Text style={[styles.statChipText, { color: C.text }]}>
+                                                {(applicant.worker.rating_avg ?? 0) > 0 ? Number(applicant.worker.rating_avg).toFixed(1) : '—'}
+                                                {(applicant.worker.rating_count ?? 0) > 0 && (
+                                                    <Text style={{ color: C.muted }}> ({applicant.worker.rating_count})</Text>
+                                                )}
+                                            </Text>
+                                        </View>
+                                        <View style={[styles.statChip, { backgroundColor: C.accentDim }]}>
+                                            <Zap size={13} color={C.accent} strokeWidth={2.4} />
+                                            <Text style={[styles.statChipText, { color: C.text }]}>{applicant.worker.xp ?? 0} XP</Text>
+                                        </View>
+                                        {applicant.worker.brigzy_verified && (
+                                            <View style={[styles.statChip, { backgroundColor: C.green + '1E' }]}>
+                                                <BadgeCheck size={13} color={C.green} strokeWidth={2.4} />
+                                                <Text style={[styles.statChipText, { color: C.green }]}>{text.verifiedBadge}</Text>
+                                            </View>
+                                        )}
                                     </View>
-                                )}
-                            </ClaySurface>
-                        ))
+
+                                    {applicant.message && <Text style={[styles.applicantMsg, { color: C.muted }]}>{applicant.message}</Text>}
+
+                                    {booking ? (
+                                        booking.status === "escrow_pending" ? (
+                                            <Pressable onPress={() => openFundSheet(booking)} style={({ pressed }) => [styles.actionBtn, { backgroundColor: C.accent }, pressed && { opacity: 0.85 }]}>
+                                                <ShieldCheck size={18} color="#FFFFFF" strokeWidth={2} />
+                                                <Text style={styles.actionBtnText}>{text.fundEscrow}</Text>
+                                            </Pressable>
+                                        ) : (
+                                            <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(`/booking/${booking.id}`); }} style={({ pressed }) => [styles.bookingPill, { backgroundColor: C.green + '1E' }, pressed && { opacity: 0.8 }]}>
+                                                <ShieldCheck size={15} color={C.green} strokeWidth={2.2} />
+                                                <Text style={[styles.bookingPillText, { color: C.green }]}>{text.awaitingSignatures}</Text>
+                                            </Pressable>
+                                        )
+                                    ) : applicant.status !== "rejected" ? (
+                                        <View style={styles.actionRow}>
+                                            <Pressable disabled={isSelecting} onPress={() => selectApplicant(applicant)} style={({ pressed }) => [styles.actionBtn, { backgroundColor: C.green }, (pressed || isSelecting) && { opacity: 0.7 }]}>
+                                                {isSelecting
+                                                    ? <ActivityIndicator size="small" color="#FFFFFF" />
+                                                    : <>
+                                                        <BadgeCheck size={18} color="#FFFFFF" strokeWidth={2} />
+                                                        <Text style={styles.actionBtnText}>{text.selectWorker}</Text>
+                                                    </>}
+                                            </Pressable>
+                                            {applicant.status === "pending" && (
+                                                <Pressable onPress={() => updateApplicationStatus(applicant.id, "rejected")} style={({ pressed }) => [styles.actionBtn, { backgroundColor: C.cLo, borderWidth: 1, borderColor: C.hair }, pressed && { opacity: 0.85 }]}>
+                                                    <XCircle size={18} color={C.text} strokeWidth={2} />
+                                                    <Text style={[styles.actionBtnText, { color: C.text }]}>{text.reject}</Text>
+                                                </Pressable>
+                                            )}
+                                        </View>
+                                    ) : null}
+                                </ClaySurface>
+                            );
+                        })
                     )}
                 </View>
             </ScrollView>
+
+            {/* S5 — escrow confirm sheet */}
+            <EscrowConfirmSheet
+                visible={s5Visible}
+                booking={s5Booking}
+                onClose={() => { setS5Visible(false); setS5Booking(null); }}
+                onFunded={() => { loadJobDetail(); }}
+            />
         </SafeAreaView>
     );
 }
@@ -233,6 +373,12 @@ const styles = StyleSheet.create({
     emptyApplicants: { alignItems: "center", paddingVertical: 40, gap: 14 },
     emptyText: { fontSize: 14, fontWeight: '500' },
     applicantHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 12 },
+    nameRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+    statsRow: { flexDirection: "row", gap: 8, marginBottom: 12, flexWrap: "wrap" },
+    statChip: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 },
+    statChipText: { fontSize: 12.5, fontWeight: "800" },
+    bookingPill: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, paddingVertical: 11, borderRadius: 13 },
+    bookingPillText: { fontSize: 13.5, fontWeight: "800" },
     applicantAvatar: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center" },
     applicantInitial: { fontSize: 20, fontWeight: "800" },
     applicantName: { fontSize: 16, fontWeight: "800", letterSpacing: -0.3 },

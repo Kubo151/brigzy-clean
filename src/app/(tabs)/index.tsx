@@ -224,18 +224,20 @@ function JobCard({ job, onPress }: { job: Job; onPress: () => void }) {
 }
 
 // ─── HOME SCREEN ────────────────────────────────────
+// Role switch must not change the number of hooks rendered in one component,
+// so the worker home lives in its own component below.
 export default function HomeScreen() {
+  const currentRole = useAppStore((s) => s.currentRole);
+  return currentRole === 'employer' ? <PosterDashboard /> : <WorkerHome />;
+}
+
+function WorkerHome() {
   const router = useRouter();
   const text = useText();
   const language = useThemeStore((s) => s.language);
   const C = useClay();
 
   const currentUser = useAppStore((s) => s.currentUser);
-  const currentRole = useAppStore((s) => s.currentRole);
-
-  if (currentRole === 'employer') {
-    return <PosterDashboard />;
-  }
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);

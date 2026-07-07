@@ -35,6 +35,7 @@ export default function MyApplicationsScreen() {
   const [pendingApps, setPendingApps] = useState<Application[]>([]);
   const [acceptedApps, setAcceptedApps] = useState<Application[]>([]);
   const [historyApps, setHistoryApps] = useState<Application[]>([]);
+  const [bookingsByJob, setBookingsByJob] = useState<Record<string, string>>({});
 
   useEffect(() => { loadApplications(); }, []);
 
@@ -62,6 +63,18 @@ export default function MyApplicationsScreen() {
         setPendingApps(applications.filter(a => a.status === 'pending'));
         setAcceptedApps(applications.filter(a => a.status === 'accepted'));
         setHistoryApps(applications.filter(a => ['rejected', 'completed'].includes(a.status)));
+      }
+
+      // Accepted applications may have a booking — those cards open the booking hub
+      const { data: bookings } = await supabase
+        .from('bookings')
+        .select('id, job_id')
+        .eq('worker_user_id', userId)
+        .neq('status', 'cancelled');
+      if (bookings) {
+        const map: Record<string, string> = {};
+        for (const b of bookings) map[b.job_id] = b.id;
+        setBookingsByJob(map);
       }
     } catch (e) { console.error("Exception:", e); }
     finally { setIsLoading(false); }
@@ -140,11 +153,16 @@ export default function MyApplicationsScreen() {
           <ClaySurface radius={18}>
             {activeApplications.map((app, index) => {
               const info = getStatusInfo(app.status);
+              const bookingId = bookingsByJob[app.job.id];
               return (
                 <React.Fragment key={app.id}>
                   {index > 0 && <View style={{ height: 1, backgroundColor: C.hair, marginLeft: 16 }} />}
                   <Pressable
-                    onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(`/job/${app.job.id}`); }}
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      // Accepted + booked → booking hub (W6); otherwise job detail
+                      router.push(bookingId ? `/booking/${bookingId}` : `/job/${app.job.id}`);
+                    }}
                     style={({ pressed }) => [styles.appRow, pressed && { opacity: 0.7 }]}
                   >
                     <View style={{ flex: 1 }}>

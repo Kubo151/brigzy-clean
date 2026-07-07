@@ -139,7 +139,7 @@ export default function Login() {
     const formatPhoneNumber = (text: string) => {
         const cleaned = text.replace(/\D/g, '');
         try {
-            const formatter = new AsYouType(countryCode);
+            const formatter = new AsYouType(countryCode as unknown as import('libphonenumber-js').CountryCode);
             setPhoneNumber(formatter.input(cleaned));
         } catch { setPhoneNumber(cleaned); }
     };

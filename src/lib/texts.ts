@@ -207,6 +207,49 @@ interface TextMap {
   noApplicantsInCategory: string;
   new: string;
 
+  // P4 select → S5 escrow
+  selectWorker: string;
+  fundEscrow: string;
+  awaitingSignatures: string;
+  escrowConfirmTitle: string;
+  reward: string;
+  serviceFee: string;
+  totalToPay: string;
+  escrowHeldNote: string;
+  payNow: string;
+  escrowFunded: string;
+  escrowFundedNote: string;
+  verifiedBadge: string;
+  selectionFailed: string;
+  done: string;
+  accountSettings: string;
+
+  // P5/W6 booking hub + S3 sign
+  bookingTitle: string;
+  stepEscrow: string;
+  stepContract: string;
+  stepWork: string;
+  stepRelease: string;
+  signContract: string;
+  waitingForPosterSign: string;
+  waitingForWorkerSign: string;
+  approveAndRelease: string;
+  paymentReleased: string;
+  paymentReleasedNote: string;
+  qrComingSoon: string;
+  contractTitle: string;
+  contractSampleNote: string;
+  enterOtp: string;
+  otpDemoHint: string;
+  confirmSign: string;
+  signFailed: string;
+  bookingNotFound: string;
+  workerLabel: string;
+  posterLabel: string;
+  bookingCancelled: string;
+  bookingDisputed: string;
+  waitingForRelease: string;
+
   // Job Detail Screen
   jobNotFound: string;
   aboutThisJob: string;
@@ -475,6 +518,49 @@ const texts: Record<Language, TextMap> = {
     noApplicantsInCategory: 'No applicants in this category',
     new: 'New',
 
+    // P4 select → S5 escrow
+    selectWorker: 'Select worker',
+    fundEscrow: 'Pay into escrow',
+    awaitingSignatures: 'Awaiting signatures',
+    escrowConfirmTitle: 'Payment into escrow',
+    reward: 'Reward',
+    serviceFee: 'Service fee',
+    totalToPay: 'Total to pay',
+    escrowHeldNote: 'The money is held safely in escrow and released to the worker only after you approve the finished work.',
+    payNow: 'Pay now',
+    escrowFunded: 'Funds are in escrow',
+    escrowFundedNote: 'Next step: both parties sign the contract.',
+    verifiedBadge: 'Verified',
+    selectionFailed: 'Could not select this worker. Please try again.',
+    done: 'Done',
+    accountSettings: 'Account settings',
+
+    // P5/W6 booking hub + S3 sign
+    bookingTitle: 'Booking',
+    stepEscrow: 'Payment in escrow',
+    stepContract: 'Contract signatures',
+    stepWork: 'Work day (QR attendance)',
+    stepRelease: 'Approval & payout',
+    signContract: 'Sign contract',
+    waitingForPosterSign: 'Waiting for the poster to sign',
+    waitingForWorkerSign: 'Waiting for the worker to sign',
+    approveAndRelease: 'Approve work & release payment',
+    paymentReleased: 'Payment released',
+    paymentReleasedNote: 'The money has been credited to the worker\'s wallet.',
+    qrComingSoon: 'QR attendance — coming soon',
+    contractTitle: 'Contract',
+    contractSampleNote: 'SAMPLE — template not yet lawyer-verified. Demo only.',
+    enterOtp: 'Enter the SMS code',
+    otpDemoHint: 'Demo OTP: 123456',
+    confirmSign: 'Sign',
+    signFailed: 'Signing failed. Check the code and try again.',
+    bookingNotFound: 'Booking not found',
+    workerLabel: 'Worker',
+    posterLabel: 'Poster',
+    bookingCancelled: 'Booking cancelled',
+    bookingDisputed: 'Booking in dispute',
+    waitingForRelease: 'Waiting for the poster to approve the work',
+
     // Job Detail Screen
     jobNotFound: 'Job not found',
     aboutThisJob: 'About This Job',
@@ -740,6 +826,49 @@ const texts: Record<Language, TextMap> = {
     failedToUpdateStatus: 'Nepodarilo sa aktualizovať status',
     noApplicantsInCategory: 'Žiadni uchádzači v tejto kategórii',
     new: 'Nové',
+
+    // P4 select → S5 escrow
+    selectWorker: 'Vybrať brigádnika',
+    fundEscrow: 'Zaplatiť do úschovy',
+    awaitingSignatures: 'Čaká na podpisy',
+    escrowConfirmTitle: 'Platba do úschovy',
+    reward: 'Odmena',
+    serviceFee: 'Servisný poplatok',
+    totalToPay: 'Spolu na úhradu',
+    escrowHeldNote: 'Peniaze sú bezpečne držané v úschove a brigádnikovi sa uvoľnia až po tvojom schválení hotovej práce.',
+    payNow: 'Zaplatiť teraz',
+    escrowFunded: 'Peniaze sú v úschove',
+    escrowFundedNote: 'Ďalší krok: obe strany podpíšu zmluvu.',
+    verifiedBadge: 'Overený',
+    selectionFailed: 'Brigádnika sa nepodarilo vybrať. Skús to znova.',
+    done: 'Hotovo',
+    accountSettings: 'Nastavenia účtu',
+
+    // P5/W6 booking hub + S3 sign
+    bookingTitle: 'Rezervácia',
+    stepEscrow: 'Platba v úschove',
+    stepContract: 'Podpisy zmluvy',
+    stepWork: 'Pracovný deň (QR dochádzka)',
+    stepRelease: 'Schválenie a výplata',
+    signContract: 'Podpísať zmluvu',
+    waitingForPosterSign: 'Čaká sa na podpis zadávateľa',
+    waitingForWorkerSign: 'Čaká sa na podpis brigádnika',
+    approveAndRelease: 'Schváliť prácu a uvoľniť platbu',
+    paymentReleased: 'Platba uvoľnená',
+    paymentReleasedNote: 'Peniaze boli pripísané do peňaženky brigádnika.',
+    qrComingSoon: 'QR dochádzka — čoskoro',
+    contractTitle: 'Zmluva',
+    contractSampleNote: 'VZOR — šablóna zatiaľ neoverená právnikom. Len na demo.',
+    enterOtp: 'Zadaj SMS kód',
+    otpDemoHint: 'Demo OTP: 123456',
+    confirmSign: 'Podpísať',
+    signFailed: 'Podpis zlyhal. Skontroluj kód a skús znova.',
+    bookingNotFound: 'Rezervácia nenájdená',
+    workerLabel: 'Brigádnik',
+    posterLabel: 'Zadávateľ',
+    bookingCancelled: 'Rezervácia zrušená',
+    bookingDisputed: 'Rezervácia v spore',
+    waitingForRelease: 'Čaká sa na schválenie práce zadávateľom',
 
     // Job Detail Screen
     jobNotFound: 'Práca nenájdená',

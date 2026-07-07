@@ -21,6 +21,10 @@ web-build/
 .DS_Store
 Thumbs.db
 
+# Tooling artifacts
+.playwright-mcp/
+.obsidian/
+
 # Build artifacts
 *.tsbuildinfo
 *.log

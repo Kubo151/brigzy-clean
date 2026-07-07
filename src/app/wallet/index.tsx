@@ -10,13 +10,39 @@ import { supabase } from '@/lib/supabase';
 import { useClay } from '@/lib/useClay';
 import type { ClayColors } from '@/lib/useClay';
 
-const MOCK_TRANSACTIONS = [
-    { id: '1', title: 'Pomocník v sklade', company: 'Logistika SK', date: 'dnes', amount: 40.00, status: 'pending' as const },
-    { id: '2', title: 'Brigáda — kaviareň', company: 'Café Modrý Kameň', date: '5. feb', amount: 67.50, status: 'cleared' as const },
-    { id: '3', title: 'Výber na účet', company: 'IBAN •••• 4821', date: '3. feb', amount: -60.00, status: 'withdrawn' as const },
-];
-
 const PRESET_AMOUNTS = [20, 50, 100];
+
+type TxItem = {
+    id: string;
+    title: string;
+    company: string;
+    date: string;
+    amount: number; // EUR, signed
+    status: 'pending' | 'cleared' | 'withdrawn';
+};
+
+type LedgerRow = {
+    id: string;
+    entry_type: 'credit' | 'debit' | 'payout' | 'fee' | 'adjustment';
+    amount_cents: number;
+    description: string | null;
+    created_at: string;
+    booking: { job: { title: string | null; company_name: string | null } | null } | null;
+};
+
+type PendingBooking = {
+    id: string;
+    agreed_amount_cents: number;
+    created_at: string;
+    job: { title: string | null; company_name: string | null } | null;
+};
+
+const formatTxDate = (iso: string): string => {
+    const d = new Date(iso);
+    const now = new Date();
+    if (d.toDateString() === now.toDateString()) return 'dnes';
+    return d.toLocaleDateString('sk-SK', { day: 'numeric', month: 'short' });
+};
 
 const maskIBAN = (iban: string): string => {
     const clean = iban.replace(/\s/g, '');
@@ -35,13 +61,75 @@ export default function WalletScreen() {
     const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
     const [savedIBAN, setSavedIBAN] = useState<string | null>(null);
     const [savedBankName, setSavedBankName] = useState<string | null>(null);
+    const [availableBalance, setAvailableBalance] = useState(0);
+    const [pendingAmount, setPendingAmount] = useState(0);
+    const [pendingCount, setPendingCount] = useState(0);
+    const [thisMonthTotal, setThisMonthTotal] = useState(0);
+    const [thisMonthJobs, setThisMonthJobs] = useState(0);
+    const [transactions, setTransactions] = useState<TxItem[]>([]);
 
-    const availableBalance = 127.50;
-    const pendingAmount = 40.00;
-    const thisMonthTotal = 215;
-    const thisMonthJobs = 3;
+    useFocusEffect(useCallback(() => { loadBankData(); loadWallet(); }, []));
 
-    useFocusEffect(useCallback(() => { loadBankData(); }, []));
+    const loadWallet = async () => {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const [ledgerRes, pendingRes] = await Promise.all([
+                supabase
+                    .from('wallet_ledger')
+                    .select('id, entry_type, amount_cents, description, created_at, booking:ref_booking_id(job:job_id(title, company_name))')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false }),
+                supabase
+                    .from('bookings')
+                    .select('id, agreed_amount_cents, created_at, job:job_id(title, company_name)')
+                    .eq('worker_user_id', user.id)
+                    .in('status', ['awaiting_signatures', 'in_progress', 'completed']),
+            ]);
+
+            const ledger = (ledgerRes.data ?? []) as unknown as LedgerRow[];
+            const pendingBookings = (pendingRes.data ?? []) as unknown as PendingBooking[];
+
+            // Ledger amounts are stored signed: credits positive, payouts/debits/fees negative.
+            setAvailableBalance(ledger.reduce((sum, r) => sum + r.amount_cents, 0) / 100);
+            setPendingAmount(pendingBookings.reduce((sum, b) => sum + b.agreed_amount_cents, 0) / 100);
+            setPendingCount(pendingBookings.length);
+
+            const monthStart = new Date();
+            monthStart.setDate(1);
+            monthStart.setHours(0, 0, 0, 0);
+            const monthCredits = ledger.filter(
+                (r) => r.entry_type === 'credit' && new Date(r.created_at) >= monthStart,
+            );
+            setThisMonthTotal(monthCredits.reduce((sum, r) => sum + r.amount_cents, 0) / 100);
+            setThisMonthJobs(monthCredits.length);
+
+            const pendingTx: TxItem[] = pendingBookings.map((b) => ({
+                id: `pending-${b.id}`,
+                title: b.job?.title || 'Brigáda',
+                company: b.job?.company_name || 'Brigzy',
+                date: formatTxDate(b.created_at),
+                amount: b.agreed_amount_cents / 100,
+                status: 'pending',
+            }));
+            const ledgerTx: TxItem[] = ledger.map((r) => ({
+                id: r.id,
+                title: r.entry_type === 'payout'
+                    ? 'Výber na účet'
+                    : r.booking?.job?.title || r.description || 'Transakcia',
+                company: r.entry_type === 'payout'
+                    ? (r.description || 'Bankový účet')
+                    : r.booking?.job?.company_name || 'Brigzy',
+                date: formatTxDate(r.created_at),
+                amount: r.amount_cents / 100,
+                status: r.amount_cents < 0 ? 'withdrawn' : 'cleared',
+            }));
+            setTransactions([...pendingTx, ...ledgerTx].slice(0, 5));
+        } catch (e) {
+            console.error('Error loading wallet:', e);
+        }
+    };
 
     const loadBankData = async () => {
         try {
@@ -90,7 +178,7 @@ export default function WalletScreen() {
         }
     };
 
-    const renderTransaction = ({ item }: { item: typeof MOCK_TRANSACTIONS[0] }) => {
+    const renderTransaction = ({ item }: { item: TxItem }) => {
         const StatusIcon = getStatusIcon(item.status);
         const isNegative = item.amount < 0;
         return (
@@ -140,10 +228,14 @@ export default function WalletScreen() {
                         <Text style={styles.balanceMain}>{Math.floor(availableBalance)}</Text>
                         <Text style={styles.balanceCents}>.{(availableBalance % 1).toFixed(2).slice(2)}</Text>
                     </View>
-                    <View style={styles.pendingRow}>
-                        <View style={styles.pendingDot} />
-                        <Text style={styles.pendingText}>€{pendingAmount.toFixed(2)} čaká na potvrdenie brigády</Text>
-                    </View>
+                    {pendingAmount > 0 ? (
+                        <View style={styles.pendingRow}>
+                            <View style={styles.pendingDot} />
+                            <Text style={styles.pendingText}>€{pendingAmount.toFixed(2)} čaká na potvrdenie brigády</Text>
+                        </View>
+                    ) : (
+                        <View style={{ marginBottom: 20 }} />
+                    )}
                     <View style={styles.balanceButtons}>
                         <Pressable style={styles.withdrawButton} onPress={handleWithdraw}>
                             <WalletIcon size={17} color={C.accent} strokeWidth={2.2} />
@@ -167,7 +259,7 @@ export default function WalletScreen() {
                         <View style={[styles.statIconBox, { backgroundColor: C.star + '22' }]}><Clock size={18} color={C.star} strokeWidth={2} /></View>
                         <Text style={styles.statLabel}>Čakajúce</Text>
                         <Text style={styles.statValue}>€{pendingAmount.toFixed(0)}</Text>
-                        <Text style={styles.statSubtext}>1 prebieha</Text>
+                        <Text style={styles.statSubtext}>{pendingCount === 1 ? '1 prebieha' : `${pendingCount} prebieha`}</Text>
                     </View>
                 </View>
 
@@ -180,11 +272,16 @@ export default function WalletScreen() {
                         </Pressable>
                     </View>
                     <FlatList
-                        data={MOCK_TRANSACTIONS}
+                        data={transactions}
                         renderItem={renderTransaction}
                         keyExtractor={(item) => item.id}
                         scrollEnabled={false}
                         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+                        ListEmptyComponent={
+                            <Text style={{ color: C.muted, fontSize: 13.5, fontWeight: '500', textAlign: 'center', paddingVertical: 24 }}>
+                                Zatiaľ žiadne transakcie
+                            </Text>
+                        }
                     />
                 </View>
             </ScrollView>

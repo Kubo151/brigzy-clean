@@ -13,6 +13,8 @@ npx expo start --clear          # Start Metro dev server (use --clear after conf
 # then press 'a' for Android emulator, 'i' for iOS simulator
 
 npx tsc --noEmit                # Type-check the whole project (strict mode is on)
+# On Node 24 the above crashes with "Maximum call stack size exceeded" — use:
+node --stack-size=8000 node_modules/typescript/bin/tsc --noEmit
 node check.js                   # Transpile-check a hard-coded subset of files (smoke test)
 
 npm install <pkg> --legacy-peer-deps   # ALWAYS use --legacy-peer-deps (React 19 peer conflicts)
