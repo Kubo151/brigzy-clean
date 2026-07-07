@@ -52,7 +52,8 @@ export default function MessagesScreen() {
 
   // People search — find any user by name and open their public profile (W13)
   useEffect(() => {
-    const q = searchQuery.trim();
+    // Strip PostgREST filter metacharacters — q is interpolated into .or()
+    const q = searchQuery.trim().replace(/[,()*%\\".]/g, '');
     if (q.length < 2) { setPeople([]); return; }
     const timer = setTimeout(async () => {
       try {
