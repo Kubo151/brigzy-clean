@@ -265,7 +265,11 @@ export default function EmployerJobDetailScreen() {
                             const isSelecting = selectingId === applicant.id;
                             return (
                                 <ClaySurface key={applicant.id} radius={18} style={{ marginBottom: 12 }} contentStyle={{ padding: 16 }}>
-                                    <View style={styles.applicantHeader}>
+                                    {/* Spec P4: tap worker name/avatar → W13 public profile */}
+                                    <Pressable
+                                        onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(`/user/${applicant.worker.id}`); }}
+                                        style={({ pressed }) => [styles.applicantHeader, pressed && { opacity: 0.7 }]}
+                                    >
                                         <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.applicantAvatar}>
                                             <Text style={[styles.applicantInitial, { color: C.onAccent }]}>{applicant.worker.display_name?.[0]?.toUpperCase() || "?"}</Text>
                                         </LinearGradient>
@@ -278,7 +282,7 @@ export default function EmployerJobDetailScreen() {
                                             </View>
                                             <Text style={[styles.applicantDate, { color: C.muted }]}>{text.applied} {new Date(applicant.created_at).toLocaleDateString()}</Text>
                                         </View>
-                                    </View>
+                                    </Pressable>
 
                                     {/* P4 rank stats: rating · XP · verified */}
                                     <View style={styles.statsRow}>

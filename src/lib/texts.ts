@@ -257,6 +257,18 @@ interface TextMap {
   estimatedHoursHint: string;
   perHourShort: string;
 
+  // W13 public profile
+  memberSince: string;
+  completedJobsLabel: string;
+  postedJobsLabel: string;
+  reviewsTitle: string;
+  noReviewsYet: string;
+  sendMessage: string;
+  profileNotFound: string;
+  ratingLabel: string;
+  peopleSection: string;
+  viewProfile: string;
+
   // Job Detail Screen
   jobNotFound: string;
   aboutThisJob: string;
@@ -575,6 +587,18 @@ const texts: Record<Language, TextMap> = {
     estimatedHoursHint: 'Used to reserve the payment in escrow (rate × hours)',
     perHourShort: 'h',
 
+    // W13 public profile
+    memberSince: 'Member since',
+    completedJobsLabel: 'Completed jobs',
+    postedJobsLabel: 'Posted jobs',
+    reviewsTitle: 'Reviews',
+    noReviewsYet: 'No reviews yet',
+    sendMessage: 'Send message',
+    profileNotFound: 'Profile not found',
+    ratingLabel: 'Rating',
+    peopleSection: 'People',
+    viewProfile: 'View profile',
+
     // Job Detail Screen
     jobNotFound: 'Job not found',
     aboutThisJob: 'About This Job',
@@ -890,6 +914,18 @@ const texts: Record<Language, TextMap> = {
     estimatedHoursLabel: 'Odhadovaný počet hodín',
     estimatedHoursHint: 'Použije sa na rezerváciu platby v úschove (sadzba × hodiny)',
     perHourShort: 'h',
+
+    // W13 public profile
+    memberSince: 'Členom od',
+    completedJobsLabel: 'Hotové brigády',
+    postedJobsLabel: 'Zadané brigády',
+    reviewsTitle: 'Recenzie',
+    noReviewsYet: 'Zatiaľ žiadne recenzie',
+    sendMessage: 'Poslať správu',
+    profileNotFound: 'Profil nenájdený',
+    ratingLabel: 'Hodnotenie',
+    peopleSection: 'Ľudia',
+    viewProfile: 'Zobraziť profil',
 
     // Job Detail Screen
     jobNotFound: 'Práca nenájdená',

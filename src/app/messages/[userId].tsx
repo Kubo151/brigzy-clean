@@ -125,17 +125,22 @@ export default function ChatScreen() {
                         <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
                     </ClaySurface>
                 </Pressable>
-                {otherUser?.avatar_url ? (
-                    <Image source={{ uri: otherUser.avatar_url }} style={st.avatar} />
-                ) : (
-                    <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={st.avatar}>
-                        <Text style={[st.avatarLetter, { color: C.onAccent }]}>{initial}</Text>
-                    </LinearGradient>
-                )}
-                <View style={{ flex: 1 }}>
-                    <Text style={st.chatName}>{otherUser?.display_name || otherUser?.name}</Text>
-                    <Text style={st.chatRole}>{otherUser?.role === 'worker' ? 'Brigádnik' : 'Zamestnávateľ'}</Text>
-                </View>
+                <Pressable
+                    onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(`/user/${userId}`); }}
+                    style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }, pressed && { opacity: 0.7 }]}
+                >
+                    {otherUser?.avatar_url ? (
+                        <Image source={{ uri: otherUser.avatar_url }} style={st.avatar} />
+                    ) : (
+                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={st.avatar}>
+                            <Text style={[st.avatarLetter, { color: C.onAccent }]}>{initial}</Text>
+                        </LinearGradient>
+                    )}
+                    <View style={{ flex: 1 }}>
+                        <Text style={st.chatName}>{otherUser?.display_name || otherUser?.name}</Text>
+                        <Text style={st.chatRole}>{otherUser?.role === 'worker' ? 'Brigádnik' : 'Zamestnávateľ'}</Text>
+                    </View>
+                </Pressable>
             </View>
 
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }} keyboardVerticalOffset={0}>

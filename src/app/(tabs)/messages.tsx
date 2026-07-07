@@ -28,6 +28,17 @@ interface Conversation {
   unreadCount: number;
 }
 
+interface PersonResult {
+  id: string;
+  display_name: string | null;
+  name: string | null;
+  surname: string | null;
+  avatar_url: string | null;
+  brigzy_verified: boolean;
+  rating_avg: number;
+  rating_count: number;
+}
+
 export default function MessagesScreen() {
   const C = useClay();
   const text = useText();
@@ -37,6 +48,28 @@ export default function MessagesScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [people, setPeople] = useState<PersonResult[]>([]);
+
+  // People search — find any user by name and open their public profile (W13)
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (q.length < 2) { setPeople([]); return; }
+    const timer = setTimeout(async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data } = await supabase
+          .from('users')
+          .select('id, display_name, name, surname, avatar_url, brigzy_verified, rating_avg, rating_count')
+          .or(`display_name.ilike.%${q}%,name.ilike.%${q}%,surname.ilike.%${q}%`)
+          .neq('id', user?.id ?? '')
+          .limit(8);
+        setPeople((data ?? []) as PersonResult[]);
+      } catch (e) {
+        console.error('People search failed:', e);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   useEffect(() => {
     loadConversations();
@@ -147,6 +180,46 @@ export default function MessagesScreen() {
         contentContainerStyle={styles.listContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} colors={[C.accent]} />}
       >
+        {/* People results (search across all users → public profile) */}
+        {people.length > 0 && (
+          <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
+            <Text style={{ fontSize: 13, fontWeight: '800', color: C.muted, textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 10 }}>
+              {text.peopleSection}
+            </Text>
+            <ClaySurface radius={18}>
+              {people.map((p, i) => {
+                const pName = p.display_name || [p.name, p.surname].filter(Boolean).join(' ') || '—';
+                return (
+                  <React.Fragment key={p.id}>
+                    {i > 0 && <View style={{ height: 1, backgroundColor: C.hair, marginLeft: 16 }} />}
+                    <Pressable
+                      onPress={() => router.push(`/user/${p.id}`)}
+                      style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', padding: 13 }, pressed && { opacity: 0.7 }]}
+                    >
+                      {p.avatar_url ? (
+                        <Image source={{ uri: p.avatar_url }} style={{ width: 42, height: 42, borderRadius: 21 }} />
+                      ) : (
+                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' }}>
+                          <Text style={{ color: C.onAccent, fontSize: 17, fontWeight: '800' }}>{pName.charAt(0).toUpperCase()}</Text>
+                        </LinearGradient>
+                      )}
+                      <View style={{ flex: 1, marginLeft: 12 }}>
+                        <Text numberOfLines={1} style={{ fontSize: 15, fontWeight: '700', color: C.text, letterSpacing: -0.2 }}>
+                          {pName}{p.brigzy_verified ? ' ✓' : ''}
+                        </Text>
+                        <Text style={{ fontSize: 12.5, color: C.muted, fontWeight: '500' }}>
+                          {(p.rating_count ?? 0) > 0 ? `★ ${Number(p.rating_avg).toFixed(1)} (${p.rating_count}) · ` : ''}{text.viewProfile}
+                        </Text>
+                      </View>
+                      <ChevronRight size={16} color={C.muted} strokeWidth={2} />
+                    </Pressable>
+                  </React.Fragment>
+                );
+              })}
+            </ClaySurface>
+          </View>
+        )}
+
         {loading ? (
           <View style={styles.centerState}>
             <ActivityIndicator size="large" color={C.accent} />
