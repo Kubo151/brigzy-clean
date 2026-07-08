@@ -278,6 +278,27 @@ interface TextMap {
   reviewRevealedNote: string;
   reviewFailed: string;
 
+  // W7/S6 QR attendance
+  showQr: string;
+  scanQr: string;
+  waitingForCheckIn: string;
+  workingSinceQr: string;
+  checkedOutSummary: string;
+  qrRefreshesIn: string;
+  offlineQrWarning: string;
+  closeAction: string;
+  scanQrTitle: string;
+  scanQrHint: string;
+  cameraDenied: string;
+  cameraDeniedHint: string;
+  qrExpiredError: string;
+  qrWrongBookingError: string;
+  qrUsedError: string;
+  qrGenericError: string;
+  scanSuccessCheckIn: string;
+  scanSuccessCheckOut: string;
+  sosContact: string;
+
   // Job Detail Screen
   jobNotFound: string;
   aboutThisJob: string;
@@ -617,6 +638,27 @@ const texts: Record<Language, TextMap> = {
     reviewRevealedNote: 'Both reviews are now public.',
     reviewFailed: 'Could not submit the review. Please try again.',
 
+    // W7/S6 QR attendance
+    showQr: 'Show QR',
+    scanQr: 'Scan QR',
+    waitingForCheckIn: 'Waiting for check-in',
+    workingSinceQr: 'Working since',
+    checkedOutSummary: 'Check-out confirmed',
+    qrRefreshesIn: 'Refreshes in',
+    offlineQrWarning: 'No connection — the QR may be invalid; the poster may reject it.',
+    closeAction: 'Close',
+    scanQrTitle: 'Scan worker\'s QR',
+    scanQrHint: 'Point the camera at the QR code',
+    cameraDenied: 'Camera access denied',
+    cameraDeniedHint: 'Allow camera access in your browser settings to scan the QR code.',
+    qrExpiredError: 'QR expired — ask the worker to refresh it',
+    qrWrongBookingError: 'This QR does not belong to this booking',
+    qrUsedError: 'This QR was already used',
+    qrGenericError: 'Could not read the QR code. Please try again.',
+    scanSuccessCheckIn: 'Check-in',
+    scanSuccessCheckOut: 'Check-out',
+    sosContact: 'SOS / Contact',
+
     // Job Detail Screen
     jobNotFound: 'Job not found',
     aboutThisJob: 'About This Job',
@@ -953,6 +995,27 @@ const texts: Record<Language, TextMap> = {
     reviewBlindNote: 'Recenzie sa odhalia, keď ohodnotia obe strany.',
     reviewRevealedNote: 'Obe recenzie sú teraz verejné.',
     reviewFailed: 'Hodnotenie sa nepodarilo odoslať. Skús to znova.',
+
+    // W7/S6 QR attendance
+    showQr: 'Ukáž QR',
+    scanQr: 'Skenuj QR',
+    waitingForCheckIn: 'Čakáme na check-in od Postera',
+    workingSinceQr: 'Pracuješ od',
+    checkedOutSummary: 'Odchod potvrdený',
+    qrRefreshesIn: 'Obnoví sa za',
+    offlineQrWarning: 'Bez pripojenia — QR nemusí byť platný; Poster ho môže odmietnuť.',
+    closeAction: 'Zatvoriť',
+    scanQrTitle: 'Naskenuj QR brigádnika',
+    scanQrHint: 'Namier kameru na QR kód',
+    cameraDenied: 'Prístup ku kamere zamietnutý',
+    cameraDeniedHint: 'Povoľ prístup ku kamere v nastaveniach prehliadača, aby si mohol skenovať QR kód.',
+    qrExpiredError: 'QR vypršal — požiadaj brigádnika o obnovenie',
+    qrWrongBookingError: 'Tento QR nepatrí k tejto brigáde',
+    qrUsedError: 'Tento QR už bol použitý',
+    qrGenericError: 'QR kód sa nepodarilo prečítať. Skús to znova.',
+    scanSuccessCheckIn: 'Check-in',
+    scanSuccessCheckOut: 'Check-out',
+    sosContact: 'SOS / Kontakt',
 
     // Job Detail Screen
     jobNotFound: 'Práca nenájdená',

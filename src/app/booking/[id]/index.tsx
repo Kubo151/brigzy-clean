@@ -309,11 +309,18 @@ export default function BookingHubScreen() {
                         (isReleasing || isAttending) ? (
                             <ActivityIndicator size="large" color={C.accent} style={{ marginVertical: 14 }} />
                         ) : !booking.check_in_at ? (
-                            <ClayButton
-                                label={text.checkInWorker}
-                                icon={<QrCode size={18} color={C.onAccent} strokeWidth={2.2} />}
-                                onPress={() => handleAttendance('check_in')}
-                            />
+                            <View style={{ gap: 10 }}>
+                                <ClayButton
+                                    label={text.scanQr}
+                                    icon={<QrCode size={18} color={C.onAccent} strokeWidth={2.2} />}
+                                    onPress={() => router.push(`/booking/${booking.id}/scan`)}
+                                />
+                                <ClayButton
+                                    label={text.checkInWorker}
+                                    variant="ghost"
+                                    onPress={() => handleAttendance('check_in')}
+                                />
+                            </View>
                         ) : !booking.check_out_at ? (
                             <View style={{ gap: 12 }}>
                                 <View style={[styles.infoBox, { backgroundColor: C.accentDim }]}>
@@ -323,8 +330,13 @@ export default function BookingHubScreen() {
                                     </Text>
                                 </View>
                                 <ClayButton
-                                    label={text.checkOutWorker}
+                                    label={text.scanQr}
                                     icon={<QrCode size={18} color={C.onAccent} strokeWidth={2.2} />}
+                                    onPress={() => router.push(`/booking/${booking.id}/scan`)}
+                                />
+                                <ClayButton
+                                    label={text.checkOutWorker}
+                                    variant="ghost"
                                     onPress={() => handleAttendance('check_out')}
                                 />
                             </View>
@@ -336,13 +348,22 @@ export default function BookingHubScreen() {
                             />
                         )
                     ) : (
-                        <View style={[styles.infoBox, { backgroundColor: C.accentDim }]}>
-                            <QrCode size={18} color={C.accent} strokeWidth={2} />
-                            <Text style={[styles.infoText, { color: C.text }]}>
-                                {booking.check_in_at && !booking.check_out_at
-                                    ? `${text.workingSince} ${formatTime(booking.check_in_at)}`
-                                    : text.waitingForRelease}
-                            </Text>
+                        <View style={{ gap: 12 }}>
+                            <View style={[styles.infoBox, { backgroundColor: C.accentDim }]}>
+                                <QrCode size={18} color={C.accent} strokeWidth={2} />
+                                <Text style={[styles.infoText, { color: C.text }]}>
+                                    {booking.check_in_at && !booking.check_out_at
+                                        ? `${text.workingSince} ${formatTime(booking.check_in_at)}`
+                                        : text.waitingForRelease}
+                                </Text>
+                            </View>
+                            {!booking.check_out_at && (
+                                <ClayButton
+                                    label={text.showQr}
+                                    icon={<QrCode size={18} color={C.onAccent} strokeWidth={2.2} />}
+                                    onPress={() => router.push(`/booking/${booking.id}/qr`)}
+                                />
+                            )}
                         </View>
                     )
                 )}

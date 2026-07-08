@@ -98,7 +98,8 @@
       "PowerShell($h = \\(Invoke-WebRequest -Uri 'https://brigzy.vercel.app/messages' -UseBasicParsing -Headers @{ 'Cache-Control' = 'no-cache' }\\).Content; [regex]::Match\\($h, 'entry-\\([a-f0-9]+\\)\\\\.js'\\).Groups[1].Value)",
       "PowerShell($js = \\(Invoke-WebRequest -Uri 'https://brigzy.vercel.app/_expo/static/js/web/entry-53cff88de3f054dd5b50607658772326.js' -UseBasicParsing\\).Content; if \\($js.Contains\\('get_public_profile_stats'\\)\\) { Write-Output 'W13 code IS in bundle' } else { Write-Output 'W13 code NOT in bundle' }; if \\($js.Contains\\('peopleSection'\\) -or $js.Contains\\('People search failed'\\)\\) { Write-Output 'people search IS in bundle' } else { Write-Output 'people search NOT in bundle' })",
       "PowerShell(\\(Get-Content 'src\\\\app\\\\messages\\\\index.tsx' | Measure-Object -Line\\).Lines)",
-      "mcp__claude_ai_Supabase__get_logs"
+      "mcp__claude_ai_Supabase__get_logs",
+      "PowerShell(npm install react-native-qrcode-svg jsqr --legacy-peer-deps)"
     ]
   }
 }
