@@ -70,14 +70,23 @@ Deno.serve(async (req: Request) => {
       if (!isPoster) return jsonResponse({ error: 'poster_signs_first' }, 409);
       const { data: job } = await admin
         .from('jobs')
-        .select('title, location, location_text')
+        .select('title, location, location_text, company_id, task_nature')
         .eq('id', booking.job_id)
         .maybeSingle();
+
+      // Contract-type derivation (spec v2.7 §3, never a user choice):
+      //   B2B (job has a company) + result   → DoVP §226 ZP
+      //   B2B (job has a company) + activity → DoPČ §228a ZP
+      //   C2C (no company)                   → Zmluva o dielo §631–643 OZ (always)
+      const contractType = job?.company_id
+        ? (job.task_nature === 'activity' ? 'dopc' : 'dovp')
+        : 'zmluva_o_dielo';
+
       const { data: created, error: createError } = await admin
         .from('contracts')
         .insert({
           booking_id: booking.id,
-          type: 'zmluva_o_dielo',
+          type: contractType,
           status: 'draft',
           esign_level: 'ades',
           template_version: 'VZOR-demo-1',

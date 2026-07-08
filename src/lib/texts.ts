@@ -299,6 +299,46 @@ interface TextMap {
   scanSuccessCheckOut: string;
   sosContact: string;
 
+  // P2 wizard
+  wizardStepOf: string;
+  wizardBack: string;
+  wizardNext: string;
+  wizardPublish: string;
+  wizardPublishing: string;
+  stepCategoryTitle: string;
+  stepDescriptionTitle: string;
+  stepPayTitle: string;
+  stepLocationTitle: string;
+  stepScheduleTitle: string;
+  stepSettingsTitle: string;
+  stepSummaryTitle: string;
+  taskNatureLabel: string;
+  taskNatureResult: string;
+  taskNatureResultHint: string;
+  taskNatureActivity: string;
+  taskNatureActivityHint: string;
+  postingAsLabel: string;
+  postingAsIndividual: string;
+  postingAsCompany: string;
+  companyNameLabel: string;
+  companyIcoLabel: string;
+  companyDicLabel: string;
+  slotsCountLabel: string;
+  startDateLabel: string;
+  recurringLabel: string;
+  recurringHint: string;
+  sosSettingLabel: string;
+  sosSettingHint: string;
+  visibilityLabel: string;
+  visibilityPublic: string;
+  visibilityInviteOnly: string;
+  feeGross: string;
+  feeService: string;
+  feeNet: string;
+  contractTypePreview: string;
+  wizardValidationError: string;
+  jobPublishedTitle: string;
+
   // Job Detail Screen
   jobNotFound: string;
   aboutThisJob: string;
@@ -659,6 +699,46 @@ const texts: Record<Language, TextMap> = {
     scanSuccessCheckOut: 'Check-out',
     sosContact: 'SOS / Contact',
 
+    // P2 wizard
+    wizardStepOf: 'Step',
+    wizardBack: 'Back',
+    wizardNext: 'Continue',
+    wizardPublish: 'Publish job',
+    wizardPublishing: 'Publishing…',
+    stepCategoryTitle: 'Category',
+    stepDescriptionTitle: 'Describe the task',
+    stepPayTitle: 'Pay',
+    stepLocationTitle: 'Location',
+    stepScheduleTitle: 'Slots & schedule',
+    stepSettingsTitle: 'Settings',
+    stepSummaryTitle: 'Summary & publish',
+    taskNatureLabel: 'What kind of task is it?',
+    taskNatureResult: 'A defined result',
+    taskNatureResultHint: 'e.g. clean this apartment, deliver these packages',
+    taskNatureActivity: 'Ongoing / repeated activity',
+    taskNatureActivityHint: 'e.g. regular shifts, recurring work',
+    postingAsLabel: 'Posting as',
+    postingAsIndividual: 'Individual',
+    postingAsCompany: 'Company (IČO)',
+    companyNameLabel: 'Company name',
+    companyIcoLabel: 'IČO',
+    companyDicLabel: 'DIČ (optional)',
+    slotsCountLabel: 'Number of spots',
+    startDateLabel: 'Start date & time',
+    recurringLabel: 'Recurring work',
+    recurringHint: 'Turn on for regular/weekly shifts (affects contract type)',
+    sosSettingLabel: 'Urgent (SOS)',
+    sosSettingHint: 'Highlighted with a red badge, higher visibility',
+    visibilityLabel: 'Visibility',
+    visibilityPublic: 'Public',
+    visibilityInviteOnly: 'Invite-only',
+    feeGross: 'Reward',
+    feeService: 'Service fee',
+    feeNet: 'Worker receives',
+    contractTypePreview: 'Contract',
+    wizardValidationError: 'Please fill in this step before continuing.',
+    jobPublishedTitle: 'Job published!',
+
     // Job Detail Screen
     jobNotFound: 'Job not found',
     aboutThisJob: 'About This Job',
@@ -1016,6 +1096,46 @@ const texts: Record<Language, TextMap> = {
     scanSuccessCheckIn: 'Check-in',
     scanSuccessCheckOut: 'Check-out',
     sosContact: 'SOS / Kontakt',
+
+    // P2 wizard
+    wizardStepOf: 'Krok',
+    wizardBack: 'Späť',
+    wizardNext: 'Pokračovať',
+    wizardPublish: 'Zverejniť brigádu',
+    wizardPublishing: 'Zverejňujem…',
+    stepCategoryTitle: 'Kategória',
+    stepDescriptionTitle: 'Popíš úlohu',
+    stepPayTitle: 'Odmena',
+    stepLocationTitle: 'Miesto',
+    stepScheduleTitle: 'Miesta a rozvrh',
+    stepSettingsTitle: 'Nastavenia',
+    stepSummaryTitle: 'Súhrn a publikovanie',
+    taskNatureLabel: 'O aký typ úlohy ide?',
+    taskNatureResult: 'Konkrétny výsledok',
+    taskNatureResultHint: 'napr. upratať byt, doručiť balíky',
+    taskNatureActivity: 'Priebežná / opakovaná činnosť',
+    taskNatureActivityHint: 'napr. pravidelné zmeny, opakovaná práca',
+    postingAsLabel: 'Zadávam ako',
+    postingAsIndividual: 'Súkromná osoba',
+    postingAsCompany: 'Firma (IČO)',
+    companyNameLabel: 'Názov firmy',
+    companyIcoLabel: 'IČO',
+    companyDicLabel: 'DIČ (nepovinné)',
+    slotsCountLabel: 'Počet miest',
+    startDateLabel: 'Dátum a čas začiatku',
+    recurringLabel: 'Opakovaná práca',
+    recurringHint: 'Zapni pri pravidelných/týždenných zmenách (ovplyvňuje typ zmluvy)',
+    sosSettingLabel: 'Urgentné (SOS)',
+    sosSettingHint: 'Zvýraznené červeným odznakom, vyššia viditeľnosť',
+    visibilityLabel: 'Viditeľnosť',
+    visibilityPublic: 'Verejná',
+    visibilityInviteOnly: 'Len na pozvanie',
+    feeGross: 'Odmena',
+    feeService: 'Servisný poplatok',
+    feeNet: 'Brigádnik dostane',
+    contractTypePreview: 'Zmluva',
+    wizardValidationError: 'Vyplň prosím tento krok, kým budeš pokračovať.',
+    jobPublishedTitle: 'Brigáda zverejnená!',
 
     // Job Detail Screen
     jobNotFound: 'Práca nenájdená',

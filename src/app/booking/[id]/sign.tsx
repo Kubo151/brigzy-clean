@@ -21,12 +21,20 @@ interface SignBooking {
     status: string;
     agreed_amount_cents: number;
     currency: string;
-    job: { title: string | null; location: string | null; company_name: string | null } | null;
+    job: { title: string | null; location: string | null; company_name: string | null; company_id: string | null; task_nature: string | null } | null;
     worker: { display_name: string | null } | null;
     poster: { display_name: string | null } | null;
 }
 
 const eur = (cents: number) => `€${(cents / 100).toFixed(2)}`;
+
+// Mirrors the derivation in the sign-contract edge function — display only.
+const contractLabel = (job: SignBooking['job']) => {
+    if (!job?.company_id) return { name: 'Zmluva o dielo', ref: 'podľa § 631–643 Občianskeho zákonníka' };
+    return job.task_nature === 'activity'
+        ? { name: 'Dohoda o pracovnej činnosti (DoPČ)', ref: 'podľa § 228a Zákonníka práce' }
+        : { name: 'Dohoda o vykonaní práce (DoVP)', ref: 'podľa § 226 Zákonníka práce' };
+};
 
 export default function ContractSignScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -46,7 +54,7 @@ export default function ContractSignScreen() {
         try {
             const { data, error } = await supabase
                 .from('bookings')
-                .select('id, worker_user_id, poster_user_id, status, agreed_amount_cents, currency, job:job_id(title, location, company_name), worker:worker_user_id(display_name), poster:poster_user_id(display_name)')
+                .select('id, worker_user_id, poster_user_id, status, agreed_amount_cents, currency, job:job_id(title, location, company_name, company_id, task_nature), worker:worker_user_id(display_name), poster:poster_user_id(display_name)')
                 .eq('id', id)
                 .maybeSingle();
             if (error) throw error;
@@ -124,10 +132,10 @@ export default function ContractSignScreen() {
                         <Text style={[styles.warnText, { color: C.text }]}>{text.contractSampleNote}</Text>
                     </View>
 
-                    {/* Contract preview */}
+                    {/* Contract preview — type auto-derived server-side, never a user choice */}
                     <ClaySurface radius={20} style={{ marginBottom: 18 }} contentStyle={{ padding: 20 }}>
-                        <Text style={[styles.contractHeading, { color: C.text }]}>Zmluva o dielo</Text>
-                        <Text style={[styles.contractSub, { color: C.muted }]}>podľa § 631–643 Občianskeho zákonníka · VZOR</Text>
+                        <Text style={[styles.contractHeading, { color: C.text }]}>{contractLabel(booking.job).name}</Text>
+                        <Text style={[styles.contractSub, { color: C.muted }]}>{contractLabel(booking.job).ref} · VZOR</Text>
 
                         <View style={[styles.divider, { backgroundColor: C.hair }]} />
 
