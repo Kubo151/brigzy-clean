@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     stepCounter: { fontSize: 12, fontWeight: '700', marginBottom: 6 },
     progressTrack: { height: 5, borderRadius: 3, overflow: 'hidden' },
     progressFill: { height: 5, borderRadius: 3 },
-    scrollContent: { paddingHorizontal: 20, paddingBottom: 60 },
+    scrollContent: { paddingHorizontal: 20, paddingBottom: 140 },
     stepTitle: { fontSize: 22, fontWeight: '800', letterSpacing: -0.5, marginBottom: 18 },
     fieldGroup: { marginBottom: 18 },
     fieldLabel: { fontSize: 11, fontWeight: '800', marginBottom: 8, marginLeft: 4, textTransform: 'uppercase', letterSpacing: 0.7 },
