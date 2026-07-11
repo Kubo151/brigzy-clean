@@ -1,0 +1,247 @@
+BRIGZY.SK
+ZASADY OCHRANY OSOBNYCH UDAJOV
+(Privacy Policy)
+Verzia 1.1 — Brigzy.sk (jun 2026) | [OPRAVENA TERMINOLOGIA - jun 2026]
+POZNAMKA K DOKUMENTU: Tento dokument je komplexnou Politikou ochrany osobnych udajov platformy Brigzy.sk. Vztahuje sa na vsetkych pouzivatelov — Brigadnikov aj Zadavatelov. Pred finalnym zverejnenim musi byt schvaleny advokatom.
+Clanok 1 — Prevadzkovatel osobnych udajov
+Udaj
+Hodnota
+Meno a priezvisko
+David Krescianko
+Obchodne meno
+Renewo (prevadzkována pod znakou Brigzy.sk)
+ICO
+57476080
+E-mail pre GDPR ziadosti
+support@brigzy.sk
+Zodpoveda osoba (DPO)
+Brigzy nevymenovala DPO. Povinnost bude priebezne vyhodnocovana podla cl. 37 GDPR.
+Clanok 2 — Rozsah a ucel spracovania osobnych udajov
+2.1 Registracia a sprava uctu (vsetci pouzivatelia)
+Kategoria udajov
+Ucel spracovania
+Prijemcovia
+Pravny zaklad GDPR
+Meno, priezvisko, e-mail, telefon
+Registracia a sprava uctu
+Brigzy (interne)
+cl. 6 ods. 1 pism. b) — plnenie zmluvy
+Fotografia profilu
+Identifikacia na Platforme
+Brigzy, ostatni pouzivatelia
+cl. 6 ods. 1 pism. b)
+IP adresa, technicke udaje zariadenia
+Zabezpecenie, prevencia podvodov
+Brigzy (interne), Supabase
+cl. 6 ods. 1 pism. f) — opr. zaujem
+Skusenosti, zrucnosti (profil)
+Sprostredkovanie vhodnej Brigady
+Brigzy, Zadavatelia
+cl. 6 ods. 1 pism. b)
+2.2 KYC overenie totoznosti (Brigadnici)
+Kategoria udajov
+Ucel spracovania
+Prijemcovia
+Pravny zaklad GDPR
+Meno, adresa, datum narodenia, IBAN
+Platobne ucely (PSD2) — Stripe Connect KYC
+Stripe Technology Europe Ltd.
+cl. 6 ods. 1 pism. b) a c)
+Foto dokladu + selfie (AI matching)
+Biometricke overenie — Stripe Identity
+Stripe Technology Europe Ltd.
+cl. 9 ods. 2 pism. b) — zakonna povinnost (AML)
+Rodne cislo, zdravotna poistovna, adresa TP
+Registracia v SP/ZP (RLFO) — LEN pri DoVP/DoPc
+Zadavatel, SP, ZP
+cl. 6 ods. 1 pism. c) — zakonna povinnost
+DOLEZITE — RODNE CISLO: Rodne cislo sa zbiera VYHRADNE pri vzniku DoVP alebo DoPc a prenasa sa Zadavatelovi vyhradne na ucely registracie v SP/ZP. Plosny zber RC pri registracii je ZAKAZANY (par. 78 ods. 4 zak. c. 18/2018 Z.z.). Od Zadavatelov (firmy, SZCO) sa RC NEZBIERA.
+2.3 Brigada, zmluvy a dochadzka
+Kategoria udajov
+Ucel spracovania
+Prijemcovia
+Pravny zaklad GDPR
+GPS poloha (QR check-in/check-out)
+Overenie dochadzky pocas aktivnej Brigady
+Brigzy (interne)
+cl. 6 ods. 1 pism. f) — opr. zaujem + DPIA
+QR udaje, casove peciatky, audit log
+Overenie dochadzky, prevencia podvodov
+Brigzy (interne)
+cl. 6 ods. 1 pism. f) — opr. zaujem
+Fotodokumentacia diela
+Riesenie sporov (Disputed stav)
+Brigzy, protistrany sporu
+cl. 6 ods. 1 pism. f) — opr. zaujem
+Spravy z chatu v aplikacii
+Komunikacia medzi stranami, dokazy pri sporoch
+Brigzy (interne)
+cl. 6 ods. 1 pism. b) a f)
+2.4 Platby a Escrow (Stripe Connect)
+Kategoria udajov
+Ucel spracovania
+Prijemcovia
+Pravny zaklad GDPR
+IBAN, transakene zaznamy
+Realizacia platieb, Wallet, Escrow
+Stripe Technology Europe Ltd., Brigzy
+cl. 6 ods. 1 pism. b) a c)
+Historia transakcii
+Uctovna a danová evidencia
+Brigzy, Financna sprava SR
+cl. 6 ods. 1 pism. c) — zakonna povinnost
+2.5 Reputacny system a Brigy coins
+Kategoria udajov
+Ucel spracovania
+Prijemcovia
+Pravny zaklad GDPR
+Hviezdiczkove hodnotenia, XP body
+Reputacny system Platformy
+Brigzy, verejny profil na Platforme
+cl. 6 ods. 1 pism. b) a f)
+Brigy coins zostatok
+Vernostny program (interna mena, nie e-peniaze)
+Brigzy (interne)
+cl. 6 ods. 1 pism. b)
+2.6 Analytika a marketingova komunikacia
+Kategoria udajov
+Ucel spracovania
+Prijemcovia
+Pravny zaklad GDPR
+Cookies, spravanie na webe (Google Analytics)
+Analytika, zlepsovanie sluzieb
+Google LLC (USA — DPF)
+cl. 6 ods. 1 pism. a) — suhlas (cookie banner)
+E-mail, telefon (push notifikacie)
+Informacne a marketingove spravy
+Brigzy, Supabase
+cl. 6 ods. 1 pism. a) — suhlas
+Clanok 3 — Prijemcovia osobnych udajov
+3.1 Povinne zdielanie zo zakona
+V pripade vzniku pracovnopravneho vztahu (DoVP/DoPc) je Brigzy povinna — na zaklade splnomocnenia Zadavatela — preniest osobne udaje Brigadnika nasledovnym prijemcom:
+Prijemca
+Udaje
+Pravny zaklad
+Socialna poistovna SR
+Meno, priezvisko, RC, adresa, typ dohody, datum vzniku a zaniku poistenia (RLFO)
+par. 231 zak. c. 461/2003 Z.z.
+Zdravotna poistovna (VsZP, Dovera, Union)
+Meno, priezvisko, RC, zamestnavatel, perioda poistenia
+par. 24 zak. c. 580/2004 Z.z.
+Zadavatel (zamestnavatel)
+Meno, priezvisko, RC, adresa, ZP, IBAN, audit log dochadzky
+cl. 6 ods. 1 pism. b) a c) GDPR
+Financna sprava SR
+Mzdove udaje, dan z prijmov
+par. 39 zak. c. 595/2003 Z.z.
+Organy cinne v trestnom konani
+Udaje potrebne na ucely trestneho konania
+par. 21 zak. c. 18/2018 Z.z.
+3.2 Technologicki partneri (sprostredkovatelia podla cl. 28 GDPR)
+Partner
+Sluzba / Udaje
+Umiestnenie / zaruky
+Stripe Technology Europe Ltd.
+Platby, KYC, IBAN, biometria (Stripe Identity)
+EU/EHP — stripe.com/legal
+Supabase Inc.
+Databaza, autentifikacia, e-mail/push notifikacie
+EU/EHP (Frankfurt) — supabase.com/privacy
+Hostinger International Ltd.
+Cloud hosting infrastruktury
+EU/EHP — hostinger.com/privacy
+Google LLC (Analytics)
+Webova analytika (cookies)
+USA — Data Privacy Framework (DPF)
+Google LLC (Maps)
+Mapove a lokacne sluzby
+USA — Data Privacy Framework (DPF)
+Clanok 4 — Doby uchovávania osobnych udajov
+Kategoria udajov
+Doba uchovávania
+Kto uchováva
+Pravna povinnost
+Registracne udaje (ucet)
+Trvanie uctu + 3 roky
+Brigzy
+Premlacacia lehota (par. 101 OZ)
+Rodne cislo, ZP (DoVP/DoPc)
+10 rokov
+Zadavatel + Brigzy (tech. archiv)
+par. 35a zak. c. 461/2003 Z.z.
+Mzdove listy
+50 rokov
+Zadavatel (primarna povinnost)
+par. 38 ods. 5 ZP
+Podpisane zmluvy (PDF + audit log)
+10 rokov
+Brigzy (tech. archiv)
+par. 35a zak. c. 461/2003 Z.z.
+GPS zaznamy (QR check-in/check-out)
+Do ukoncenia Brigady + 30 dni
+Brigzy — po lehote trvalo maze
+Opr. zaujem (dokaz pri sporoch)
+IP adresa, Device ID
+Trvanie uctu + 3 roky
+Brigzy
+Opr. zaujem (bezpecnost)
+KYC foto dokladu (Stripe Identity)
+5 rokov po ukonceni vztahu
+Stripe (vlastna AML politika)
+AML zakonna povinnost
+Chat komunikacia
+Trvanie uctu + 3 roky
+Brigzy
+Opr. zaujem (spory, dokazy)
+DOLEZITE — ARCHIVACIA MZDOVYCH DOKLADOV: Brigzy zabezpecuje technicky archiv podpisanych zmluv a RLFO podkladov (10 rokov). Mzdove listy (50 rokov) a osobny spis (70. rok veku) su zakonnopou povinnostou Zadavatela — Brigzy mu exportuje podklady (CSV/XML pre Pohodu, Kros Olymp), ale za archivaciu mzdovych listov zodpoveda vyhradne Zadavatel.
+Clanok 5 — Vase prava (GDPR cl. 15-22)
+Ako dotknutá osoba mate nasledujuce prava. Ziadost mozete podat e-mailom na support@brigzy.sk. Na vasu ziadost odpovedame do 30 dni.
+Pravo
+Obsah a sposob uplatnenia
+Na pristup (cl. 15)
+Mozete poziadat o kopiu vasich udajov.
+Na opravu (cl. 16)
+Mozete poziadat o opravu neospravnych udajov.
+Na vymazanie (cl. 17)
+Mozete poziadat o zmazanie udajov. Niektoré udaje musiime uchováavat zo zakona.
+Na obmedzenie (cl. 18)
+Mozete poziadat o pozastavenie spracovania.
+Na prenositelnost (cl. 20)
+Mozete poziadat o export udajov v strojovo citatelnom formate (JSON/CSV).
+Namietat (cl. 21)
+Mozete namietat proti spracúvaniu na zaklade opravneneho zaujmu (napr. GPS, Device ID).
+Odvolat suhlas (cl. 7 ods. 3)
+Marketingový suhlas mozete kedykolvek odvolat cez nastavenia aplikacie alebo na support@brigzy.sk.
+Podat staznost
+Urad na ochranu osobnych udajov SR: dataprotection.gov.sk | ARS (EU): ec.europa.eu/odr
+Clanok 6 — Bezpecnostne opatrenia
+Sifrovanie dat pri prenose (TLS 1.2+/SSL)
+Sifrovanie rodneho cisla a citlivych udajov v databaze (Supabase)
+Hash overenie integrity zmluvnych dokumentov (audit log)
+Pristup k udajom len pre opravnenych pracovnikov (princip minimalnych opravneni)
+Pravidelne bezpecnostne audity
+Zálohovanie dat s garantovanou integritou
+V pripade bezpecnostneho incidentu (cl. 33 GDPR) Brigzy poda hlasenie Uradu na ochranu osobnych udajov SR do 72 hodin.
+Clanok 7 — Minimalny vek pouzivatela
+Brigzy nie je urcena pre osoby mladsia ako 16 rokov. Brigzy registruje vyhradne osoby starsie ako 16 rokov. Vedome nespracuvame udaje od deti.
+Clanok 8 — Cookies a sledovanie
+Typ cookies
+Ucel
+Suhlas potrebny
+Nevyhnutne
+Fungovanie stranky, session, bezpecnost
+Nie (zakonna vynimka)
+Analyticke (Google Analytics)
+Pochopenie pouzivania stranky, zlepsovanie sluzieb
+Ano — cez cookie banner
+Marketingove
+Retargeting, personalizovana reklama
+Ano — cez cookie banner
+Clanok 9 — Zmeny tychto Zasad
+Brigzy moze tieto Zasady aktualizovat. O vyznamnych zmenach budeme informovat e-mailom alebo oznamom v aplikacii min. 14 dni pred nadobudnutim ucinnosti.
+Clanok 10 — Kontakt
+E-mail: support@brigzy.sk
+Urad na ochranu osobnych udajov SR: dataprotection.gov.sk
+Platforma ARS (EU): https://ec.europa.eu/odr
+OTVORENE PRE PRAVNIKA — SUHRN: 1) Posúdit povinnost vymenovat DPO (cl. 37 GDPR). 2) Potvrdit DPA s kazdym technologickym partnerom. 3) Vypracovat DPIA pre GPS sledovanie a Device ID. 4) Vypracovat balancne testy opravneneho zaujmu. 5) Overit aktualny status Google DPF. 6) Potvrdit doby uchavavania.
+Brigzy.sk — vzorovy dokument, podlieha schvaleniu pravnikom

@@ -1,0 +1,79 @@
+BRIGZY.SK
+SPROSTREDKOVATELSKA ZMLUVA
+Brigzy.sk (Renewo) — Zadavatel B2B, vratane splnomocnenia na RLFO
+Verzia 1.0 — vzor pre Brigzy.sk (jun 2026) | [OPRAVENA TERMINOLOGIA - jun 2026]
+POZNAMKA: Tato zmluva upravuje vztah medzi Brigzy/Renewo ako sprostredkovatelom a Zadavatelom — pravnickou osobou alebo SZCO. Obsahuje: (1) sprostredkovatelsku zmluvu, (2) splnomocnenie na podanie RLFO v mene Zadavatela, (3) odkaz na DPA. Pred finalnym nasadenim musi byt schvalena advokatom.
+Sprostredkovatel:
+Obchodne meno: Renewo / Brigzy.sk
+ICO: 57476080
+Sidlo: [doplnit]
+Zastupeny: [doplnit]
+Zadavatel (zamestnavatel):
+Obchodne meno / Meno a priezvisko SZCO: [doplnit]
+Sidlo: [doplnit]
+ICO: [doplnit]
+DIC: [doplnit]
+IC DPH (ak je platitelom): [doplnit]
+Zastupeny: [doplnit]
+Kontaktna osoba pre SP/ZP agendu: [doplnit]
+Cislo registracie v Socialnej poistovni: [doplnit]
+Clanok 1 — Predmet zmluvy
+1.1. Brigzy sa zavazuje poskytovat Zadavatelovi prostrednictvom Platformy Brigzy.sk nasledujuce sprostredkovatelske a technologicke sluzby:
+sprostredkovanie kontaktu medzi Zadavatelom a Brigadnikmi prostrednictvom digitalnej Platformy,
+automaticke generovanie vzorových zmluv (DoVP/DoPc) na zaklade udajov zadanych Zadavatelom,
+spravu Escrow platobneho mechanizmu prostrednictvom Stripe Connect,
+technicke podanie Registracneho listu fyzickej osoby (RLFO) do Socialnej poistovne v mene Zadavatela na zaklade splnomocnenia podla cl. 4 tejto zmluvy,
+generovanie XML suborov pre eSluzby Socialnej poistovne (RLFO) a CSV/XML exportov pre mzdove systemy (Pohoda, Kros OLYMP),
+spravu dochadzky a audit logu (QR check-in/check-out v aplikacii Brigzy.sk),
+dalsie funkcie Platformy podla aktualnej specifikacie Brigzy.sk.
+1.2. Zadavatel sa zavazuje za tieto sluzby uhradat Servisny poplatok — odplatu Brigzy za sprostredkovanie a technologicke sluzby Platformy — podla platneho cennika Brigzy, prijateho pri registracii a uvedeneho v prislusnych VOP B2B.
+Clanok 2 — Postavenie zmluvnych stran
+2.1. Brigzy vystupuje vyhradne ako technologicky sprostredkovatel kontaktu. Brigzy NIE JE:
+zamestnavatelom Brigadnikov — zamestnavatelom je vyhradne Zadavatel,
+agentúrou docasteho zamestnavania podla par. 29 zakona c. 5/2004 Z. z.,
+zmluvnou stranou pracovnopravneho vztahu medzi Zadavatelom a Brigadnikom.
+2.2. Zamestnavatelom Brigadnika je vzdy a vyhradne Zadavatel.
+2.3. Brigzy v ziadnom okamihu nerozhoduje o obsahu, rozsahu, sposobe vykonu prace ani o vybere Brigadnika.
+Clanok 3 — Povinnosti Zadavatela ako zamestnavatela
+3.1. Zadavatel sa zavazuje pred nastupom prveho Brigadnika splnit vsetky povinnosti zamestnavatela:
+zaregistrovat sa v Socialnej poistovni ako zamestnavatel,
+prihlasiit Brigadnika do Socialnej poistovne (RLFO, kod 3 = DoVP alebo kod 4 = DoPc) najneskor pred zacatim vykonu prace,
+prihlasiit Brigadnika v prislusnej zdravotnej poistovni,
+zrazit a odviest preddavok na dan z prijmu zo zavislej cinnosti (par. 35 ZDP),
+odviest poistne na socialne a zdravotne poistenie,
+viest mzdovu agendu a uchovavat ju v zakonnych lehotach.
+3.2. Zadavatel sa zavazuje poskytnút Brigzy spravne, uplne a vcasne udaje (meno, priezvisko, RC, adresa, ZP, IBAN) najneskor 24 hodin pred pozadovanym terminom registracie.
+3.3. Zodpovednost za spravnost a vcasnost registracie Brigadnika v SP a ZP nesie v plnom rozsahu Zadavatel.
+Clanok 4 — Splnomocnenie na podanie RLFO
+OTVORENE PRE PRAVNIKA: Splnomocnenie musi byt schvalene advokatom. Potrebne overit: (1) rozsah splnomocnenia a sulad s poziadavkami SP; (2) ci je potrebne notarsky overene splnomocnenie; (3) zodpovednost za chyby a omeskania podania.
+4.1. Zadavatel tym splnomocnuje Brigzy na:
+elektronicke podanie RLFO do Socialnej poistovne SR cez eSluziby SP,
+prihlasenie Brigadnika (vznik poistenia) a odhlasenie (zanik poistenia),
+generovanie a odovzdanie XML suborov pre Socialnu poistovnu Zadavatelovi.
+4.2. Toto splnomocnenie: sa vztahuje vyhradne na Brigadnikov s DoVP alebo DoPc cez Platformu; je obmedzene na technicke podanie udajov od Zadavatela; plati pocas trvania zmluvy a moze byt Zadavatelom kedykolvek odvolane.
+4.3. Zodpovednost za omeskanie: Ak je omeskanie zavinene vyhradne technickym zlyhanim systemu Brigzy (nie nepresnostou udajov Zadavatela), Brigzy zodpoveda za skutocnu skodu max. do vysky pokuty SP (0,30 — 3,32 EUR/den).
+Clanok 5 — Ochrana osobnych udajov (odkaz na DPA)
+5.1. Spracovanie osobnych udajov Brigadnikov (vratane RC) sa riadi osobitnou Dohodou o spolocnom spracuvani osobnych udajov (cl. 26 GDPR) — Priloha c. 1 tejto zmluvy.
+5.2. Brigzy spracuva RC a osobne udaje Brigadnika vyhradne za ucelom podania RLFO a generovania mzdovych podkladov. Po splneni ucelu ich uchováava len v zakonnych lehotach.
+5.3. Zadavatel sa zavazuje spracuvat osobne udaje Brigadnikov vyhradne na ucely zamestnavatelskej agendy a zabezpecit ich ochranu v sulade s GDPR.
+Clanok 6 — Mlcanlivost
+6.1. Obe zmluvne strany sa zavazuju zachovavat mlcanlivos o vsetkych duvernych informaciach ziskanych v ramci tejto zmluvy.
+6.2. Tato povinnost trva aj po skonceni zmluvy — po dobu 3 rokov.
+Clanok 7 — Zodpovednost a indemnifikacia
+7.1. Zodpovednost Brigzy je obmedzena podla ustanoveni VOP B2B.
+7.2. Zadavatel sa zavazuje v plnom rozsahu odskodonit Brigzy za akukolvek skodu, pokutu alebo naklady vzniknute v dosledku: nepravdivych udajov Zadavatela; porusenia povinnosti zamestnavatela; negalneho zamestnavania.
+Clanok 8 — Trvanie a skoncenie zmluvy
+8.1. Zmluva sa uzatvaráa na dobu neurèitu a nadobuda ucinnost dnm registracie Zadavatela na Platforme.
+8.2. Kazda strana moze zmluvu vypovedát s 30-dennou výpovednou dobou.
+8.3. Brigzy moze zmluvu okamzite vypovedát pri závaznom poruseni VOP B2B alebo tejto zmluvy.
+Clanok 9 — Zaverecne ustanovenia
+Zmluva sa spravuje pravnym poriadkom SR.
+Na riesenie sporov su prislusne sudy SR, miestne prislusne podla sidla Brigzy.
+Zmeny zmluvy su platne len v pisomnej forme.
+Miesto a datum uzavretia: [doplnit]
+Brigzy / Renewo (podpis)
+Zadavatel (podpis, peciatka)
+Priloha c. 1 — Dohoda o spolocnom spracuvani osobnych udajov (cl. 26 GDPR)
+(Tato priloha tvori neoddelitelnu sučast Sprostredkovatelskej zmluvy a je vypracovana ako samostatny dokument — DPA Brigzy-Zadavatel.)
+OTVORENE PRE PRAVNIKA: Presne znenie DPA musi byt schvalene advokatom, najma model joint controllers vs. processor a rozdelenie povinnosti podla cl. 26 GDPR.
+Brigzy.sk — vzorovy dokument, podlieha schvaleniu pravnikom

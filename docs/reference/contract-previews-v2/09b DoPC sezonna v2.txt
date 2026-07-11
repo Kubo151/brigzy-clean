@@ -1,0 +1,80 @@
+BRIGZY.SK
+DOHODA O PRACOVNEJ ČINNOSTI NA VÝKON SEZÓNNEJ PRÁCE
+podľa § 228a Zákonníka práce — sezónna varianta (max. 520 h/rok, max. 8 mesiacov)
+Verzia 2.0 — zapracované pripomienky právnika
+ℹ️ POZNÁMKA K POUŽITIU
+Pre sezónne práce (poľnohospodárstvo, cestovný ruch, sezónne gastro). Limit: najviac 520 hodín v kalendárnom roku a trvanie najviac 8 mesiacov u toho istého zamestnávateľa. Druh práce musí zodpovedať prílohe č. 1b Zákonníka práce.
+
+uzatvorená medzi:
+
+Zamestnávateľ (Zadávateľ)
+Obchodné meno / Meno a priezvisko: [doplniť]
+Sídlo / adresa: [doplniť]
+IČO: [doplniť]
+DIČ: [doplniť]
+Zastúpený: [doplniť]
+Registrácia v Sociálnej poisťovni: [číslo, dátum registrácie zamestnávateľa]
+
+Zamestnanec (Brigádnik)
+Meno a priezvisko: [doplniť]
+Dátum narodenia: [doplniť]
+Rodné číslo: [doplniť pri vzniku DoPČ — Brigzy formulár]
+Trvalý pobyt / adresa: [doplniť]
+Zdravotná poisťovňa: [doplniť pri vzniku DoPČ]
+Číslo bankového účtu (IBAN): [doplniť]
+Telefónne číslo (overené): [doplniť]
+E-mail: [doplniť]
+
+(ďalej spoločne ako „zmluvné strany“)
+
+Článok 1 — Predmet dohody
+1.1. Zmluvné strany uzatvárajú túto dohodu o pracovnej činnosti na výkon sezónnej práce v súlade s § 228a a prílohou č. 1b Zákonníka práce.
+Druh sezónnej práce: [musí zodpovedať prílohe č. 1b ZP]
+Miesto výkonu práce: [adresa]
+Článok 2 — Rozsah práce a doba trvania
+Dátum začatia výkonu práce: [doplniť]
+Dátum skončenia: [doplniť]
+Celkový rozsah práce: [max. 520 hodín v kalendárnom roku]
+2.1. Doba trvania dohody (vrátane predĺžení u toho istého zamestnávateľa) nesmie v kalendárnom roku prekročiť 8 mesiacov a 520 hodín.
+Článok 3 — Odmena
+Dohodnutá odmena: [hodinová sadzba alebo dohodnutá suma v EUR]
+Odmena je splatná mesačne, najneskôr do konca kalendárneho mesiaca nasledujúceho po mesiaci výkonu práce.
+Zamestnávateľ zráža preddavok na daň (§ 35 ZDP) a odvádza poistné.
+Vyplatenie prebieha cez Brigzy.sk (Stripe Connect).
+Článok 4 — Práva a povinnosti zmluvných strán
+4.1 Zamestnávateľ sa zaväzuje:
+preukázateľne poučiť zamestnanca o BOZP pred začatím výkonu práce a dať mu toto poučenie podpísať,
+zaregistrovať zamestnanca v Sociálnej poisťovni (RLFO) najneskôr pred začatím výkonu práce,
+prihlásiť zamestnanca v príslušnej zdravotnej poisťovni,
+dodržiavať dohodnutý rozsah práce a riadne vyplácať odmenu.
+4.2 Zamestnanec sa zaväzuje:
+vykonávať dohodnutú činnosť osobne a riadne,
+zaznamenávať dochádzku prostredníctvom QR check-in/check-out v aplikácii Brigzy,
+dodržiavať pokyny BOZP, s ktorými bol oboznámený.
+Postavenie platformy Brigzy.sk
+Platforma Brigzy.sk je výhradne technickým a zmluvným sprostredkovateľom. Brigzy.sk nie je zamestnávateľom ani agentúrou dočasného zamestnávania. Zamestnávateľ udeľuje Brigzy.sk splnomocnenie na technické podanie RLFO v jeho mene v rozsahu dohodnutom v Sprostredkovateľskej zmluve; zodpovednosť za správnosť a včasnosť registrácie nesie zamestnávateľ.
+Ochrana osobných údajov
+Osobné údaje zamestnanca (vrátane rodného čísla a údaja o zdravotnej poisťovni) sú spracúvané na právnom základe čl. 6 ods. 1 písm. b) a c) GDPR. Spracúvanie a postúpenie rodného čísla zamestnávateľovi prebieha na základe osobitného súhlasu zamestnanca; rodné číslo sa nezverejňuje. Bližšie informácie v Zásadách ochrany osobných údajov Brigzy.sk.
+Skončenie dohody
+Dohoda zaniká uplynutím dohodnutej doby, dosiahnutím limitu 520 h, alebo dohodou zmluvných strán.
+Podmienky predčasného skončenia jednotlivých zmien (storno) sa spravujú VOP Brigzy.sk.
+Forma a podpis dohody
+PRÁVNY ZÁKLAD — PÍSOMNÁ FORMA (§ 228a a § 226 ods. 2 ZP, § 40 ods. 4 OZ)
+Táto dohoda musí byť písomná, inak je neplatná. Sken alebo fotografia podpísanej dohody sama o sebe nenahrádza písomné vyhotovenie. Preto zmluvné strany nižšie výslovne dojednávajú, čo sa medzi nimi považuje za dodržanie písomnej formy.
+
+Dohoda sa podpisuje jedným z nasledujúcich spôsobov:
+(a) Vlastnoručný podpis: Obe strany podpíšu dohodu vlastnou rukou a podpísanú kópiu odfotia alebo oskenujú a nahrajú do aplikácie Brigzy.sk.
+(b) Kvalifikovaný elektronický podpis (KEP) prostredníctvom eID / Slovensko.sk.
+Každá zmluvná strana obdrží jedno podpísané vyhotovenie tejto dohody. Pri vlastnoručnom podpise doručí zamestnávateľ zamestnancovi jeho podpísané vyhotovenie najneskôr pri nástupe na výkon práce.
+Zmluvné strany sa výslovne dohodli, že za dodržanie písomnej formy tejto dohody podľa § 40 ods. 4 Občianskeho zákonníka považujú aj podpis vykonaný spôsobom podľa písm. (a) v spojení s nezmeniteľným audit logom systému Brigzy.sk (IP adresa, časová pečiatka UTC, Device ID, hash dokumentu, overený telefón/e-mail).
+Po podpise systém doručí podpísanú kópiu vo formáte PDF e-mailom obom stranám. Archivácia: mzdové doklady 10 rokov, mzdové listy 50 rokov; primárnu zodpovednosť nesie zamestnávateľ, Brigzy.sk zabezpečuje technické úložisko s garantovanou integritou.
+
+Záverečné ustanovenia
+Táto dohoda sa spravuje právnym poriadkom Slovenskej republiky, najmä Zákonníkom práce.
+Vyhotovená v dvoch vyhotoveniach s rovnakou platnosťou — po jednom pre každú zmluvnú stranu.
+
+Miesto a dátum uzavretia: [doplniť]
+
+Zamestnávateľ (podpis)
+
+Zamestnanec (podpis)

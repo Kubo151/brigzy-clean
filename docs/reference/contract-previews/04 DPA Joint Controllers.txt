@@ -1,0 +1,138 @@
+BRIGZY.SK
+DOHODA O SPOLOČNOM SPRACÚVANÍ OSOBNÝCH ÚDAJOV
+podľa čl. 26 nariadenia (EÚ) 2016/679 (GDPR) — Príloha č. 1 Sprostredkovateľskej zmluvy
+Verzia 1.0 — vzor pre Brigzy.sk (jún 2026)
+ℹ️ POZNÁMKA K DOKUMENTU
+Tento dokument upravuje rozdelenie zodpovednosti za spracúvanie osobných údajov Brigádnikov medzi Brigzy a Zadávateľom v súvislosti s RLFO agendou a prenosom údajov. Model: joint controllers (čl. 26 GDPR). Pred finálnym zverejnením musí byť overený advokátom — alternatívou je model processor (čl. 28 GDPR), ak sa zistí, že Brigzy vykonáva spracúvanie výhradne podľa pokynov Zadávateľa.
+
+❓ KĽÚČOVÁ OTÁZKA PRE PRÁVNIKA
+Joint controllers (čl. 26) vs. Processor (čl. 28):
+- Ak Brigzy sama rozhoduje o spôsobe zberu r.č. (vlastný formulár, vlastná logika aktivácie) a prenáša údaje SP aj na iné účely (audit log, archivácia) → joint controllers.
+- Ak Brigzy len spracúva r.č. výhradne podľa pokynov Zadávateľa a nemá vlastný záujem → processor.
+Navrhovaný model: joint controllers — potvrdiť/korigovať na stretnutí s právnikom.
+
+uzatvorená medzi:
+
+Správca 1 (Sprostredkovateľ):
+Renewo / Brigzy.sk, IČO: 57476080: [doplniť]
+Sídlo: [doplniť]
+(ďalej len „Brigzy“): [doplniť]
+
+Správca 2 (Zadávateľ / Zamestnávateľ):
+Obchodné meno / Meno a priezvisko: [doplniť]
+IČO: [doplniť]
+Sídlo: [doplniť]
+
+(ďalej spoločne ako „spoloční správcovia“)
+
+Článok 1 — Predmet a účel dohody
+1.1. Spoloční správcovia spoločne určujú účely a prostriedky spracúvania osobných údajov Brigádnikov v nasledovnom rozsahu:
+Kategória údajov
+Účel spracúvania
+Právny základ (GDPR)
+Meno, priezvisko, dátum narodenia, adresa
+Uzatvorenie a plnenie DoVP/DoPČ
+Čl. 6 ods. 1 písm. b) plnenie zmluvy
+Rodné číslo, zdravotná poisťovňa
+Registrácia v SP/ZP, RLFO, mzdová agenda
+Čl. 6 ods. 1 písm. c) zákonná povinnosť
+IBAN, transakčné záznamy
+Platobné transakcie cez Stripe Connect
+Čl. 6 ods. 1 písm. b) a c)
+GPS, Device ID, IP, audit log
+Overenie dochádzky, prevencia podvodov
+Čl. 6 ods. 1 písm. f) oprávnený záujem + DPIA
+
+Článok 2 — Rozdelenie zodpovedností
+2.1. Spoloční správcovia sa dohodli na nasledovnom rozdelení povinností:
+Povinnosť / zodpovednosť
+Brigzy
+Zadávateľ
+Informačná povinnosť voči Brigádnikovi (čl. 13 GDPR) — Privacy Policy
+✅ Primárne (pre celkové fungovanie Platformy)
+✅ Za spracúvanie v mzdovej agende
+Zber r.č. a ZP (Brigzy formulár)
+✅ Technické zabezpečenie zberu
+✅ Zodpovednosť za správnosť údajov
+Prenos r.č. a ZP do SP/ZP (RLFO)
+✅ Technické podanie (na základe splnomocnenia)
+✅ Právna zodpovednosť za obsah a včasnosť
+Archivácia mzdových dokladov (10 rokov)
+✅ Technické úložisko (integrita, hash)
+✅ Primárna zákonná povinnosť
+Archivácia mzdových listov (50 rokov)
+❌ Neuchováva
+✅ Primárna zákonná povinnosť
+Vybavovanie žiadostí dotknutých osôb (Brigádnikov)
+✅ Primárne (cez Platformu)
+✅ Za žiadosti týkajúce sa mzdovej agendy
+Bezpečnosť a šifrovanie r.č.
+✅ Technické opatrenia na Platforme
+✅ Bezpečnosť vo vlastných systémoch
+DPIA (GPS, Device ID)
+✅ Vypracovanie a vedenie
+❌ Nie je povinná pre tieto účely
+Hlásenie bezpečnostných incidentov (čl. 33 GDPR)
+✅ Pre incidenty na Platforme
+✅ Pre incidenty vo vlastných systémoch
+
+Článok 3 — Doby uchovávania
+Údaj
+Doba uchovávania
+Kto uchováva
+Rodné číslo, ZP (pri DoVP/DoPČ)
+10 rokov (mzdové doklady)
+Zadávateľ (primárne); Brigzy (technické úložisko)
+Mzdové listy
+50 rokov
+Zadávateľ
+Osobný spis zamestnanca
+Do 70. roku veku zamestnanca
+Zadávateľ
+KYC foto dokladu (Stripe Identity)
+5 rokov po ukončení vzťahu
+Stripe (vlastná AML politika)
+GPS záznamy (check-in/out)
+Do ukončenia Brigády + 30 dní (pre prípad sporu)
+Brigzy — po lehote trvalo maže
+Device ID
+Po dobu trvania účtu + 3 roky (premlčacia lehota)
+Brigzy
+Transakčné záznamy
+10 rokov (zákon č. 431/2002 Z. z.)
+Brigzy (technicky); Zadávateľ (účtovníctvo)
+E-mail, meno, kontakt (účet)
+Trvanie účtu + 3 roky (premlčacia lehota)
+Brigzy
+
+Článok 4 — Práva dotknutých osôb (Brigádnikov)
+4.1. Kontaktným miestom pre žiadosti Brigádnikov podľa čl. 15–22 GDPR je primárne Brigzy (e-mail: [doplniť]). Brigzy je povinná informovať Zadávateľa o každej žiadosti, ktorá sa týka údajov spracúvaných v mene alebo pre Zadávateľa.
+4.2. Zadávateľ je povinný spolupracovať pri vybavovaní žiadostí dotknutých osôb v lehotách podľa GDPR (spravidla 1 mesiac, max. 3 mesiace).
+4.3. Brigzy informuje Brigádnikov o existencii tejto dohody a o možnosti uplatniť práva voči obom spoločným správcom, a to prostredníctvom Privacy Policy Brigzy.sk.
+Článok 5 — Bezpečnostné opatrenia
+5.1. Obe zmluvné strany sa zaväzujú implementovať primerané technické a organizačné opatrenia podľa čl. 32 GDPR, najmä:
+Brigzy: šifrovanie r.č. v databáze, prístup iba pre oprávnených pracovníkov, hash overenie integrity dokumentov, zálohovanie dát,
+Zadávateľ: bezpečné uchovávanie mzdových listov a osobných spisov, obmedzenie prístupu k r.č., zabezpečenie e-mailovej komunikácie s r.č.
+5.2. V prípade bezpečnostného incidentu (čl. 33 GDPR) strana, ktorá incident zistí, bezodkladne (najneskôr do 24 hodín) informuje druhú zmluvnú stranu. Brigzy zabezpečuje podanie hlásenia dozornému orgánu (Úrad na ochranu osobných údajov SR) v lehote 72 hodín.
+Článok 6 — Subsprostredkovatelia
+6.1. Brigzy využíva nasledujúcich subsprostredkovateľov a informuje o nich Zadávateľa:
+Stripe Technology Europe, Ltd. — platobné a KYC služby (DPA dostupná na stripe.com/legal),
+Google Maps / Mapbox — mapové a lokačné služby (DPA dostupná online),
+Push notifikačná služba (napr. OneSignal / Firebase),
+E-mail / SMS provider (napr. SendGrid, Twilio),
+Cloudový hosting (napr. AWS, GCP) — DPA a SCC dostupné online.
+6.2. Brigzy zabezpečuje, aby všetci subsprostredkovatelia poskytovali dostatočné záruky podľa čl. 28 GDPR. O zmene subsprostredkovateľov informuje Zadávateľa s primeraným predstihom.
+6.3. Prenos osobných údajov mimo EÚ/EHP (napr. USA) je zabezpečený prostredníctvom Štandardných zmluvných doložiek (SCC) alebo Data Privacy Framework (DPF). Brigzy overuje aktuálny status DPF pred podpisom každej DPA.
+Článok 7 — Záverečné ustanovenia
+Táto dohoda sa uzatvára na rovnakú dobu ako Sprostredkovateľská zmluva, ktorej je prílohou.
+Spravuje sa právnym poriadkom SR a nariadením GDPR (EÚ) 2016/679.
+V prípade rozporu medzi touto dohodou a Sprostredkovateľskou zmluvou má prednosť táto dohoda v časti týkajúcej sa osobných údajov.
+
+❓ OTVORENÉ PRE PRÁVNIKA — SÚHRN
+1) Potvrdiť model joint controllers vs. processor a upraviť dohodu podľa záverov. 2) Vypracovať DPIA pre GPS sledovanie a Device ID anti-fraud systém (čl. 35 GDPR). 3) Vypracovať balančné testy oprávneného záujmu pre GPS a Device ID. 4) Overiť, či štandardné online DPA od Stripe a Google Maps postačujú alebo sú potrebné individuálne zmluvy. 5) Potvrdiť doby uchovávania osobných dokladov (osobný spis 70 rokov veku) a kto je za ne zodpovedný.
+
+Miesto a dátum uzavretia: [doplniť]
+
+Brigzy / Renewo (podpis)
+
+Zadávateľ (podpis, pečiatka)

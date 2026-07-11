@@ -26,6 +26,22 @@ updated: 2026-06-07
 > the core. Status legend below: items the accountant confirmed are marked **ACCOUNTANT-CONFIRMED**;
 > lawyer-template items stay open but non-blocking.
 
+> **Update 2026-07-08 — lawyer contract templates received + app data map generated.**
+> 12 vzory prišli od právnika (`docs/reference/contract-previews/`, dátumované jún 2026,
+> "opravená terminológia") — DoVP, DoPČ bežná/sezónna, ZoD, VOP B2B/C2C/Brigádnici,
+> Sprostredkovateľská zmluva, DPA Joint Controllers, Privacy Policy, VOP Brigzy,
+> terminológia. Owner: **ešte sa môžu meniť**, nebrať ako finálne. Zhoda s appkou:
+> poplatky/storno/no-show/KYC/Brigy coins/GPS sedia. **Nesedí (C-12):** všetky 4 zmluvné
+> vzory povoľujú podpis len vlastnoručne+foto alebo KEP/eID — appka má mock SMS OTP.
+> Ponechané zámerne do finalizácie vzorov (rozhodnutie ownera 2026-07-08). Pri tej
+> príležitosti vznikla aj `docs/reference/contract-previews/App-Data-Mapa-2026-07.md` —
+> kompletná technická mapa appky (obrazovky/DB/storage/edge fns/subdodávatelia) priamo z
+> produkčnej DB, podklad pre C-9 ROPA. Zistilo sa navyše: **čl. 17/20 GDPR (výmaz,
+> prenositeľnosť) je v appke len UI mock bez funkčnosti** — `/privacy` tlačidlá nič
+> nerobia, a v DB chýba mazací/anonymizačný mechanizmus (väčšina FK na `users.id` je
+> `NO ACTION`, nie `CASCADE`). Treba doriešiť pred spracúvaním reálnych dát ostrých
+> používateľov.
+
 ## ✅ Locked strategic decision
 **Payment architecture = Stripe Connect; Brigzy NEVER holds user funds.** This single
 choice removes the NBS licence requirement (C-2) and most AML duties (C-4). "Everything

@@ -1,0 +1,90 @@
+BRIGZY.SK
+VSEOBECNE OBCHODNE PODMIENKY
+Platforma Brigzy.sk — pre Zadavatelov C2C (fyzicke osoby — nepodnikatelia)
+Verzia 1.0 — vzor pre Brigzy.sk (jun 2026) | [OPRAVENA TERMINOLOGIA - jun 2026]
+POZNAMKA K DOKUMENTU: Tieto VOP sa vztahuju vyhradne na Zadavatelov C2C — fyzicke osoby nepodnikatelov. Uplatňuje sa plny spotrèbitelskoprávny rezim podla zakona c. 250/2007 Z. z. Financne pokuty voci Brigadnikovi-spotrebitelovi v predformulovaných zmluvach su absolutne neplatne (par. 53 ods. 4-5 OZ).
+1. Uvodni ustanovenia a definicie
+1.1. Tieto VOP upravuju prava a povinnosti medzi spolocnostou Renewo (dalej len Brigzy, ICO: 57476080) a Zadavatelom C2C pri pouzivani platformy Brigzy.sk.
+1.2. Definicie [OPRAVENE - pridane Brigy coins, Wallet, KYC, No-show, Kratkodoby rezim]:
+Platforma — webova a mobilna aplikacia Brigzy.sk vratane vsetkych jej funkcii.
+Zadavatel C2C — fyzicka osoba nepodnikatel hladajuca jednorazovu vypomoc.
+Brigadnik — fyzicka osoba registrovana na Platforme za ucelom vykonu Brigad.
+Brigada — konkretna pracovna prilezitost zverejnena Zadavatelom na Platforme.
+ZoD — Zmluva o dielo podla SS 631-643 Obcianskeho zakonnika (C2C vztah).
+Escrow — zmrazenie a podmienene uvolnenie prostriedkov prostredníctvom Stripe Connect.
+Servisny poplatok — odplata Brigzy za sprostredkovanie a technologicke sluzby Platformy.
+Wallet — prehlad zostatku Brigadnika na jeho Stripe Connected ucte.
+Brigy coins — interna virtualna lojalitna mena Platformy (nie elektronicke peniaze; nie su konvertibilne na EUR ani vyberateline na bankovy ucet).
+KYC — overenie totoznosti (Know Your Customer) vyzadovane Platformou a Stripe.
+No-show — situacia, ked Brigadnik zrusi potvrdenú Brigádu menej ako 12 hodin pred zaciatkom alebo sa vobec nedostavi.
+Kratkodoby rezim — rezim Platformy s povinnym vyuzitim Escrow (Stripe Connect). Dostupny pre jednorazove C2C Brigady.
+Zmluva o dielo — zmluva podla SS 631-643 OZ generovana systemom Brigzy pre C2C vztah.
+2. Postavenie Brigzy
+2.1. Brigzy je vyhradne technologickym a zmluvnym sprostredkovatelom a nie je zmluvnou stranou ZoD.
+2.2. Brigzy NIE JE:
+zamestnavatelom Brigadnika,
+agentúrou prace,
+poistovnou ani poisťovacim sprostredkovatelom,
+poskytovatelom platobnych sluzieb — platby realizuje Stripe Technology Europe, Ltd.
+3. Registracia
+3.1. Registracia C2C nevyzaduje firmne udaje. Vyzaduje sa meno, priezvisko, overene telefonne cislo a e-mail.
+3.2. Jeden pouzivatel moze mat len jeden aktivny ucet.
+4. Typ Brigady a zmluvny mechanizmus
+DOLEZITE: C2C rezim (ZoD) je dostupny VYHRADNE pre Brigady s konkretnym hmatatelnym vysledkom (dielo): kosenie zahrady, stahovanie, malbanie, montaz nabytku, jednorazove upratovanie. Pre opakovane cinnosti sa ZoD NESMI pouzit.
+4.1. System automaticky generuje ZoD (par. 631-643 OZ) pre C2C Brigady.
+5. Prilezitostny prijem Brigadnika
+5.1. Ak je Zadavatel fyzicka osoba-nepodnikatel, prijem Brigadnika z C2C ZoD moze byt oslobodeny od dane podla par. 9 ods. 1 pism. g) zakona c. 595/2003 Z. z. do vysky 500 EUR za rok.
+UPOZORNENIE: Toto oslobodenie NEPLATI, ak je Zadavatel pravnicka osoba alebo SZCO — v takom pripade aplikacia automaticky prepne do B2B rezimu. Brigzy nezodpoveda za danove povinnosti Brigadnika.
+6. Financna architektura — Escrow a Stripe Connect
+6.1. Platby v C2C rezime sa realizuju prostrednictvom Stripe Connect. Brigzy neodrzi prostriedky.
+6.2. Zivotnyt cyklus platby:
+Pending — Zadavatel potvrdil vyber Brigadnika, prostriedky zmrazene v Escrow.
+Cleared — Brigada dokoncena a schvalena, prostriedky uvolnene do Wallet Brigadnika.
+Disputed — nahlaseny spor, transakcia zmrazena do rozhodnutia podpory Brigzy.
+6.3. Minimalny limit vyberu z Wallet na bankovy ucet je 15 EUR.
+7. Servisny poplatok
+7.1. Za sprostredkovanie Brigady v C2C Kratkodobom rezime si Brigzy uctuje Servisny poplatok vo vyske 2 EUR + 10 % z ceny Brigady (bez DPH).
+7.2. Servisny poplatok je splatny pri zlozeni prostriedkov do Escrow a v pripade zrusenia sa nevraciava, s vynimkou zavinenych pripadov zo strany Brigzy.
+8. Storno podmienky C2C
+PRAVNE UPOZORNENIE: Financne pokuty voci Brigadnikovi-spotrebitelovi su absolutne neplatne (par. 53 ods. 4-5 OZ). Sankcie su vyhradne reputacne.
+8.1 Zrusenie Zadavatelom:
+Cas zrusenia
+Refundacia Zadavatelovi
+Uvolnenie Brigadnikovi
+Viac ako 24 hodin
+Plna refundacia
+0 EUR (Servisny poplatok sa nevraciava)
+12-24 hodin
+Refundacia 80 %
+20 % — nahrada straty prijmu
+Menej ako 12 hodin
+Refundacia 50 %
+50 % — nahrada preukázateľnej skody
+8.2 No-show Brigadnikom:
+Ak Brigadnik zrusi potvrdenu Brigadu menej ako 12 hodin pred zaciatkom (No-show), Zadavatelovi sa vracia plna zlozena suma. Brigadnik je sankcionovany vyhradne reputacnym systemom — ziadna financna pokuta.
+9. Zakaz obchadzania platformy
+9.1. Zadavatel sa zavazuje, ze po dobu 6 mesiacov od prveho kontaktu s Brigadnikom cez Platformu nebude s nim uzatvaraat zmluvne vztahy mimo Platformy za ucelom vyhnutia sa Servisnemu poplatku.
+9.2. V pripade porusenia je Brigzy opravnena pozadovat nahradu vo vyske Servisneho poplatku, min. 100 EUR.
+10. Hodnotenia
+10.1. Zadavatel moze po dokonceni Brigady ohodnotit Brigadnika (1-5 hviezdiciek). Hodnotenie musi byt pravdive.
+11. Ochrana osobnych udajov
+11.1. Brigzy spracuva osobne udaje Zadavatela C2C na zaklade plnenia zmluvy (cl. 6 ods. 1 pism. b) GDPR). V C2C vzťahu sa rodne cislo Brigadnika NEVYZADUJE a NEZBIERA.
+11.2. Zadavatel sa zavazuje spracuvat osobne udaje Brigadnika vyhradne na ucel realizacie konkretnej Brigady.
+12. Zodpovednost
+12.1. Celkova zodpovednost Brigzy voci Zadavatelovi C2C je obmedzena vyskou Servisneho poplatku za konkretnu Brigadu.
+12.2. Brigzy nezodpoveda za skodu sposobenú Brigadnikom na majetku alebo zdravi Zadavatela.
+OTVORENE PRE PRAVNIKA: Rozsah limitacie zodpovednosti voci spotrebitelovi potvrdit (zakon c. 250/2007 Z. z.).
+13. Poistenie
+PRAVNE UPOZORNENIE: Pred aktivaciou poistneho produktu nutna konzultacia s pravnikom (licencia financneho agenta).
+13.1. Brigady v Kratkodobom C2C rezime mozu byt kryte poistenim zodpovednosti za skodu. Brigzy vystupuje len ako odkazujuci subjekt na produkt FinExpert Group.
+14. Skoncenie
+14.1. Zadavatel moze zrusit ucet kedykolvek po vyrovnani splatnych zavazkov.
+14.2. Brigzy moze zrusit ucet pri zavaznom poruseni VOP.
+15. Riesenie sporov
+15.1. Tieto VOP sa spravuju pravnym poriadkom SR. Na riesenie sporov su prislusne sudy SR.
+15.2. Zadavatel — spotrebitel — ma pravo obratit sa na SOI (www.soi.sk) alebo ARS: https://ec.europa.eu/odr.
+16. Zaverecne ustanovenia
+Brigzy moze tieto VOP menit s oznamenim najmenej 14 dni vopred.
+Pokracovanim v pouzivani Platformy Zadavatel vyjadruje suhlas so zmenami VOP.
+Neplatnost jedneho ustanovenia sa nedotyká platnosti ostatnych.
+Brigzy.sk — vzorovy dokument, podliehá schváleniu právnikom

@@ -1,0 +1,293 @@
+BRIGZY.SK
+VŠEOBECNÉ OBCHODNÉ PODMIENKY
+Platforma Brigzy.sk — pre Zadávateľov B2B, Zadávateľov C2C a Brigádnikov
+Verzia 1.1 | Platnosť od: jún 2026 | Aktualizácia: jún 2026
+Prevádzkovateľ: Dávid Kresčanko – Renewo, so sídlom Prešov, Slovenská republika, IČO: 57476080, e-mail: support@brigzy.sk, tel.: dostupný na brigzy.sk/kontakt. Orgán dozoru: Slovenská obchodná inšpekcia (SOI), Inšpektorát SOI pre Prešovský kraj.
+
+Obsah
+ČASŤ A — Spoločné ustanovenia (platia pre všetkých)
+ČASŤ B — Ustanovenia pre Zadávateľov B2B (firmy a SZČO)
+ČASŤ C — Ustanovenia pre Zadávateľov C2C (fyzické osoby – nepodnikatelia)
+ČASŤ D — Ustanovenia pre Brigádnikov (Workers)
+ČASŤ E — Právo na odstúpenie od zmluvy (spotrebitelia)
+
+ČASŤ A — SPOLOČNÉ USTANOVENIA
+
+A1. Úvodné ustanovenia a definície
+Tieto Všeobecné obchodné podmienky (ďalej len „VOP“) upravujú práva a povinnosti medzi prevádzkovateľom platformy Brigzy.sk, spoločnosťou Dávid Kresčanko – Renewo (IČO: 57476080, ďalej len „Brigzy“) a jej používateľmi pri využívaní platformy Brigzy.sk.
+A1.1 Definície
+Platforma — webová a mobilná aplikácia Brigzy.sk vrátane všetkých funkcií.
+Zadávateľ B2B — právnická osoba alebo SZČO využívajúca Platformu na hľadanie pracovnej sily.
+Zadávateľ C2C — fyzická osoba nepodnikateľ hľadajúca jednorazovú výpomoc.
+Brigádnik (Worker) — fyzická osoba registrovaná na Platforme za účelom výkonu Brigád.
+Brigáda — konkrétna pracovná príležitosť zverejnená Zadávateľom na Platforme.
+DoVP — Dohoda o vykonaní práce podľa § 226 Zákonníka práce.
+DoPČ — Dohoda o pracovnej činnosti podľa § 228a Zákonníka práce.
+ZoD — Zmluva o dielo podľa § 631–643 Občianskeho zákonníka (C2C vzťah).
+Escrow — zmrazenie a podmienené uvoľnenie prostriedkov cez Stripe Connect.
+Servisný poplatok — odplata Brigzy za sprostredkovanie.
+Wallet — prehľad zostatku Brigádnika na jeho Stripe Connected účte.
+Brigy coins — interná virtuálna lojalitná mena Platformy (nie elektronické peniaze).
+KYC — overenie totožnosti (Know Your Customer) vyžadované Platformou a Stripe.
+Spotrebiteľ — fyzická osoba nepodnikateľ konajúca mimo rámca svojej podnikateľskej činnosti.
+
+A1.2 Informačné povinnosti pred uzatvorením zmluvy (§ 3 zák. č. 102/2014 Z. z.)
+Pred uzatvorením zmluvy na diaľku je Brigzy povinná poskytnúť spotrebiteľovi nasledovné informácie, ktoré sú dostupné na Platforme a v týchto VOP:
+totožnosť prevádzkovateľa: Dávid Kresčanko – Renewo, IČO: 57476080, sídlo: Prešov, SR;
+kontaktné údaje: e-mail support@brigzy.sk, kontaktný formulár na brigzy.sk/kontakt;
+hlavná vlastnosť služby: sprostredkovanie pracovných príležitostí (Brigád) prostredníctvom online platformy;
+celková cena vrátane servisného poplatku: zobrazená pred potvrdením Brigády;
+podmienky platby: úhrada vopred cez Stripe Connect (Escrow);
+právo na odstúpenie od zmluvy: podrobne v Časti E týchto VOP;
+trvanie zmluvy: na dobu trvania konkrétnej Brigády;
+orgán dohľadu: SOI, Inšpektorát pre Prešovský kraj.
+
+A2. Postavenie platformy Brigzy
+Brigzy je výhradne technologickým a zmluvným sprostredkovateľom. Brigzy NIE JE:
+zamestnávateľom Brigádnikov,
+agentúrou práce ani agentúrou dočasného zamestnávania (§ 29 zák. č. 5/2004 Z. z.),
+zmluvnou stranou DoVP, DoPČ ani ZoD,
+poisťovňou ani poisťovacím sprostredkovateľom,
+poskytovateľom platobných služieb — platby realizuje Stripe Technology Europe, Ltd.
+Zamestnávateľom Brigádnika je vždy a výlučne Zadávateľ. Brigzy nezodpovedá za výsledok, kvalitu ani riadne vykonanie Brigády.
+
+A2.1 Transparentnosť rankingu a statusu používateľov (smernica Omnibus 2019/2161/EÚ)
+V súlade so smernicou EÚ 2019/2161/EÚ platnou od 28. 5. 2022 Brigzy informuje:
+Hodnotenia (hviezdičky) pochádzajú výhradne od overených používateľov, ktorí skutočne absolvovali danú Brigádu.
+Poradie zobrazovania Brigád v zozname je určované algoritmom zohľadňujúcim: aktuálnosť, hodnotenie, vzdialenosť a relevanciu. Platené zvýraznenie (Premium) je vždy označené.
+Brigzy informuje spotrebiteľa, či protistrana je podnikateľ (B2B) alebo nepodnikateľ (C2C), a to pri každej Brigáde.
+
+A3. Registrácia a používateľský účet
+Registrácia vyžaduje uvedenie pravdivých, úplných a aktuálnych osobných a kontaktných údajov. Každý používateľ môže mať len jeden aktívny účet. Vytvorenie duplicitných alebo falošných účtov je zakázané a vedie k okamžitému zrušeniu všetkých dotknutých účtov.
+Brigzy si vyhradzuje právo odmietnuť registráciu, obmedziť alebo zrušiť účet pri porušení VOP, nepravdivých údajoch alebo ak používateľ neprejde KYC procesom.
+
+A4. Platobná architektúra — Escrow a Stripe Connect
+Platby za Brigády sa realizujú prostredníctvom Stripe Connect. Brigzy v žiadnom okamihu nedrží prostriedky Zadávateľa ani Brigádnika. Životný cyklus platby:
+Pending — Zadávateľ potvrdil výber Brigádnika, prostriedky zmrazené v Escrow.
+Cleared — Brigáda dokončená a schválená, prostriedky uvoľnené Brigádnikovi.
+Disputed — nahlásený spor, transakcia zmrazená do rozhodnutia podpory Brigzy.
+Minimálny limit výberu z Wallet na bankový účet je 15 €.
+
+A5. Zákaz obchádzania platformy
+Každý používateľ sa zaväzuje, že po dobu 6 mesiacov od prvého kontaktu s konkrétnym protistranným používateľom prostredníctvom Platformy nebude s touto osobou uzatvárať zmluvné vzťahy mimo Platformy s cieľom obísť Servisný poplatok. Toto ustanovenie sa nevzťahuje na vzťahy preukázateľne existujúce pred prvým kontaktom cez Platformu.
+Poznámka k spotrebiteľom: V prípade porušenia tohto záväzku spotrebiteľom (Zadávateľ C2C alebo Brigádnik-spotrebiteľ) má Brigzy nárok iba na náhradu skutočne preukázateľnej škody (ušlý Servisný poplatok), nie na zmluvnú pokutu. Akákoľvek paušálna sankcia voči spotrebiteľovi by bola v rozpore s § 53 ods. 4–5 Občianskeho zákonníka.
+
+A6. Hodnotenia a reputácia
+Brigzy prevádzkuje verejný reputačný systém pozostávajúci z hviezdičkových hodnotení (1–5) a XP bodov. Hodnotenia musia byť pravdivé a vecné. Nepravdivé, urážlivé alebo diskriminačné hodnotenia môžu byť odstránené. Brigzy si vyhradzuje právo obmedziť prístup k Brigádam na základe dlhodobo nízkeho hodnotenia alebo opakovaného porušovania VOP.
+
+A7. Ochrana osobných údajov
+Brigzy spracúva osobné údaje používateľov v súlade s nariadením GDPR (EÚ) 2016/679 a zákonom č. 18/2018 Z. z. Právnym základom spracovania sú čl. 6 ods. 1 písm. b) (plnenie zmluvy) a písm. c) (zákonná povinnosť). Podrobné informácie o právnych základoch, dobách uchovávania a právach dotknutých osôb sú dostupné v Zásadách ochrany osobných údajov na brigzy.sk/privacy.html.
+Rodné číslo Brigádnika sa zbiera VÝHRADNE pri vzniku DoVP alebo DoPČ a prenáša sa Zadávateľovi výlučne na účely registrácie v Sociálnej a zdravotnej poisťovni. Plošný zber rodného čísla pri registrácii je zakázaný.
+
+A8. Duševné vlastníctvo
+Všetok obsah Platformy vrátane dizajnu, loga, textov a zdrojového kódu je chránený autorským právom. Bez písomného súhlasu Brigzy nie je povolené obsah kopírovať, distribuovať ani upravovať.
+
+A9. Zmeny VOP
+Brigzy môže tieto VOP meniť. O zmene budú spotrebitelia informovaní prostredníctvom Platformy alebo e-mailom najmenej 14 dní vopred. Pokračovaním v používaní Platformy po nadobudnutí účinnosti zmien používateľ vyjadruje súhlas so zmenenými VOP. Spotrebiteľ má právo VOP odmietnuť a ukončiť zmluvu bez sankcie pred nadobudnutím ich účinnosti.
+
+A10. Záverečné a alternatívne riešenie sporov
+Tieto VOP sa spravujú právnym poriadkom Slovenskej republiky. Na riešenie sporov sú príslušné súdy SR. Neplatnosť jedného ustanovenia sa nedotýka platnosti ostatných.
+Spotrebiteľ má právo obrátiť sa na orgán alternatívneho riešenia sporov:
+Slovenská obchodná inšpekcia (SOI) — www.soi.sk
+Platforma RSO Európskej komisie — https://ec.europa.eu/odr
+Brigzy sa zaväzuje zúčastniť sa mimosúdneho riešenia sporu. Pred podaním návrhu na ARS je spotrebiteľ povinný zaslať sťažnosť na support@brigzy.sk; Brigzy odpovie do 30 dní.
+
+ČASŤ B — ZADÁVATELIA B2B (firmy a SZČO)
+
+B1. Aplikácia tejto časti
+Táto časť VOP sa vzťahuje výhradne na Zadávateľov — právnické osoby a fyzické osoby podnikateľov (SZČO), ktorí využívajú Platformu na vyhľadávanie a zamestnávanie Brigádnikov na základe DoVP alebo DoPČ.
+
+B2. Povinnosti Zadávateľa B2B ako zamestnávateľa
+Zadávateľ ako zamestnávateľ je povinný pred nástupom každého Brigádnika:
+zaregistrovať sa v Sociálnej poisťovni ako zamestnávateľ, ak tak ešte neurobil;
+prihlásiť Brigádnika do Sociálnej poisťovne (RLFO, kód 3 = DoVP alebo kód 4 = DoPČ) najneskôr pred začatím výkonu práce (§ 231 zákona č. 461/2003 Z. z.);
+prihlásiť Brigádnika v príslušnej zdravotnej poisťovni;
+zraziť a odviesť preddavok na daň z príjmu zo závislej činnosti (§ 35 ZDP);
+odviesť poistné na sociálne a zdravotné poistenie v zákonnej výške a lehote;
+viesť mzdovú agendu (mzdový list, mzdové doklady) a uchovávať ju v zákonných lehotách.
+Brigzy môže na základe splnomocnenia Zadávateľa technicky podať RLFO do Sociálnej poisťovne v jeho mene. Zodpovednosť za správnosť, úplnosť a včasnosť registrácie nesie v plnom rozsahu vždy Zadávateľ.
+
+B3. Typy zmlúv v B2B vzťahu
+Systém Brigzy automaticky generuje správny typ zmluvy na základe charakteru Brigády:
+Dohoda o vykonaní práce (DoVP) — pre jednorazovú prácu s konkrétnym výsledkom (max. 350 h/rok u toho istého zamestnávateľa).
+Dohoda o pracovnej činnosti — bežná (DoPČ) — pre opakujúcu sa činnosť, max. 10 h/týždeň v priemere.
+Dohoda o pracovnej činnosti — sezónna (DoPČ sezónna) — pre sezónne práce podľa prílohy č. 1b Zákonníka práce, max. 520 h/rok a max. 8 mesiacov.
+Nesprávne použitie typu zmluvy môže byť posúdené ako nelegálne zamestnávanie s pokutou 2 000 – 200 000 € (zákon č. 82/2005 Z. z.). Systém Brigzy blokuje vystavenie zmluvy pri dosiahnutí zákonných limitov. Brigzy nezodpovedá za správnosť zaradenia, ak Zadávateľ uviedol nepravdivý popis Brigády.
+
+B4. Servisný poplatok — B2B
+Výška Servisného poplatku pre B2B Zadávateľov je uvedená v platnom cenníku Brigzy dostupnom na Platforme a odsúhlasenom pri registrácii.
+
+B5. Storno podmienky — B2B
+Čas zrušenia
+Refundácia Zadávateľovi
+Uvoľnenie Brigádnikovi
+Viac ako 24 hodín pred začiatkom
+Plná refundácia zloženej sumy
+0 € (Servisný poplatok sa nevracia)
+12 – 24 hodín pred začiatkom
+Refundácia 80 % zloženej sumy
+20 % ako náhrada preukázateľnej škody
+Menej ako 12 hodín pred začiatkom
+Refundácia 50 % zloženej sumy
+50 % ako náhrada preukázateľnej škody
+
+V prípade sporu je transakcia zmrazená a podpora Brigzy rozhodne na základe dostupných dôkazov (QR check-in/out, fotodokumentácia, komunikácia v čete).
+
+B6. Zodpovednosť a jej obmedzenie — B2B
+Celková zodpovednosť Brigzy voči Zadávateľovi B2B za akúkoľvek škodu je obmedzená výškou Servisného poplatku uhradného za konkrétnu Brigádu, v súvislosti s ktorou škoda vznikla. Brigzy nezodpovedá za škodu spôsobenú Brigádnikom na majetku alebo zdraví Zadávateľa ani tretích osôb.
+Zadávateľ sa zaväzuje v plnom rozsahu odškodniť Brigzy za akúkoľvek škodu, pokutu alebo sankciu, ktoré vzniknú Brigzy v dôsledku porušenia povinností Zadávateľa ako zamestnávateľa.
+
+ČASŤ C — ZADÁVATELIA C2C (fyzické osoby – nepodnikatelia)
+
+C1. Aplikácia tejto časti a spotrebiteľský režim
+Táto časť VOP sa vzťahuje výhradne na Zadávateľov — fyzické osoby nepodnikateľov (občanov), ktorí využívajú Platformu na hľadanie jednorazovej výpomoci v domácnosti, záhrade alebo pri sťahovaní. Uplatňuje sa plný spotrebiteľský režim podľa zákona č. 250/2007 Z. z. o ochrane spotrebiteľa, zákona č. 102/2014 Z. z. o ochrane spotrebiteľa pri predaji tovaru alebo poskytovaní služieb na základe zmluvy uzavretej na diaľku a § 52 a nasl. Občianskeho zákonníka.
+
+C2. Typ Brigády a zmluvný mechanizmus — C2C
+C2C režim je dostupný VÝHRADNE pre Brigády s konkrétnym, hmatateľným alebo nehmotne zachyteným výsledkom — dielom (napr. kosenie záhrady, sťahovanie nábytku, maľovanie, montáž nábytku, jednorazové upratovanie). Pre opakujúce sa činnosti sa ZoD nesmie použiť.
+Systém automaticky generuje Zmluvu o dielo podľa § 631–643 Občianskeho zákonníka.
+
+C3. Príležitostný príjem Brigádnika v C2C
+Príjem Brigádnika z C2C Zmluvy o dielo môže byť oslobodený od dane podľa § 9 ods. 1 písm. g) zákona č. 595/2003 Z. z. do výšky 500 € za kalendárny rok — VÝHRADNE pri čisto C2C vzťahu (objednávateľ je nepodnikateľ). Brigzy nezodpovedá za daňové povinnosti Brigádnika.
+
+C4. Servisný poplatok — C2C
+Za sprostredkovanie Brigády v C2C režime si Brigzy účtuje Servisný poplatok vo výške 2 € + 10 % z ceny Brigády. Servisný poplatok je splatný pri zložení prostriedkov do Escrow a v prípade zrušenia Brigády sa nevracia, s výnimkou prípadov výlučného zavinenia Brigzy alebo uplatnenia práva na odstúpenie od zmluvy podľa Časti E.
+
+C5. Storno podmienky — C2C
+Zadávateľ C2C je v pozícii spotrebiteľa. Čiastky uvoľňované Brigádnikovi pri storne predstavujú výhradne náhradu preukázateľných nákladov a skutočnej straty príjmu Brigádnika — nie zmluvnú pokutu (§ 53 ods. 4–5 OZ).
+
+Zrušenie Brigády Zadávateľom C2C:
+Čas zrušenia
+Refundácia Zadávateľovi
+Uvoľnenie Brigádnikovi
+Viac ako 24 hodín pred začiatkom
+Plná refundácia zloženej sumy
+0 € (náhrada škody nevznikla)
+12 – 24 hodín pred začiatkom
+Refundácia 80 % zloženej sumy
+20 % — náhrada preukázateľnej straty
+Menej ako 12 hodín pred začiatkom
+Refundácia 50 % zloženej sumy
+50 % — náhrada preukázateľnej škody
+
+No-show alebo zrušenie Brigádnikom:
+Ak Brigádnik zruší menej ako 12 hodín pred začiatkom alebo sa nedostaví, Zadávateľovi sa vracia plná zložená suma. Brigádnik je sankcionovaný výhradne reputačným systémom (nie finančnou pokutou).
+
+C6. Zodpovednosť — C2C
+Celková zodpovednosť Brigzy voči Zadávateľovi C2C je obmedzená výškou Servisného poplatku uhradného za konkrétnu Brigádu. Brigzy nezodpovedá za škodu spôsobenú Brigádnikom na majetku alebo zdraví Zadávateľa.
+
+C7. Riešenie sporov — C2C
+Zadávateľ — spotrebiteľ — má právo obrátiť sa so sťažnosťou na Slovenská obchodná inšpekcia (SOI), www.soi.sk, alebo využiť platformu alternatívneho riešenia sporov dostupnú na https://ec.europa.eu/odr. Kontaktná adresa pre podania: support@brigzy.sk.
+
+ČASŤ D — BRIGÁDNICI (Workers)
+
+D1. Aplikácia tejto časti
+Táto časť VOP upravuje vzťah medzi Brigzy a Brigádnikom. Pracovnoprávny vzťah vzniká výhradne medzi Brigádnikom a Zadávateľom na základe osobitnej zmluvy (DoVP/DoPČ/ZoD).
+
+D2. Registrácia a overenie totožnosti (KYC)
+Brigádnik je pri registrácii povinný uviesť pravdivé, úplné a aktuálne osobné údaje: meno, priezvisko, dátum narodenia, adresu, overené telefónne číslo a e-mail.
+KYC systém pozostáva z troch vrstiev:
+Stripe Connect KYC (meno, adresa, dátum narodenia, IBAN) — pri registrácii.
+Stripe Identity (foto dokladu + selfie) — pri vyšších objemoch transakcií.
+Brigzy formulár (rodné číslo, zdravotná poisťovňa) — výhradne pri vzniku DoVP/DoPČ, nie pri registrácii.
+
+D3. Práva a povinnosti Brigádnika
+Brigádnik je oprávnený:
+vyhľadávať Brigády na mape a uchádzať sa o ne,
+vyjednávať o odmene prostredníctvom integrovaného četu,
+sledovať stav platieb vo Wallet a vyberať prostriedky na bankový účet (min. 15 €),
+zbierať Brigy coins a uplatňovať ich na prémiové funkcie.
+Brigádnik sa zaväzuje:
+vykonávať Brigádu osobne, riadne, v dohodnutom čase a mieste,
+zaznamenávať príchod a odchod prostredníctvom QR check-in/check-out v aplikácii,
+správať sa voči Zadávateľovi a jeho majetku s náležitou starostlivosťou,
+bezodkladne nahlásiť prípadnú škodu alebo incident prostredníctvom aplikácie,
+spĺňať osobitné požiadavky Zadávateľa uvedené v inzeráte (vek, prax, osvedčenie).
+Brigádnik sa zaväzuje zdržať sa:
+poskytovania nepravdivých informácií o svojich kvalifikáciách alebo dostupnosti,
+obchádzania Platformy s cieľom vyhnúť sa Servisnému poplatku,
+vytvárania duplicitných alebo falošných účtov,
+výkonu Brigády pod vplyvom alkoholu alebo omamných látok,
+akéhokoľvek diskriminačného, urážlivého alebo obťažujúceho konania.
+
+D4. Odmena, Wallet a výplaty
+Odmena Brigádnika je stanovená dohodou medzi Brigádnikom a Zadávateľom prostredníctvom Platformy. Po dokončení a schválení Brigády sú prostriedky uvoľnené do Wallet Brigádnika.
+Splatnosť pri DoVP — po dokončení a odovzdaní práce.
+Splatnosť pri DoPČ — najneskôr do konca nasledujúceho kalendárneho mesiaca (§ 228 ods. 1 ZP).
+V B2C vzťahu (DoVP/DoPČ) je Zadávateľ ako zamestnávateľ povinný zraziť preddavok na daň a odviesť poistné. Vyplatená suma do Wallet je suma po odpočítaní zákonných zrážok.
+V C2C vzťahu (ZoD) je Brigádnik výlučne zodpovedný za správne zdanenie svojich príjmov.
+
+D5. Storno podmienky a No-show — Brigádnik
+Zrušenie viac ako 24 hodín pred začiatkom: dovolené bez sankcie.
+Zrušenie 12–24 hodín pred začiatkom: −50 Brigy coinov + −10 XP bodov.
+Zrušenie menej ako 12 hodín pred začiatkom alebo No-show: −100 Brigy coinov + pokles XP rebríčka + dočasné obmedzenie zobrazenia nových ponúk (24 hodín).
+Tri No-show/zrušenia v lehote menej ako 12 hodín v priebehu 90 dní = trvalý ban na Platforme.
+Žiadna finančná pokuta voči Brigádnikovi-spotrebiteľovi sa neuplatňuje — sankčný systém je výhradne reputačný, v súlade s § 53 ods. 4–5 Občianskeho zákonníka.
+
+D6. Systém Brigy coins
+Brigy coins NIE SÚ elektronickými peniazmi ani iným platobným prostriedkom v zmysle zákona č. 492/2009 Z. z. o platobných službách. Nie sú konvertibilné na EUR ani iné meny a nemôžu byť vybraté na bankový účet. Ich použitie je obmedzené výhradne na prémiové funkcie v rámci Platformy.
+
+Fixný interný ekvivalent: 100 Brigov = 1 € (výhradne pre prepočty prémiových funkcií). Brigy coins nie sú prenositeľné na iný účet a zanikajú zrušením účtu — nevzniká nárok na refundáciu.
+V prípade technickej chyby alebo zmeny systému Brigy coins Brigzy informuje používateľov min. 30 dní vopred a umožní im Brigy coins spotrebovať pred zmenou. Ak zmena systému znemožní čerpanie naakumulovaných coinov, Brigzy poskytne primeranú náhradu vo forme prémiových funkcií.
+
+Získavanie Brigy coins (Earning Engine):
++10 Brigov za každú riadne odpracovanú hodinu.
++25 Brigov za plné hodnotenie 5 hviezdičiek od Zadávateľa.
++150 Brigov jednorazovo za úspešné odporúčanie priateľa (max. 600 Brigov celkovo z referralov).
++50 Brigov mesačný bonus pri priemernom hodnotení nad 4,8 hviezdičky.
+Uplatnenie Brigy coins (Spending Engine):
+Premium na 30 dní: 500 Brigov.
+Topovanie profilu a prémiové odznaky podľa aktuálneho cenníka.
+
+D7. Zodpovednosť Brigádnika
+Brigádnik nesie plnú zodpovednosť za škodu, ktorú spôsobí Zadávateľovi, jeho majetku alebo zdraví, alebo tretím osobám, pri výkone Brigády. Brigádnik zodpovedá za pravdivosť všetkých údajov v profile.
+
+D8. Skončenie zmluvy s Brigádnikom
+Zmluvný vzťah medzi Brigzy a Brigádnikom trvá od registrácie do zrušenia účtu. Brigádnik môže zrušiť účet kedykoľvek po dokončení všetkých aktívnych Brigád.
+Brigzy môže okamžite a bez náhrady obmedziť alebo zrušiť účet Brigádnika pri: podvodnom konaní, troch No-show prípadoch v priebehu 90 dní, porušení zákazu obchádzania Platformy, nepravdivých KYC údajoch alebo akomkoľvek závažnom porušení VOP.
+
+D9. Riešenie sporov — Brigádnik
+Brigádnik — spotrebiteľ — má právo obrátiť sa so sťažnosťou na SOI alebo platformu ARS: https://ec.europa.eu/odr. Kontakt: support@brigzy.sk.
+
+ČASŤ E — PRÁVO NA ODSTÚPENIE OD ZMLUVY
+
+E1. Koho sa táto časť týka
+Táto časť sa vzťahuje výhradne na spotrebiteľov — fyzické osoby nepodnikatelia — teda na Zadávateľov C2C a Brigádnikov uzatvárajúcich zmluvy s Brigzy prostredníctvom online Platformy (zmluvy uzavreté na diaľku). Zadávatelia B2B (podnikatelia) nemajú právo na odstúpenie podľa tohto článku.
+
+E2. Právo na odstúpenie od Zmluvy o poskytovaní služieb
+V súlade s § 7 zákona č. 102/2014 Z. z. má spotrebiteľ právo odstúpiť od zmluvy uzavretej na diaľku (t. j. registrácie alebo zadania Brigády na Platforme) bez uvedenia dôvodu do 14 dní odo dňa uzatvorenia zmluvy.
+
+DÔLEŽITÉ UPOZORNENIE: Ak spotrebiteľ výslovne požiada o začatie poskytovania služieb pred uplynutím 14-dňovej lehoty (napr. potvrdí Brigádu a Brigádnik začne pracovať), právo na odstúpenie od zmluvy zaniká dokončením Brigády. Spotrebiteľ je o tejto skutočnosti upozornený pri zadávaní Brigády (tzv. súhlas so začatím plnenia pred uplynutím lehoty na odstúpenie, § 7 ods. 6 zák. č. 102/2014 Z. z.).
+
+E3. Ako uplatniť právo na odstúpenie
+Odstúpenie od zmluvy musí byť uplatnené písomne (e-mailom alebo poštou) pred uplynutím 14-dňovej lehoty. Spotrebiteľ môže použiť vzorový formulár na odstúpenie od zmluvy (Príloha č. 1 týchto VOP) alebo akýkoľvek iný jednoznačný prejav vôle obsahujúci:
+identifikáciu spotrebiteľa (meno, priezvisko, e-mailová adresa účtu),
+označenie zmluvy, od ktorej spotrebiteľ odstupuje (číslo Brigády alebo dátum registrácie),
+dátum odstúpenia,
+podpis (pri papierovom podaní).
+Odstúpenie zasielajte na: support@brigzy.sk alebo písomne na adresu prevádzkovateľa: Dávid Kresčanko – Renewo, Prešov, Slovenská republika.
+
+E4. Dôsledky odstúpenia — vrátenie platieb
+V prípade platného odstúpenia od zmluvy Brigzy vráti spotrebiteľovi všetky platby prijaté v súvislosti s danou Brigádou, a to bez zbytočného odkladu, najneskôr do 14 dní odo dňa doručenia odstúpenia, rovnakým spôsobom, akým bola platba prijatá (cez Stripe).
+Servisný poplatok Brigzy sa v prípade odstúpenia vracia IBA vtedy, ak Brigáda ešte nezačala (t. j. Brigádnik ešte nevykonal žiadnu prácu). Ak spotrebiteľ výslovne požiadal o začatie poskytovania pred uplynutím lehoty na odstúpenie, Brigzy si môže ponechať pomernú časť servisného poplatku zodpovedajúcu rozsahu poskytnutých služieb.
+
+E5. Výnimky z práva na odstúpenie
+Právo na odstúpenie od zmluvy sa neuplatňuje v prípade:
+zmluvy o poskytnutí služby, ak sa služba (Brigáda) začala plniť so výslovným súhlasom spotrebiteľa pred uplynutím lehoty na odstúpenie a spotrebiteľ bol informovaný, že tým stráca právo na odstúpenie;
+zmluvy, ktorej predmetom je poskytnutie služby, ktorá bola v plnom rozsahu splnená pred uplynutím lehoty na odstúpenie.
+
+E6. Vzorový formulár na odstúpenie od zmluvy
+PRÍLOHA č. 1 — VZOROVÝ FORMULÁR NA ODSTÚPENIE OD ZMLUVY
+
+Komu: Dávid Kresčanko – Renewo, IČO: 57476080, support@brigzy.sk
+
+Týmto oznamujem, že odstupujem od zmluvy o poskytovaní služby:
+Číslo Brigády / dátum objednávky: ___________________________
+Meno a priezvisko spotrebiteľa: _____________________________
+E-mailová adresa účtu: ____________________________________
+Adresa spotrebiteľa: ______________________________________
+Dátum odstúpenia: ______________________________________
+Podpis (ak sa podáva v listinnej podobe): ______________________
+
+Brigzy.sk — Všeobecné obchodné podmienky | Verzia 1.1, jún 2026
+Prevádzkovateľ: Dávid Kresčanko – Renewo, IČO: 57476080 | support@brigzy.sk | brigzy.sk
+Dátum poslednej aktualizácie: jún 2026 | Dokument podlieha finálnemu schváleniu právnikom.

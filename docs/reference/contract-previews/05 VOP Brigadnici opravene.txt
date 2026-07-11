@@ -1,0 +1,134 @@
+BRIGZY.SK
+VSEOBECNE OBCHODNE PODMIENKY
+Platforma Brigzy.sk — pre Brigadnikov (Workers)
+Verzia 1.0 — vzor pre Brigzy.sk (jun 2026) | [OPRAVENA TERMINOLOGIA - jun 2026]
+POZNAMKA: Tieto VOP sa vztahuju na pouzivatelov registrovanych v role Brigadnik. Pracovnopravny vztah vzniká vyhradne medzi Brigadnikom a Zadavatelom na zaklade osobitnej zmluvy (DoVP/DoPc/ZoD).
+1. Uvodni ustanovenia a definicie
+1.1. Tieto VOP upravuju prava a povinnosti medzi Renewo (Brigzy, ICO: 57476080) a Brigadnikom pri pouzivani Platformy Brigzy.sk.
+1.2. Definicie [OPRAVENE]:
+Brigadnik — fyzicka osoba registrovana na Platforme za ucelom vyhladavania a vykonu Brigad.
+Brigada — konkretna pracovna prilezitost zverejnena Zadavatelom na Platforme.
+Wallet — prehlad zostatku Brigadnika na jeho Stripe Connected ucte.
+Brigy coins — interna virtualna lojalitna mena Platformy (nie elektronicke peniaze; nie su konvertibilne na EUR ani vyberateline na bankovy ucet).
+KYC — overenie totoznosti (Know Your Customer) vyzadovane Platformou a Stripe.
+Escrow — zmrazenie a podmienene uvolnenie prostriedkov prostredníctvom Stripe Connect.
+No-show — situacia, ked Brigadnik zrusi potvrdenu Brigadu menej ako 12 hodin pred zaciatkom alebo sa vobec nedostavi.
+XP body — reputacne body Brigadnika zobrazovane v jeho verejnom profile.
+Servisny poplatok — odplata Brigzy za sprostredkovanie a technologicke sluzby Platformy.
+2. Postavenie Brigzy
+2.1. Brigzy je vyhradne technologickym a zmluvnym sprostredkovatelom. Brigzy NIE JE:
+zamestnavatelom Brigadnika,
+agentúrou docasneho zamestnávania,
+zmluvnou stranou zmluvy (DoVP/DoPc/ZoD),
+poistovaciou instituciiou,
+poskytovatelom platobnych sluzieb — zabezpecuje Stripe Technology Europe, Ltd.
+2.2. Brigzy nezarucuje minimalny pocet dostupnych Brigad ani urcitu vysku zarobku.
+3. Registracia, overenie totoznosti (KYC) a ucet
+3.1 Registracne udaje
+Brigadnik je povinny pri registracii uviest pravdive, uplne a aktualne osobne udaje.
+3.2 Trojvrstvovy KYC system
+Vrstva KYC
+Zbierane udaje
+Ucel a kedy sa aktivuje
+Stripe Connect KYC
+Meno, adresa, datum narodenia, IBAN
+Platobne ucely (PSD2) — pri registracii
+Stripe Identity
+Foto dokladu + selfie (AI matching)
+Biometricke overenie — pri vyssich objemoch transakcii
+Brigzy formular
+Rodne cislo, zdravotna poistovna, adresa TP
+LEN pri vzniku DoVP/DoPc — nie pri registracii
+PRAVNE UPOZORNENIE — RODNE CISLO: Rodne cislo sa zbiera VYHRADNE pri vzniku DoVP alebo DoPc a prenasa sa Zadavatelovi vyhradne na ucely registracie v SP/ZP. Plosny zber RC pri registracii je zakazany (par. 78 ods. 4 zakona c. 18/2018 Z. z.).
+4. Vyuzivanie platformy — prava a povinnosti Brigadnika
+4.1 Brigadnik je opravneny:
+vyhladavat Brigady a ucasat sa o ne,
+vyjednávat o odmene cez chat (funkcia Navrhnút novu sumu),
+sledovat stav platieb vo Wallet a vyberát prostriedky na bankovy ucet (min. 15 EUR),
+zbierát Brigy coins a uplatnovatích na premiumne funkcie.
+4.2 Brigadnik sa zavazuje:
+vykonavat Brigadu osobne, riadne, v dohodnutom case a mieste,
+zaznamenavat prichod a odchod prostredníctvom QR check-in/check-out v aplikácii Brigzy.sk,
+spravat sa voci Zadavatelovi a jeho majetku s nalezitou starostlivostou,
+bezodkladne nahlasiť pripadnu skodu alebo incident cez aplikáciu.
+4.3 Brigadnik sa zavazuje zdrzat sa:
+poskytovaniia nepravdivych informacii o kvalifikaciach,
+obchadzania Platformy s cielom vyhnút sa Servisnemu poplatku,
+vytvarania duplicitnych alebo falsosych uctov,
+manipulacie s hodnoteniami,
+odcudzenia alebo poskodeniiia majetku Zadavatela.
+5. Odmena, Wallet a vyplaty
+5.1. Odmena je stanovena dohodou medzi Brigadnikom a Zadavatelom cez Platformu.
+5.2. Po dokonceni a schvaleni Brigady su prostriedky uvolnene do Wallet Brigadnika.
+5.3. Minimalny limit vyberu z Wallet je 15 EUR.
+5.4. Splatnost: pri DoVP po dokonceni prace; pri DoPc najneskor do konca nasledujuceho mesiaca (par. 228 ods. 1 ZP).
+5.5. V B2C vztahu (DoVP/DoPc) zrazi Zadavatel preddavok na dan a odvody. Vyplatena suma je suma po odpocitani zakonnych zrazok.
+5.6. V C2C vztahu (ZoD) je Brigadnik vyhradne zodpovedny za spravne zdanenie prijmov.
+6. Storno podmienky a No-show
+6.1 Zrusenie potvrdenej Brigady Brigadnikom
+Zrusenie viac ako 24 hodin: dovolene bez sankcie.
+Zrusenie 12-24 hodin: -50 Brigy coins + -10 XP bodov.
+Zrusenie menej ako 12 hodin alebo No-show: -100 Brigy coins + pokles XP rebricka + docasne obmedzenie zobrazovania novych ponuk (24 hodin).
+Tri No-show v priebehu 90 dni = trvaly ban na Platforme.
+PRAVNE UPOZORNENIE: Ziadna financna pokuta voci Brigadnikovi-spotrebitelovi sa neuplatnuje — sankcie su vyhradne reputacne (Brigy coins, XP body), v sulade s par. 53 ods. 4-5 OZ.
+6.2 Zrusenie Brigady Zadavatelom
+Zadavatel zrusi viac ako 24 hodin: plna refundacia bez kompenzacie Brigadnika.
+Zadavatel zrusi 12-24 hodin: Brigadnik dostane 20 % zo zlozenej sumy ako nahradu straty prijmu.
+Zadavatel zrusi menej ako 12 hodin: Brigadnik dostane 50 % zo zlozenej sumy ako nahradu preukázateľnej skody.
+7. Reputacny system
+7.1. Brigzy prevadzkuje verejny reputacny system pozostavajuci z hviezdickovych hodnoteni (1-5) a XP bodov.
+7.2. Hodnotenia musia byt pravdive. Brigadnik moze poziadat o prezkumanie hodnotenia, ak ma dovod domnievat sa, ze je nepravdive.
+7.3. Brigzy si vyhradzuje pravo obmedzit pristup Brigadnika k Brigádam na zaklade dlhodobo nizkeho hodnotenia.
+8. System Brigy coins (interna lojalitna mena)
+KRITICKE PRAVNE UPOZORNENIE: Brigy coins NIE SU elektronickymi penazmi ani inym platobnym prostriedkom. Nie su konvertibilne na EUR ani ine meny a nemozu byt vyberane na bankovy ucet. Pouzitie je obmedzene vyhradne na nakup premiumnych funkcii v ramci Platformy.
+8.1 Zakladne pravidla:
+Fixny ekvivalent: 100 Brigov = 1 EUR (vyhradne pre interne prepocty premiumnych funkcii).
+Brigy coins nie su prenositelne na iny ucet.
+Brigy coins zanikaju zrusenim uctu — nevzniká nárok na refundaciu.
+Brigzy si vyhradzuje pravo upravit system so 14-dnovym oznamenim.
+8.2 Earning Engine — ziskavanie Brigy coins:
++10 Brigov za kazdu riadne odpracovanu hodinu (QR check-in/check-out).
++25 Brigov za plne hodnotenie 5 hviezdiciek od Zadavatela.
++150 Brigov jednorazovo po uspesnej konverzii referral priatela.
++50 Brigov mesacny bonus, ak priemerny rating neklesne pod 4,8.
+8.3 Spending Engine:
+Premium na 30 dni: 500 Brigov.
+Topovanie profilu a ine in-app vyhody podla aktualneho cennika.
+8.4 Anti-fraud:
+Dozivotny strop z referral systemu: max. 600 Brigov (4 uspesne konvertovani priatelia).
+Automaticka blokacia pri zhodnom IBAN, telefone alebo Device ID oboch uctov.
+9. Zakaz obchadzania platformy (Anti-circumvention)
+9.1. Brigadnik sa zavazuje, ze po dobu 6 mesiacov od prveho kontaktu s Zadavatelom cez Platformu nebude uzatvaräat zmluvne vztahy mimo Platformy za ucelom obisá Servisneho poplatku.
+9.2. V pripade porusenia je Brigzy opravnena okamzite zabanovát ucet Brigadnika a pozadovat nahradu zodpovedajucu Servisnemu poplatku.
+9.3. Toto ustanovenie sa nevztahuje na vztahy preukázateľne existujuce pred prvym kontaktom cez Platformu.
+10. Ochrana osobnych udajov
+10.1. Brigzy spracuva osobne udaje Brigadnika v sulade s GDPR. Blizsie informacie v Zasadach ochrany osobnych udajov Brigzy.sk.
+10.2. Brigadnik berie na vedomie spracuvanie GPS polohy pocas aktivnej Brigady (check-in/check-out) na pravnom zaklade opravneneho zaujmu.
+10.3. Brigadnik berie na vedomie spracuvanie Device ID na pravnom zaklade opravneneho zaujmu (prevencia podvodov).
+10.4. Rodne cislo je spracuvane VYHRADNE pri vzniku DoVP/DoPc a prenasane vyhradne prislusnemu Zadavatelovi.
+11. Zodpovednost Brigadnika
+11.1. Brigadnik nesie plnu zodpovednost za skodu sposobenu Zadavatelovi alebo tretim osobam pri vykone Brigady.
+11.2. Brigadnik zodpoveda za pravdivost vsetkych udajov v profile.
+11.3. Brigadnik sa zavazuje odskodonit Brigzy za akukolvek skodu vyhradne v dosledku jeho konani.
+12. Zodpovednost Brigzy voci Brigadnikovi
+12.1. Brigzy nezarucuje dostupnost Brigad ani urcity prijem.
+12.2. Celkova zodpovednost Brigzy voci Brigadnikovi je obmedzena vyskou sumy v Escrow za konkretnu Brigadu.
+12.3. Brigzy nezodpoveda za zdanovanie prijmov Brigadnika.
+13. Trvanie a skoncenie
+13.1. Zmluvny vztah trva od registracie do zrusenia uctu.
+13.2. Brigadnik moze zrusit ucet kedykolvek po dokonceni vsetkych aktivnych Brigad.
+13.3. Brigzy moze okamzite zrusit ucet Brigadnika pri:
+podvodnom konani,
+troch No-show v priebehu 90 dni,
+poruseni zakazu obchadzania Platformy,
+nepravdivych KYC udajoch,
+poskodeni majetku Zadavatela bez nahlasenia.
+14. Riesenie sporov
+14.1. Tieto VOP sa spravuju pravnym poriadkom SR.
+14.2. Brigadnik — spotrebitel — ma pravo obratit sa na SOI alebo ARS: https://ec.europa.eu/odr.
+15. Zaverecne ustanovenia
+Brigzy moze tieto VOP menit s oznamenim 14 dni vopred.
+Pokracovanim v pouzivani Platformy Brigadnik vyjadruje suhlas so zmenami VOP.
+Neplatnost jedneho ustanovenia sa nedotyká platnosti ostatnych.
+OTVORENE PRE PRAVNIKA: 1) Reputacny sankeny system (cl. 6) vs. zakaz pokut voci spotrebitelovi. 2) Device ID a GPS ako opravneny zaujem. 3) Limitacia zodpovednosti Brigzy (cl. 12.2). 4) Brigy coins system vs. vydavanie elektronickych penazi.
+Brigzy.sk — vzorovy dokument, podlieha schvaleniu pravnikom

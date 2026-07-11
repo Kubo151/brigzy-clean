@@ -1,0 +1,214 @@
+BRIGZY.SK
+VŠEOBECNÉ OBCHODNÉ PODMIENKY
+Platforma Brigzy.sk — pre Zadávateľov B2B (právnické osoby a SZČO)
+Verzia 1.0 — vzor pre Brigzy.sk (jún 2026)
+ℹ️ POZNÁMKA K DOKUMENTU
+Tento dokument je pracovným návrhom VOP pripraveným na základe Projektovej špecifikácie Brigzy.sk v2.7. Pred zverejnením je nevyhnutná kontrola advokátom (najmä ustanovenia o zodpovednosti, sankciách, storno podmienkach a obchádzaní platformy) a súlad s § 53a a nasl. Občianskeho zákonníka a zákonom č. 250/2007 Z. z. o ochrane spotrebiteľa v rozsahu, v akom sa B2B zadávateľ v konkrétnom prípade považuje za spotrebiteľa (neplatí pri s.r.o./SZČO podnikajúcich v rámci predmetu činnosti).
+
+1. Úvodné ustanovenia a definície
+1.1. Tieto Všeobecné obchodné podmienky (ďalej len “VOP“) upravujú vzájomné práva a povinnosti medzi spoločnosťou Renewo (ďalej len “Brigzy“, IČO: 57476080) a Zadávateľom — právnickou osobou alebo živnostníkom/SZČO (ďalej len “Zadávateľ“) pri používaní platformy Brigzy.sk (ďalej len “Platforma“).
+1.2. Definície:
+Platforma — webová a mobilná aplikácia Brigzy.sk vrátane všetkých jej funkcií.
+Zadávateľ — registrovaný používateľ vystupujúci v role právnickej osoby alebo SZČO, ktorý prostredníctvom Platformy ponúka pracovné príležitosti (Brigády).
+Brigádnik — registrovaný používateľ — fyzická osoba — ktorý prostredníctvom Platformy vyhľadáva a vykonáva Brigády.
+Brigáda — konkrétna pracovná príležitosť zverejnená Zadávateľom na Platforme.
+Krátkodobý režim — režim Platformy s povinným využitím Escrow (Stripe Connect).
+Dlhodobý režim — inzertný model „Brigzy Verified“ bez Escrow.
+Escrow — zmrazenie a podmienené uvoľnenie prostriedkov prostredníctvom Stripe Connect.
+Wallet — interný prehľad zostatku Brigádnika na jeho Stripe Connected účte.
+Zmluva — DoVP, DoPČ alebo iná zmluva uzatváraná medzi Zadávateľom a Brigádnikom prostredníctvom Platformy.
+Servisný poplatok — odplata Brigzy za sprostredkovanie a technologické služby Platformy.
+Brigy coins — interná virtuálna lojalitná mena Platformy (nie elektronické peniaze; nie sú konvertibilné na EUR a nie je možné ich vybrať na bankový účet).
+KYC — overenie totožnosti (Know Your Customer) vyžadované Platformou a Stripe.
+No-show — situácia, keď Brigádnik zruší potvrdenú Brigádu menej ako 12 hodín pred začiatkom alebo sa vôbec nedostaví.
+2. Postavenie Brigzy a charakter služby
+2.1. Brigzy je výhradne technologickým a zmluvným sprostredkovateľom („messenger“), ktorý poskytuje Zadávateľovi a Brigádnikovi technickú infrastruktúru na nájdenie, dohodnutie a zdokumentovanie spolupráce.
+2.2. Brigzy NIE JE:
+zamestnávateľom Brigádnika ani Zadávateľa,
+agentúrou dočasného zamestnávania v zmysle zákona č. 5/2004 Z. z. o službách zamestnanosti,
+zmluvnou stranou Zmluvy uzatváranej medzi Zadávateľom a Brigádnikom,
+poskytovateľom platobných služieb ani inštitúciou elektronických peňazí — tieto služby zabezpečuje výlučne Stripe Technology Europe, Ltd.
+2.3. Zadávateľ berie na vedomie a súhlasí s tým, že výlučnú zodpovednosť za:
+správnu právnu klasifikáciu pracovnoprávneho vzťahu (DoVP/DoPČ),
+registráciu Brigádnika v Sociálnej poisťovni a zdravotnej poisťovni,
+odvod poistného a dane z príjmu,
+dodržiavanie predpisov bezpečnosti a ochrany zdravia pri práci (BOZP) na pracovisku Zadávateľa,
+plnenie všetkých povinností vyplývajúcich zo Zákonníka práce a súvisiacich predpisov,
+nesie v plnom rozsahu Zadávateľ ako zamestnávateľ. Brigzy v tomto smere poskytuje len technickú asistenciu (napr. generovanie vzorov zmlúv a XML exportov), ktorá Zadávateľa v žiadnom prípade nezbavuje jeho zákonných povinností.
+3. Registrácia a používateľský účet
+3.1. Registrácia ako B2B Zadávateľ vyžaduje uvedenie pravdivých a úplných fakturačných údajov (obchodné meno, sídlo, IČO, DIČ, IČ DPH ak je platiteľom, meno a kontaktné údaje oprávnenej osoby).
+3.2. Zadávateľ zodpovedá za:
+pravdivosť, úplnosť a aktuálnosť všetkých uvedených údajov,
+zabezpečenie prístupových údajov a zamedzenie ich zneužitiu treťou osobou,
+všetky úkony vykonané prostredníctvom jeho účtu, vrátane úkonov vykonaných osobami, ktorým umožnil prístup.
+3.3. Brigzy je oprávnená overiť identitu a oprávnenie Zadávateľa konať za právnickú osobu (napr. výpisom z OR SR/ŽR SR) a registráciu podmieniť úspešným overením.
+3.4. Brigzy si vyhradzuje právo odmietnuť registráciu, zrušiť účet alebo obmedziť funkcionalitu Zadávateľovi, ktorý:
+uviedol nepravdivé alebo zavádzajúce údaje,
+opakovane porušil tieto VOP,
+je v omeškaní s úhradou Servisného poplatku,
+vykazuje známky podvodného alebo zneužívajúceho konania.
+4. Produktová matica a zmluvný mechanizmus
+4.1 Krátkodobý režim (Core produkt s Escrow)
+Zameranie: jednorazové a operatívne Brigády (od pár hodín do niekoľkých dní).
+Povinné využitie Escrow cez Stripe Connect — finančné prostriedky Zadávateľa sú zmrazené pred začatím práce a uvoľnené Brigádnikovi po riadnom dokončení.
+Systém automaticky vygeneruje DoVP (§ 226 ZP) alebo DoPČ (§ 228a ZP) podľa charakteru Brigády zadanej Zadávateľom.
+4.2 Dlhodobý režim (Inzertný model „Brigzy Verified“)
+Finančné plnenie prebieha kompletne mimo Platformy.
+Brigzy poskytuje výhradne inzertný priestor a prístup k overeným profilom Brigádnikov.
+⚠️ PRÁVNE UPOZORNENIE — DLHODOBÝ REŽIM
+Brigzy.sk v Dlhodobom režime poskytuje výhradne inzertný priestor. Za právnu správnosť dohôd uzatvorených mimo Platformy (DoVP, DoPČ, pracovná zmluva alebo iný typ zmluvy) zodpovedajú výhradne zmluvné strany — Zadávateľ a Brigádnik. Brigzy nezodpovedá za pracovnoprávnu klasifikáciu vzťahu vzniknutého na základe inzerátu uverejneného v Dlhodobom režime, ani za akékoľvek škody, sankcie alebo nároky vyplývajúce z takéhoto vzťahu.
+
+5. Zmluvná matica a klasifikácia práce
+5.1. Platforma na základe údajov zadaných Zadávateľom (typ Zadávateľa, popis Brigády) automaticky priraďuje typ Zmluvy:
+DoVP (§ 226 ZP) — práca vymedzená výsledkom (max. 350 h/rok u jedného Zadávateľa).
+DoPČ (§ 228a ZP) — opakujúca sa činnosť (max. 10 h/týždeň v priemere, alebo sezónna DoPČ max. 520 h/rok).
+5.2. Zadávateľ je výlučne zodpovedný za poskytnutie pravdivého a presného popisu Brigády (najmä rozlíšenie „výsledok“ vs. „činnosť“). Brigzy nezodpovedá za nesprávne zaradenie Zmluvy, ak vychádzalo z nesprávnych, neúplných alebo zavádzajúcich údajov poskytnutých Zadávateľom.
+⚠️ PRÁVNE UPOZORNENIE — ŠVARCSYSTÉM
+Nesprávna klasifikácia pracovnoprávneho vzťahu (napr. DoVP na opakovanú činnosť, alebo využitie Zmluvy o dielo pri B2C vzťahu) môže byť Inšpektorátom práce posúdená ako nelegálne zamestnávanie s pokutou 2 000 – 200 000 € (zákon č. 82/2005 Z. z.). Túto pokutu, ako aj akékoľvek ďalšie sankcie, dorubenia daní/odvodov, úroky z omeškania a súvisiace náklady, znáša v plnom rozsahu Zadávateľ. Brigzy nenesie žiadnu zodpovednosť za následky nesprávneho zaradenia, ktoré vyplývajú z údajov poskytnutých Zadávateľom alebo z reálneho výkonu práce odlišného od deklarovaného popisu.
+
+5.3. Zadávateľ sa zaväzuje zabezpečiť, aby reálny výkon práce zodpovedal Zmluve vygenerovanej Platformou. Ak Zadávateľ umožní alebo požaduje výkon práce v rozsahu alebo spôsobom, ktorý vybočuje z vygenerovanej Zmluvy (napr. opakovaná účasť toho istého Brigádnika na DoVP brigádach charakteru „činnosť“), nesie za to výlučnú zodpovednosť.
+5.4. Limit 350 hodín ročne (DoVP) — Platforma vedie počítadlo odpracovaných hodín per dvojica Zadávateľ–Brigádnik, upozorňuje pri dosiahnutí 90 % limitu a po dosiahnutí 350 h zablokuje vystavenie ďalšej DoVP u tohto Zadávateľa. Zadávateľ je povinný sledovať aj akékoľvek iné formy spolupráce s Brigádnikom mimo Platformy, ktoré sa do tohto limitu započítavajú podľa Zákonníka práce.
+6. Sprostredkovanie registrácie v Sociálnej a zdravotnej poisťovni
+6.1. V súlade s osobitnou Sprostredkovateľskou zmluvou Brigzy–Zadávateľ môže Brigzy v mene Zadávateľa technicky podať Registračný list fyzickej osoby (RLFO) do Sociálnej poisťovne, na základe plnomocenstva udeleného Zadávateľom.
+6.2. Právnu zodpovednosť za správnosť, úplnosť a včasnosť tejto registrácie, ako aj za prípadné sankcie zo strany Sociálnej poisťovne (vrátane pokuty 0,30 – 3,32 € za deň omeškania na zamestnanca), nesie v plnom rozsahu Zadávateľ. Brigzy zodpovedá výlučne za technické podanie údajov, ktoré jej Zadávateľ poskytol, a to len v prípade, že k omeškaniu alebo chybe podania došlo výlučne v dôsledku zlyhania systému Brigzy a Zadávateľ poskytol správne a úplné údaje v dostatočnom časovom predstihu (najmenej 24 hodín pred požadovaným termínom registrácie).
+6.3. Brigzy nezodpovedá za škodu spôsobenú nesprávnymi, neúplnými alebo neskoro poskytnutými údajmi zo strany Zadávateľa alebo Brigádnika.
+7. Finančná architektúra — Escrow a Stripe Connect
+7.1. Platby v Krátkodobom režime sa realizujú výlučne prostredníctvom Stripe Connect. Brigzy v žiadnom okamihu nedrží finančné prostriedky Zadávateľa ani Brigádnika.
+7.2. Životný cyklus platby:
+Pending — Zadávateľ potvrdil výber Brigádnika, prostriedky sú zmrazené na Stripe Connected účte.
+Cleared — práca je dokončená a schválená, Stripe uvoľní sumu do Wallet Brigádnika.
+Disputed — nahlásený spor, transakcia zmrazená do rozhodnutia podpory Brigzy.
+7.3. Minimálny limit výberu z Wallet na bankový účet je 15 €.
+7.4. Zadávateľ výslovne súhlasí s tým, že zložením prostriedkov do Escrow vzniká záväzok zaplatiť Servisný poplatok Brigzy bez ohľadu na ďalší priebeh Brigády, s výjimkou prípadov uvedených v storno podmienkach (čl. 10).
+8. Servisný poplatok a fakturácia
+Typ poplatku
+Výška (bez DPH)
+Fakturačný moment
+Servisný poplatok (Krátkodobý režim)
+2 € + 10 % z ceny práce
+Pri zložení do Escrow
+Inzertný poplatok (Dlhodobý režim)
+9 € – 35 € (podľa topovania)
+Pri uverejnení inzerátu
+B2B Predplatné
+30 € – 99 € / mesiac
+Mesačná fakturácia
+
+8.1. Všetky poplatky podliehajú príslušnej sadzbe DPH (momentálne 23 %), pokiaľ Brigzy/Renewo nie je platiteľom DPH, faktúry sa vystavujú bez DPH.
+8.2. Zadávateľ v EÚ (mimo SR): fakturácia formou prenesenia daňovej povinnosti (reverse charge).
+8.3. Faktúry sú vystavované elektronicky a sú dostupné v sekcii „Faktúry“ v účte Zadávateľa.
+8.4. V prípade omeškania s úhradou akéhokoľvek poplatku je Brigzy oprávnená:
+účtovať úrok z omeškania v zákonnej výške,
+obmedziť alebo zablokovať prístup Zadávateľa k Platforme až do úhrady dlžnej sumy,
+postúpiť pohľadávku na vymáhanie tretej strane.
+9. Práva a povinnosti Zadávateľa
+9.1 Zadávateľ sa zaväzuje:
+uvádzať pravdivé, presné a úplné informácie o Brigáde (popis, miesto, čas, odmena, požiadavky),
+zaobchádzať s Brigádnikmi v súlade s platnými právnymi predpismi, najmä Zákonníkom práce a predpismi BOZP,
+zabezpečiť bezpečné a vhodné pracovné podmienky na mieste výkonu Brigády,
+riadne a včas uhradiť odmenu Brigádnikovi prostredníctvom Platformy,
+splniť všetky zákonné povinnosti zamestnávateľa (registrácia v SP/ZP, odvody, zrážková daň),
+nepožadovať od Brigádnika výkon práce nad rámec Zmluvy vygenerovanej Platformou,
+bezodkladne nahlásiť Platforme akýkoľvek incident, škodu alebo spor súvisiaci s Brigádou.
+9.2 Zadávateľ sa zaväzuje zdržať sa najmä:
+uvádzania nepravdivých, zavádzajúcich alebo diskriminačných informácií v inzerátoch,
+obchádzania Platformy a Servisného poplatku (pozri čl. 11),
+akéhokoľvek konania, ktoré by mohlo byť posúdené ako nelegálne zamestnávanie alebo zastretý pracovnoprávny vzťah,
+vyžadovania od Brigádnika úhrad, kaucií alebo poplatkov mimo mechanizmov Platformy,
+akéhokoľvek diskriminačného, urážlivého, vyhrážajúceho alebo obťažujúceho konania voči Brigádnikom,
+zneužívania osobných údajov Brigádnikov získaných prostredníctvom Platformy na iné účely, než je realizácia konkrétnej Brigády,
+vytvárania duplicitných alebo fingovaných inzerátov, hodnotení alebo účtov.
+10. Storno podmienky
+⚠️ PRÁVNE UPOZORNENIE
+Pri B2C vzťahu (Zadávateľ je nepodnikateľ) sú finančné pokuty voči Brigádnikovi-spotrebiteľovi v predformulovaných zmluvách absolútne neplatné (§ 53 ods. 4–5 Občianskeho zákonníka). Toto ustanovenie sa primárne týka VOP pre C2C Zadávateľov. Pre B2B Zadávateľov (tento dokument) platí nižšie uvedený režim založený na zmluvnej pokute, ktorá je medzi podnikateľmi v zásade platná a vymáhateľná (§ 544 OZ / § 300 a nasl. Obchodného zákonníka), s výhradou práva súdu na moderáciu podľa § 545a OZ.
+
+10.1 Zrušenie Brigády Zadávateľom (B2B)
+Zrušenie viac ako 24 hodín pred plánovaným začiatkom Brigády: plná refundácia zložených prostriedkov Zadávateľovi, Servisný poplatok sa nevracia.
+Zrušenie 12–24 hodín pred plánovaným začiatkom: refundácia 80 % zloženej sumy; 20 % prepadá v prospech Brigádnika ako kompenzácia preukázateľnej straty času a príjmu, Servisný poplatok sa nevracia.
+Zrušenie menej ako 12 hodín pred plánovaným začiatkom: zmluvná pokuta vo výške 20 % zloženej sumy z Escrow prepadá v prospech Brigádnika, zvyšok sa vracia Zadávateľovi; Servisný poplatok sa nevracia.
+Pri opakovanom (3-krát a viackrát v období 90 dní) zrušení Brigády Zadávateľom v lehote kratšej ako 12 hodín je Brigzy oprávnená dočasne alebo trvalo obmedziť možnosť Zadávateľa zverejňovať nové Brigády.
+10.2 Zrušenie Brigády Brigádnikom (No-show)
+Ak Brigádnik zruší potvrdenú Brigádu menej ako 12 hodín pred začiatkom alebo sa nedostaví, Zadávateľovi sa vracia plná zložená suma; Servisný poplatok sa nevracia, ale Brigzy môže podľa vlastného uváženia poskytnúť Zadávateľovi zľavu na ďalšiu Brigádu.
+Brigádnik je sankcionovaný systémom Brigzy (odpočet Brigy coins, pokles XP rebríčka, obmedzenie zobrazenia ponúk, ban po 3 absenciách) — bližšie vo VOP pre Brigádnikov.
+10.3 Spory a reklamácie
+V prípade nahláseného spor (Disputed) je transakcia zmrazená a Brigzy podpora rozhodne o ďalšom postupe na základe dostupných dôkazov (QR check-in/out, fotodokumentácia, komunikácia v čete).
+Rozhodnutie podpory Brigzy v spore je konečné v rámci interného riešenia; nedotýka sa práva strán domáhať sa nárokov súdnou cestou.
+11. Zákaz obchádzania platformy (Anti-circumvention)
+🔒 KĽÚČOVÉ USTANOVENIE NA OCHRANU BRIGZY
+Toto ustanovenie chráni obchodný model Brigzy proti obchádzaniu Servisného poplatku.
+
+11.1. Zadávateľ sa zaväzuje, že po dobu 12 mesiacov od prvého kontaktu s konkrétnym Brigádnikom prostredníctvom Platformy nebude s týmto Brigádnikom uzatvárať žiadne pracovnoprávne, obchodné alebo iné zmluvné vzťahy mimo Platformy s cieľom vyhnúť sa Servisnému poplatku, pokiaľ:
+takýto vzťah nevznikol výlučne na základe inzerátu v Dlhodobom režime (kde sa finančné plnenie podľa čl. 4.2 realizuje mimo Platformy legitímne), alebo
+strany neuhradia Brigzy primeranú náhradu zodpovedajúcu Servisnému poplatku, ktorý by inak bol splatný.
+11.2. V prípade preukázaného porušenia tohto ustanovenia je Brigzy oprávnená požadovať od Zadávateľa zmluvnú pokutu vo výške zodpovedajúcej Servisnému poplatku, ktorý by bol Brigzy náležal za sprostredkovanie príslušnej spolupráce počas obdobia 12 mesiacov, minimálne však vo výške 500 €.
+11.3. Toto ustanovenie sa nevzťahuje na vzťahy vzniknuté na základe legitímneho využitia Dlhodobého inzertného režimu v súlade s čl. 4.2 a 4.3.
+12. Hodnotenia, reputácia a Brigy coins
+12.1. Zadávateľ je oprávnený po dokončení Brigády ohodnotiť Brigádnika. Hodnotenia musia byť pravdivé, vecné a nesmú obsahovať osobné údaje nad rámec potrebný na hodnotenie spolupráce.
+12.2. Brigzy je oprávnená odstrániť hodnotenie, ktoré je nepravdivé, urážlivé, diskriminačné alebo porušuje tieto VOP.
+12.3. Zadávateľ berie na vedomie, že interná mena „Brigy coins“ je výhradne lojalitným nástrojom pre Brigádnikov, nie je konvertibilná na EUR a nezakladá Zadávateľovi žiadne práva ani nároky.
+13. Ochrana osobných údajov a GDPR
+13.1. Brigzy spracúva osobné údaje Zadávateľa (kontaktné a fakturačné údaje) na právnom základe plnenia zmluvy (čl. 6 ods. 1 písm. b) GDPR) a plnenia zákonných povinností (účtovníctvo, daňové predpisy).
+13.2. V rozsahu, v akom Brigzy spracúva alebo prenáša osobné údaje Brigádnikov (vrátane rodného čísla) Zadávateľovi za účelom registrácie v SP/ZP, postupujú zmluvné strany podľa samostatnej Zmluvy o spracúvaní osobných údajov / dohody o spoločných správcoch (čl. 26/28 GDPR), ktorá je prílohou Sprostredkovateľskej zmluvy.
+13.3. Zadávateľ sa zaväzuje spracúvať osobné údaje Brigádnikov získané prostredníctvom Platformy výlučne na účel realizácie konkrétnej Brigády a súvisiacich zákonných povinností, v súlade s GDPR a zákonom č. 18/2018 Z. z., a zabezpečiť ich primeranú ochranu (najmä rodné číslo).
+13.4. Bližšie informácie sú uvedené v Zásadách ochrany osobných údajov Brigzy.sk.
+14. Zodpovednosť a obmedzenie zodpovednosti
+🔒 KĽÚČOVÉ USTANOVENIE NA OCHRANU BRIGZY
+Toto ustanovenie maximálne (v medziach platného práva SR) limituje zodpovednosť Brigzy. Pri spotrebiteľských vzťahoch (C2C) môžu byť niektoré limitácie neúčinné — pre B2B Zadávateľov (podnikateľov) je rozsah limitácie zmluvnej voľnosti širší (§ 379 a nasl. Obchodného zákonníka), s výhradou kogentných ustanovení (napr. zodpovednosť za škodu spôsobenú úmyselne alebo hrubou nedbanlivosťou nemožno vylúčiť).
+
+14.1. Brigzy poskytuje Platformu „ako je“ („as is“) a nezaručuje nepretržitú, bezchybnú alebo bezpečnostnú dostupnosť Platformy.
+14.2. Brigzy nezodpovedá za:
+kvalitu, riadne vykonanie alebo výsledok práce vykonanej Brigádnikom,
+škodu spôsobenú Brigádnikom na majetku alebo zdraví Zadávateľa alebo tretích osôb (s výhradou poistného krytia podľa čl. 15),
+škodu spôsobenú Zadávateľom Brigádnikovi,
+správnosť právnej klasifikácie Zmluvy, ak vychádzala z nepravdivých alebo neúplných údajov Zadávateľa,
+nesplnenie povinností Zadávateľa ako zamestnávateľa (registrácia, odvody, dane),
+akékoľvek nepriame, následné škody, ušlý zisk, stratu dát alebo poškodenie dobrého mena,
+výpadky, prerušenia alebo nedostupnosť Platformy spôsobené okolnosťami vyššej moci, treťou stranou (vrátane Stripe) alebo technickou údržbou,
+obsah inzerátov, hodnotení a komunikácie medzi používateľmi.
+14.3. Celková zodpovednosť Brigzy voči Zadávateľovi za škodu z akéhokoľvek právneho dôvodu súvisiaceho s používaním Platformy je v každom prípade obmedzená do výšky súčtu Servisných poplatkov uhradených Zadávateľom Brigzy za posledných 6 mesiacov predchádzajúcich vzniku škodovej udalosti, maximálne však do výšky 1 000 €, pokiaľ kogentné ustanovenia právneho poriadku SR neustanovujú inak.
+14.4. Obmedzenia podľa tohto článku sa nevztahujú na škodu spôsobenú úmyselne alebo hrubou nedbanlivosťou Brigzy, ani na škodu na zdraví.
+15. Náhrada škody a indemnifikácia (Zadávateľ → Brigzy)
+🔒 KĽÚČOVÉ USTANOVENIE NA OCHRANU BRIGZY
+Indemnifikačná klauzula — Zadávateľ odškodní Brigzy za škody vzniknuté z jeho konania.
+
+15.1. Zadávateľ sa zaväzuje nahradiť Brigzy v plnom rozsahu akúkoľvek škodu, pokutu, sankciu, náklady na právne zastúpenie alebo iný majetkový nárok tretej strany (vrátane Inšpektorátu práce, Sociálnej poisťovne, zdravotných poisťovní, Finančnej správy, Brigádnika alebo iného Zadávateľa), ktorý vznikol v dôsledku:
+porušenia týchto VOP Zadávateľom,
+nesprávnej, neúplnej alebo nepravdivej informácie poskytnutej Zadávateľom,
+nesplnenia povinností Zadávateľa ako zamestnávateľa,
+nelegálneho zamestnávania alebo zastretého pracovnoprávneho vzťahu vzniknutého z konania Zadávateľa,
+porušenia predpisov BOZP na pracovisku Zadávateľa,
+škody spôsobenej Brigádnikovi alebo tretej osobe v súvislosti s výkonom Brigády u Zadávateľa.
+15.2. Brigzy je oprávnená započítať takéto nároky voči akýmkoľvek splatným pohľadávkam Zadávateľa voči Brigzy, vrátane prostriedkov vo Wallet (v rozsahu, v akom to umožňuje architektúra Stripe Connect).
+16. Poistenie (FinExpert Group)
+⚠️ PRÁVNE UPOZORNENIE
+Propagácia a sprostredkovanie poistenia môže vyžadovať licenciu finančného agenta podľa zákona č. 186/2009 Z. z. Pred aktiváciou tejto funkcie je nutná konzultácia s právnikom a prípadná registrácia v registri NBS. Text nižšie je formulovaný podmienečne („pokiaľ je funkcia aktívna“) a musí byť pred zverejnením potvrdený právnikom.
+
+16.1. Pokiaľ je funkcia aktívna, Brigády realizované v Krátkodobom režime môžu byť kryté poistením zodpovednosti za škodu spôsobenú na majetku tretej osoby prostredníctvom partnera FinExpert Group. Brigzy v tomto smere vystupuje len ako technický odkazujúci subjekt, nie ako poisťovací sprostredkovateľ, pokiaľ nie je Brigzy registrovaná ako finančný agent.
+16.2. Podrobnosti poistného krytia, výluky a postup pri nahlasovaní škody upravujú podmienky poistného produktu FinExpert Group, nie tieto VOP. Brigzy nezodpovedá za rozsah, platnosť ani plnenie poistného krytia.
+17. Duševné vlastníctvo
+17.1. Všetky práva k Platforme, jej softvéru, dizajnu, logu, databázam a obsahu (s výjimkou obsahu vloženého používateľmi) patria Brigzy/Renewo alebo jej licencorom.
+17.2. Zadávateľ udeľuje Brigzy nevýhradnú, bezplatnú licenciu na použitie obsahu vloženého Zadávateľom (texty inzerátov, logá, obrázky) na účely poskytovania a propagácie Platformy.
+17.3. Zadávateľ sa zaväzuje, že obsah, ktorý vkladá, neporušuje práva tretích osôb (autorské práva, ochranné známky).
+18. Mlčanlivosť
+18.1. Zmluvné strany sa zaväzujú zachovávať mlčanlivosť o dôverných informáciách získaných v súvislosti s používaním Platformy, s výjimkou informácií, ktoré sú verejne dostupné alebo ktorých sprístupnenie vyžaduje zákon.
+19. Trvanie a skončenie zmluvného vzťahu
+19.1. Zmluvný vzťah medzi Zadávateľom a Brigzy vzniká registráciou a trvá do zrušenia účtu jednou zo strán.
+19.2. Zadávateľ môže zrušiť svoj účet kedykoľvek, s výhradou vyrovnania všetkých splatných záväzkov.
+19.3. Brigzy môže okamžite ukončiť alebo obmedziť prístup Zadávateľa pri závažnom porušení VOP, najmä pri:
+podvodnom konaní,
+opakovanom porušovaní storno podmienok,
+porušení zákazu obchádzania platformy (čl. 11),
+nelegálnom zamestnávaní zistenom alebo nahlásenom príslušným orgánom.
+19.4. Skončenie zmluvného vzťahu sa nedotýka už vzniknutých nárokov (napr. nárokov Brigzy na zaplatenie Servisného poplatku, indemnifikačných nárokov).
+20. Riešenie sporov a rozhodné právo
+20.1. Tieto VOP a vzťahy z nich vyplývajúce sa spravujú právnym poriadkom Slovenskej republiky.
+20.2. Zmluvné strany sa budú snažiť riešiť prípadné spory predovšetkým mimosúdnou dohodou.
+20.3. Na riešenie sporov sú príslušné všeobecné súdy Slovenskej republiky, miestne príslušné podľa sídla Brigzy/Renewo, pokiaľ kogentné normy neurčujú inak.
+21. Záverečné ustanovenia
+Brigzy je oprávnená tieto VOP jednostranne meniť; o zmene bude Zadávateľ informovaný prostredníctvom Platformy alebo e-mailom s primeraným predstihom (najmenej 14 dní pred účinnosťou, pri podstatných zmenách).
+Pokračovaním v používaní Platformy po nadobudnutí účinnosti zmien Zadávateľ vyjadruje súhlas so zmenenými VOP.
+Ak je niektoré ustanovenie týchto VOP neplatné alebo neúčinné, nedotýka sa to platnosti ostatných ustanovení.
+Tieto VOP nadobúdajú účinnosť dňom ich zverejnenia na Platforme.
+
+❓ OTVORENÉ PRE PRÁVNIKA — SÚHRN
+1) Potvrdiť rozsah a vymáhateľnosť limitácie zodpovednosti (čl. 14) a indemnifikačnej klauzuly (čl. 15) voči B2B Zadávateľom. 2) Potvrdiť vymáhateľnosť a primeranosť zmluvnej pokuty v čl. 11 (anti-circumvention) a čl. 10.1 (storno B2B). 3) Doplniť/upraviť znenie čl. 16 (poistenie) po rozhodnutí o licencii finančného agenta. 4) Skontrolovať, či B2B Zadávateľ (najmä SZČO bez zamestnancov) môže byť v určitých prípadoch posúdený ako spotrebiteľ a aký to má dopad na čl. 10 a 14.

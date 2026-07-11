@@ -1,0 +1,76 @@
+BRIGZY.SK
+ZMLUVA O DIELO
+podľa § 631 – 643 zákona č. 40/1964 Zb. Občianskeho zákonníka (C2C)
+Verzia 2.0 — zapracované pripomienky právnika
+ℹ️ POZNÁMKA K POUŽITIU
+Generuje sa VÝHRADNE pre vzťahy medzi dvoma nepodnikateľmi (fyzická osoba ↔ fyzická osoba/brigádnik) a VÝHRADNE pre činnosti s jasným, hmatateľným výsledkom (kosenie, sťahovanie, montáž nábytku, jednorazové upratovanie). NESMIE sa použiť, ak je objednávateľom právnická osoba alebo SZČO (vtedy DoVP/DoPČ), ani pre opakovanú činnosť bez konkrétneho výsledku.
+
+uzatvorená medzi:
+
+Objednávateľ
+Meno a priezvisko: [doplniť]
+Dátum narodenia: [doplniť]
+Trvalý pobyt / adresa: [doplniť]
+Číslo bankového účtu (IBAN): [nepovinné]
+Telefónne číslo (overené): [doplniť]
+E-mail: [doplniť]
+
+Zhotoviteľ (Brigádnik)
+Meno a priezvisko: [doplniť]
+Dátum narodenia: [doplniť]
+Trvalý pobyt / adresa: [doplniť]
+Číslo bankového účtu (IBAN): [pre vyplatenie odmeny]
+Telefónne číslo (overené): [doplniť]
+E-mail: [doplniť]
+
+(ďalej spoločne ako „zmluvné strany“)
+
+Článok 1 — Predmet zmluvy
+Popis diela (konkrétny výsledok): [napr. pokosenie záhrady o výmere 500 m²]
+Miesto vykonania diela: [adresa]
+
+1.1. Zhotoviteľ sa zaväzuje na svoje náklady a nebezpečenstvo vykonať dielo a objednávateľ sa zaväzuje dielo prevziať a zaplatiť dohodnutú cenu.
+1.2. Zmluvné strany výslovne potvrdzujú, že predmetom zmluvy je dielo s konkrétnym výsledkom, nie výkon opakovanej alebo pravidelnej činnosti.
+Článok 2 — Termín vykonania diela
+Dátum/termín začatia: [doplniť]
+Dátum/termín odovzdania diela: [doplniť]
+Článok 3 — Cena diela
+Dohodnutá cena diela: [suma v EUR, automaticky z escrow]
+Cena je splatná po riadnom vykonaní a odovzdaní diela objednávateľovi.
+Platba prebieha cez Brigzy.sk (Stripe Connect) — prostriedky objednávateľa sú zmrazené v escrow a uvoľnené po potvrdení prevzatia diela (Cleared).
+Článok 4 — Vykonanie a odovzdanie diela
+Zhotoviteľ vykoná dielo osobne, riadne a v dohodnutom termíne.
+Odovzdanie sa potvrdzuje cez aplikáciu Brigzy.sk (QR check-in/check-out, prípadne fotodokumentácia výsledku).
+Objednávateľ je povinný dielo prevziať, ak bolo vykonané riadne a v súlade s touto zmluvou.
+Článok 5 — Zodpovednosť za vady
+Zhotoviteľ zodpovedá za to, že dielo je vykonané v súlade so zmluvou a bez vád.
+Objednávateľ môže nahlásiť vady cez aplikáciu bezodkladne po odovzdaní; systém zmrazí transakciu v stave Disputed do vyriešenia.
+Článok 6 — Daňové súvislosti (príležitostný príjem)
+PRÍLEŽITOSTNÝ PRÍJEM
+Príjem zhotoviteľa môže byť oslobodený od dane do 500 € za kalendárny rok podľa § 9 ods. 1 písm. g) zákona č. 595/2003 Z. z. — VÝHRADNE pri čisto C2C vzťahu (objednávateľ je nepodnikateľ). Aplikácia túto informáciu zobrazuje len ak je objednávateľom skutočne fyzická osoba-nepodnikateľ.
+
+6.1. Zhotoviteľ je zodpovedný za riadne zdanenie svojich príjmov. Pri prekročení 500 €/rok zo všetkých príležitostných príjmov je povinný príjem zahrnúť do daňového priznania.
+6.2. Registrácia v Sociálnej a zdravotnej poisťovni sa pri tomto type zmluvy nevyžaduje.
+Článok 7 — Postavenie platformy Brigzy.sk
+7.1. Brigzy.sk je výhradne technickým a zmluvným sprostredkovateľom a nie je zmluvnou stranou tejto zmluvy. Brigzy.sk poskytuje iba príležitosť uzatvoriť zmluvu a nezodpovedá za naplnenie jej obsahu, kvalitu diela ani za prípadnú nesprávnu klasifikáciu vzťahu zmluvnými stranami.
+7.2. Ak skutočná povaha činnosti nezodpovedá definícii „diela“ (napr. ide o opakovanú činnosť so znakmi závislej práce), nesú za nesprávnu právnu klasifikáciu vzťahu plnú zodpovednosť zmluvné strany.
+Článok 8 — Ochrana osobných údajov
+Osobné údaje zmluvných strán sú spracúvané na právnom základe čl. 6 ods. 1 písm. b) GDPR (plnenie zmluvy). Bližšie informácie sú v Zásadách ochrany osobných údajov Brigzy.sk.
+Článok 9 — Forma a podpis zmluvy
+PÍSOMNÁ FORMA (§ 40 ods. 4 OZ)
+Zmluvné strany sa výslovne dohodli, čo medzi nimi predstavuje písomnú formu uzatvorenia tejto zmluvy. Táto dohoda o forme je pre platné uzatvorenie zmluvy medzi objednávateľom a zhotoviteľom postačujúca.
+
+9.1. Zmluva sa podpisuje jedným z nasledujúcich spôsobov:
+(a) Vlastnoručný podpis: Obe strany podpíšu zmluvu vlastnou rukou a podpísanú kópiu odfotia/oskenujú a nahrajú do aplikácie Brigzy.sk.
+(b) Kvalifikovaný elektronický podpis (KEP) prostredníctvom eID / Slovensko.sk.
+9.2. Zmluvné strany sa výslovne dohodli, že za dodržanie písomnej formy tejto zmluvy podľa § 40 ods. 4 Občianskeho zákonníka považujú aj podpis vykonaný spôsobom podľa písm. (a) v spojení s nezmeniteľným audit logom systému Brigzy.sk (IP adresa, časová pečiatka UTC, Device ID, hash dokumentu, overený telefón/e-mail). Podpis formou KEP podľa písm. (b) je platný samostatne.
+9.3. Každá strana obdrží jedno podpísané vyhotovenie zmluvy; systém doručí podpísanú kópiu vo formáte PDF e-mailom obom stranám.
+Článok 10 — Záverečné ustanovenia
+Zmluva sa spravuje právnym poriadkom Slovenskej republiky, najmä Občianskym zákonníkom.
+Vyhotovená v dvoch vyhotoveniach s rovnakou platnosťou — po jednom pre každú zmluvnú stranu.
+
+Miesto a dátum uzavretia: [doplniť]
+
+Objednávateľ (podpis)
+
+Zhotoviteľ (podpis)

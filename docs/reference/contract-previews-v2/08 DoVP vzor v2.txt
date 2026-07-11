@@ -1,0 +1,87 @@
+BRIGZY.SK
+DOHODA O VYKONANÍ PRÁCE
+podľa § 226 zákona č. 311/2001 Z. z. Zákonníka práce (DoVP)
+Verzia 2.0 — zapracované pripomienky právnika
+ℹ️ POZNÁMKA K POUŽITIU TOHTO VZORU
+Tento vzor sa generuje systémom Brigzy.sk automaticky pri B2C brigádach (Zadávateľ = firma/SZČO), kde je predmetom práce jasne vymedzený VÝSLEDOK. Dohoda sa NESMIE použiť pre opakujúcu sa činnosť (čašník, predavač, skladník na viac zmien) — pre tie systém generuje DoPČ. Nesprávne použitie môže byť posúdené ako nelegálne zamestnávanie s pokutou 2 000 – 200 000 € (zákon č. 82/2005 Z. z.).
+
+uzatvorená medzi:
+
+Zamestnávateľ (Zadávateľ)
+Obchodné meno / Meno a priezvisko: [doplniť]
+Sídlo / adresa: [doplniť]
+IČO: [doplniť]
+DIČ: [doplniť]
+Zastúpený: [doplniť]
+Registrácia v Sociálnej poisťovni: [číslo, dátum registrácie zamestnávateľa]
+
+Zamestnanec (Brigádnik)
+Meno a priezvisko: [doplniť]
+Dátum narodenia: [doplniť]
+Rodné číslo: [doplniť pri vzniku DoVP — Brigzy formulár]
+Trvalý pobyt / adresa: [doplniť]
+Zdravotná poisťovňa: [doplniť pri vzniku DoVP]
+Číslo bankového účtu (IBAN): [doplniť]
+Telefónne číslo (overené): [doplniť]
+E-mail: [doplniť]
+
+(ďalej spoločne ako „zmluvné strany“)
+
+Článok 1 — Predmet dohody
+1.1. Zamestnávateľ a zamestnanec uzatvárajú túto dohodu o vykonaní práce v súlade s § 226 Zákonníka práce.
+1.2. Predmetom tejto dohody je vykonanie pracovnej úlohy vymedzenej výsledkom (dielom): 
+Popis výsledku práce: [automaticky vyplní systém z popisu brigády]
+Miesto výkonu práce: [adresa brigády]
+
+1.3. Práca je vymedzená výsledkom, nie druhom činnosti. Zamestnanec sa zaväzuje vykonať a odovzdať dohodnutý výsledok práce v dohodnutom rozsahu a termíne.
+Článok 2 — Rozsah práce a doba trvania dohody
+Táto dohoda sa uzatvára na dobu určitú, najviac na 12 mesiacov.
+Dátum začatia výkonu práce: [doplniť]
+Dátum skončenia / odovzdania diela: [doplniť]
+Predpokladaný rozsah práce (hodiny): [max. 350 h/rok u tohto zamestnávateľa]
+Celkový rozsah práce nesmie u tohto zamestnávateľa v kalendárnom roku prekročiť 350 hodín. Brigzy.sk vedie počítadlo odpracovaných hodín per dvojica zamestnávateľ–zamestnanec a pri dosiahnutí limitu zablokuje vystavenie ďalšej DoVP.
+Článok 3 — Odmena
+Dohodnutá odmena (brutto): [suma v EUR, automaticky z escrow]
+Odmena je splatná po dokončení a riadnom odovzdaní dohodnutej práce, najneskôr v lehotách podľa § 228 ods. 1 Zákonníka práce.
+Zamestnávateľ je povinný z odmeny zraziť preddavok na daň (§ 35 zákona č. 595/2003 Z. z.) a odviesť poistné na sociálne a zdravotné poistenie.
+Vyplatenie odmeny prebieha cez platformu Brigzy.sk (Stripe Connect) — prostriedky Zadávateľa sú zmrazené v escrow od potvrdenia výberu zamestnanca a uvoľnené po potvrdení dokončenia práce (Cleared).
+Článok 4 — Práva a povinnosti zmluvných strán
+4.1 Zamestnávateľ sa zaväzuje:
+zabezpečiť podmienky potrebné na vykonanie práce dohodnutým spôsobom,
+preukázateľne poučiť zamestnanca o bezpečnosti a ochrane zdravia pri práci (BOZP) pred začatím výkonu práce a dať mu toto poučenie podpísať,
+zaregistrovať zamestnanca v Sociálnej poisťovni (RLFO, kód 3 = DoVP) najneskôr pred začatím výkonu práce podľa § 231 zákona č. 461/2003 Z. z.,
+prihlásiť zamestnanca v príslušnej zdravotnej poisťovni,
+riadne a včas zaplatiť odmenu za vykonanú prácu.
+4.2 Zamestnanec sa zaväzuje:
+vykonať dohodnutú prácu osobne, riadne a v dohodnutom termíne,
+odovzdať výsledok práce spôsobom umožňujúcim jeho overenie (napr. QR check-out v aplikácii Brigzy),
+dodržiavať pokyny BOZP, s ktorými bol oboznámený.
+Článok 5 — Postavenie platformy Brigzy.sk
+5.1. Platforma Brigzy.sk je výhradne technickým a zmluvným sprostredkovateľom kontaktu medzi zmluvnými stranami. Brigzy.sk nie je zamestnávateľom, agentúrou dočasného zamestnávania ani zmluvnou stranou tejto dohody.
+5.2. Zamestnávateľ udeľuje Brigzy.sk splnomocnenie na technické podanie RLFO v jeho mene — v rozsahu dohodnutom v Sprostredkovateľskej zmluve. Právnu zodpovednosť za správnosť a včasnosť registrácie nesie zamestnávateľ.
+Článok 6 — Ochrana osobných údajov
+6.1. Osobné údaje zamestnanca (vrátane rodného čísla a údaja o zdravotnej poisťovni) sú spracúvané na právnom základe čl. 6 ods. 1 písm. b) a c) GDPR za účelom plnenia tejto dohody a splnenia zákonných povinností (registrácia v SP/ZP, mzdová a daňová agenda).
+6.2. Spracúvanie a postúpenie rodného čísla zamestnávateľovi prebieha na základe osobitného súhlasu zamestnanca; rodné číslo sa nezverejňuje a postupuje sa výhradne za účelom uzatvorenia a plnenia tejto dohody. Bližšie informácie sú v Zásadách ochrany osobných údajov Brigzy.sk.
+Článok 7 — Skončenie dohody
+Dohoda zaniká uplynutím dohodnutej doby, vykonaním a odovzdaním dohodnutej práce, alebo dohodou zmluvných strán.
+Podmienky predčasného skončenia (vrátane zrušenia brigády) sa spravujú VOP Brigzy.sk (storno podmienky pre B2C vzťahy).
+Článok 8 — Forma a podpis dohody
+PRÁVNY ZÁKLAD — PÍSOMNÁ FORMA (§ 226 ods. 2 ZP, § 40 ods. 4 OZ)
+Podľa § 226 ods. 2 Zákonníka práce musí byť táto dohoda písomná, inak je neplatná. Sken alebo fotografia podpísanej dohody sama o sebe nenahrádza písomné vyhotovenie. Preto zmluvné strany podľa čl. 8.3 nižšie výslovne dojednávajú, čo sa medzi nimi považuje za dodržanie písomnej formy.
+
+8.1. Dohoda sa podpisuje jedným z nasledujúcich spôsobov:
+(a) Vlastnoručný podpis: Obe strany podpíšu dohodu vlastnou rukou (na papierovej kópii alebo na zobrazenom dokumente) a podpísanú kópiu odfotia alebo oskenujú a nahrajú do aplikácie Brigzy.sk.
+(b) Kvalifikovaný elektronický podpis (KEP) prostredníctvom eID / Slovensko.sk.
+8.2. Každá zmluvná strana obdrží jedno podpísané vyhotovenie tejto dohody. Pri vlastnoručnom podpise (spôsob (a)) doručí zamestnávateľ zamestnancovi jeho podpísané vyhotovenie najneskôr pri nástupe na výkon práce; pri KEP (spôsob (b)) systém doručí podpísané vyhotovenie obom stranám elektronicky.
+8.3. Zmluvné strany sa výslovne dohodli, že za dodržanie písomnej formy tejto dohody podľa § 40 ods. 4 Občianskeho zákonníka považujú aj podpis vykonaný spôsobom podľa čl. 8.1 písm. (a) v spojení s nezmeniteľným audit logom vytvoreným systémom Brigzy.sk. Audit log obsahuje: IP adresu, časovú pečiatku (UTC), identifikátor zariadenia (Device ID), hash verzie dokumentu a overené telefónne číslo/e-mail strany.
+8.4. Po dokončení podpisového procesu systém doručí podpísanú kópiu dohody vo formáte PDF e-mailom obom zmluvným stranám.
+8.5. Archivácia: mzdové doklady 10 rokov, mzdové listy 50 rokov. Primárnu zodpovednosť za archiváciu nesie zamestnávateľ; Brigzy.sk zabezpečuje technické úložisko podpísanej kópie s garantovanou integritou (hash overenie).
+Článok 9 — Záverečné ustanovenia
+Táto dohoda sa spravuje právnym poriadkom Slovenskej republiky, najmä Zákonníkom práce a Občianskym zákonníkom.
+Táto dohoda je vyhotovená v dvoch vyhotoveniach s rovnakou platnosťou — po jednom pre každú zmluvnú stranu.
+
+Miesto a dátum uzavretia: [doplniť]
+
+Zamestnávateľ (podpis)
+
+Zamestnanec (podpis)

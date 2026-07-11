@@ -1,0 +1,87 @@
+BRIGZY.SK — Prehľad terminologických nezrovnalostí a potrebných zmien
+Dokument identifikuje 13 terminologických nezrovnalostí naprieč 10 dokumentmi Brigzy.sk. Kanonická terminológia vychádza z VOP_Brigzy_v1_1_opravene.docx ako referenčného dokumentu. Všetky opravy sú zachytené v jednotlivých opravených súboroch.
+Verzia: jún 2026 | Referenčný dokument: VOP_Brigzy_v1_1_opravene.docx
+
+Termín
+Problém / nekonzistentnosť
+Dotknuté dokumenty
+Kanonická definícia
+Potrebná akcia
+Brigy / Brigy coins
+Niektoré dokumenty používajú "Brigy" (skratka), iné "Brigy coins" (plný názov). VOP_B2B ani VOP_C2C nedefinujú "Brigy coins" vôbec — definícia je len vo VOP_Brigádnici.
+01_VOP_B2B, 02_VOP_C2C, 05_VOP_Brigádnici, 06_Privacy_Policy
+"Brigy coins" — plný názov vždy pri prvom výskyte v každom dokumente, ďalej skrátene "Brigy coins" (nie "Brigy" osamote bez kontextu). Definícia: interná virtuálna lojalitná mena Platformy (nie elektronické peniaze).
+Doplniť definíciu Brigy coins do čl. 1 (Definície) VOP_B2B a VOP_C2C. Nahradiť osamotené "Brigy" za "Brigy coins" v Privacy Policy.
+No-show / no-show
+VOP_Brigádnici píše "No-show" s veľkým N a definuje ho v čl. 1. VOP_B2B a VOP_C2C používajú "no-show" malým písmenom bez definície.
+01_VOP_B2B, 02_VOP_C2C, 05_VOP_Brigádnici
+"No-show" — vždy s veľkým N (vlastný termín platformy). Definícia: situácia, keď Brigádnik zruší potvrdenú Brigádu menej ako 12 hodín pred začiatkom alebo sa nedostaví. Doplniť do Definícií všetkých VOP.
+Zjednotiť veľkosť písmena. Doplniť definíciu do VOP_B2B čl. 1 a VOP_C2C čl. 1.
+Wallet
+VOP_B2B ho nespomína v Definíciách, hoci ho používa v texte. VOP_C2C ho definuje len opisne v čl. 6. Privacy Policy ho vôbec neuvádza.
+01_VOP_B2B, 02_VOP_C2C, 06_Privacy_Policy
+"Wallet" — prehľad zostatku Brigádnika na jeho Stripe Connected účte. Definovať v čl. 1 každého dokumentu, kde sa termín používa.
+Doplniť definíciu Wallet do VOP_B2B čl. 1 a VOP_C2C čl. 1.
+KYC
+VOP_Brigádnici rozpisuje trojvrstvový KYC systém podrobne. VOP_B2B a Sprostredkovateľská zmluva KYC nespomínajú vôbec. Privacy Policy ho uvádza bez rozpisovania vrstiev.
+01_VOP_B2B, 03_Sprostredkovatelska_zmluva, 06_Privacy_Policy
+"KYC" — overenie totožnosti (Know Your Customer) vyžadované Platformou a Stripe. Trojvrstvový systém je detailne opísaný v VOP_Brigádnici. Ostatné dokumenty odkazujú na VOP_Brigádnici alebo uvádzajú stručnú definíciu.
+Doplniť skratkovú definíciu KYC do VOP_B2B čl. 1. Pridať krížový odkaz na VOP_Brigádnici v Privacy Policy.
+Escrow
+VOP_B2B definuje: "funkcionalita zmrazenia a podmieneného uvoľnenia finančných prostriedkov prostredníctvom Stripe Connect". VOP_C2C: "zmrazenie a podmienené uvoľnenie prostriedkov cez Stripe Connect". VOP_Brigádnici: rovnako ako C2C. DoPČ/DoVP: "zmrazené v escrow" malým písmenom.
+01_VOP_B2B, 02_VOP_C2C, 05_VOP_Brigádnici, 08_DoVP, 09a_DoPČ, 09b_DoPČ
+"Escrow" — zmrazenie a podmienené uvoľnenie prostriedkov prostredníctvom Stripe Connect. Vždy s veľkým E ako vlastný termín platformy.
+Skrátiť definíciu v VOP_B2B. Opraviť malé "e" v escrow v zmluvných vzoroch DoVP a DoPČ.
+Servisný poplatok
+VOP_B2B: "odplata Brigzy za sprostredkovanie a technické služby Platformy". VOP_C2C a VOP_Brigádnici: "odplata Brigzy za sprostredkovanie" (bez zmienky o technických službách). Sprostredkovateľská zmluva ho vôbec nedefinuje.
+01_VOP_B2B, 02_VOP_C2C, 05_VOP_Brigádnici, 03_Sprostredkovatelska_zmluva
+"Servisný poplatok" — odplata Brigzy za sprostredkovanie a technologické služby Platformy. Výška je stanovená platným cenníkom Brigzy.
+Zjednotiť definíciu vo všetkých VOP. Doplniť definíciu do Sprostredkovateľskej zmluvy čl. 1.
+Platforma
+VOP_B2B: "webová a mobilná aplikácia Brigzy.sk vrátane všetkých jej funkcií". VOP_Brigádnici: rovnako. VOP_C2C: rovnako. VOP_v1_1: "vrátane všetkých funkcií" (bez "jej"). Zmluvy (DoVP, DoPČ, ZoD): "technickým a zmluvným sprostredkovateľom" — neuvádzajú samotnú definíciu Platformy.
+Všetky dokumenty
+"Platforma" — webová a mobilná aplikácia Brigzy.sk vrátane všetkých jej funkcií.
+Zjednotiť formuláciu — pridať "jej" do VOP_v1_1. Zmluvy (DoVP, DoPČ, ZoD) nech odkazujú na definíciu v príslušných VOP namiesto opisného vysvetlenia.
+Brigádnik (Worker)
+VOP_B2B: "Brigádnik". VOP_C2C: "Brigádnik". VOP_Brigádnici: "Brigádnik (Worker)". VOP_v1_1: "Brigádnik (Worker)". ZoD: "Zhotoviteľ (Brigádnik)". DoVP/DoPČ: "Zamestnanec (Brigádnik)".
+Všetky dokumenty
+Termín závisí od právneho kontextu: v pracovných zmluvách (DoVP/DoPČ) = "Zamestnanec (Brigádnik)"; v ZoD = "Zhotoviteľ (Brigádnik)"; vo VOP a ostatných dokumentoch = "Brigádnik". Zátvorkový doplnok "(Worker)" je nepovinný v neformálnom kontexte.
+Žiadna zmena — rozdiely sú právne odôvodnené. Doplniť vysvetlivku do Privacy Policy, že "Brigádnik" a "Zamestnanec" v zmluvách označujú tú istú osobu.
+QR check-in/check-out
+Dokumenty používajú rôzne formulácie: "QR check-in/check-out" (DoVP, DoPČ), "QR check-in/check-out v aplikácii Brigzy" (VOP_Brigádnici), "check-in/out" skrátene (Privacy Policy).
+05_VOP_Brigádnici, 06_Privacy_Policy, 08_DoVP, 09a_DoPČ, 09b_DoPČ
+"QR check-in/check-out v aplikácii Brigzy.sk" — plná formulácia pri prvom výskyte, ďalej skrátene "QR check-in/check-out".
+Doplniť "v aplikácii Brigzy.sk" do DoVP a DoPČ. Nahradiť "check-in/out" v Privacy Policy za "check-in/check-out".
+Krátkodobý / Dlhodobý režim
+Tieto termíny sú definované len vo VOP_B2B. VOP_C2C spomína "Krátkodobý C2C režim" bez definície. VOP_Brigádnici tieto pojmy nepoužíva vôbec. Zmluvy (DoVP, DoPČ, ZoD) ich nespomínajú.
+01_VOP_B2B, 02_VOP_C2C
+"Krátkodobý režim" — režim s povinným Escrow (Stripe Connect). "Dlhodobý režim" — inzertný model bez Escrow (len B2B). Doplniť stručnú definíciu do VOP_C2C.
+Doplniť definíciu Krátkodobého režimu do VOP_C2C čl. 1. VOP_Brigádnici nie je potrebné meniť — Brigádnik vždy pracuje v Krátkodobom režime.
+XP / XP body
+VOP_Brigádnici používa "XP body" aj "XP ranking" striedavo. Privacy Policy uvádza "XP body". VOP_B2B a VOP_C2C XP body nespomínajú.
+05_VOP_Brigádnici, 06_Privacy_Policy
+"XP body" — reputačné body Brigádnika zobrazované v jeho verejnom profile. Skrátene "XP". Termín "XP ranking" nahradiť za "XP rebríček" (slovakizovaný termín).
+Nahradiť "XP ranking" za "XP rebríček" v VOP_Brigádnici. Privacy Policy ponechať.
+Pending / Cleared / Disputed
+VOP_B2B, VOP_C2C aj VOP_Brigádnici definujú tieto stavy, ale mierne odlišne. B2B: "prostriedky sú zmrazené na Stripe Connected účte". C2C a Brigádnici: "prostriedky zmrazené". Privacy Policy tieto stavy nespomína.
+01_VOP_B2B, 02_VOP_C2C, 05_VOP_Brigádnici
+Pending — Zadávateľ potvrdil výber Brigádnika, prostriedky zmrazené v Escrow.
+Cleared — Brigáda dokončená a schválená, prostriedky uvoľnené do Wallet Brigádnika.
+Disputéd — nahlásený spor, transakcia zmrazená do rozhodnutia podpory Brigzy.
+Zjednotiť formuláciu stavov vo všetkých 3 VOP — odstrániť "na Stripe Connected účte" z B2B (redundantné).
+Sprostredkovateľ / Brigzy
+VOP_B2B volá platformu "Brigzy" alebo "Poskytovateľ". VOP_C2C a VOP_Brigádnici len "Brigzy". Sprostredkovateľská zmluva: "Brigzy". Privacy Policy: "Brigzy" alebo "Prevádzkovateľ". VOP_v1_1: "Brigzy".
+01_VOP_B2B
+Jednotný termín: "Brigzy" vo všetkých dokumentoch. Termín "Poskytovateľ" odstrániť z VOP_B2B — je nadbytočný a rozporný.
+Nahradiť "Poskytovateľ" za "Brigzy" v VOP_B2B čl. 1 a všade inde v texte.
+
+Súhrnné štatistiky
+Celkový počet identifikovaných nezrovnalostí: 13
+Dokumenty vyžadujúce zmeny: 8 z 10 (VOP_B2B, VOP_C2C, VOP_Brigádnici, Privacy_Policy, Sprostredkovateľská zmluva, DoVP vzor, DoPČ bežná, DoPČ sezónna)
+Dokumenty bez zmien: DPA_Joint_Controllers, ZoD vzor
+Najčastejší problém: chýbajúce definície v dokumentoch, kde sa termín používa (Wallet, Brigy coins, KYC, No-show)
+
+Priority opráv
+VYSOKÁ priorita (právny dopad): Escrow (malé/veľké písmeno v zmluvách), No-show (jednotná definícia), Servisný poplatok (doplniť do Sprostredkovateľskej zmluvy)
+STREDNÁ priorita (konzistentnosť): Brigy coins vs. Brigy, Wallet (chýba v definíciách B2B/C2C), Krátkodobý režim (chýba v C2C)
+NÍZKA priorita (kozmetika): QR check-in/out formulácia, XP ranking → XP rebríček, Poskytovateľ → Brigzy v B2B
