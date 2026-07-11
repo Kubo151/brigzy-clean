@@ -110,6 +110,8 @@ export default function AccountSettings() {
             const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
             const { error: updErr } = await supabase.auth.updateUser({ data: { avatar_url: publicUrl } });
             if (updErr) throw updErr;
+            const { error: rowErr } = await supabase.from('users').update({ avatar_url: publicUrl }).eq('id', u.id);
+            if (rowErr) throw rowErr;
             updateField('avatar_url', `${publicUrl}?t=${Date.now()}`);
             showAlert(text.ok, text.photoSuccessfullyChanged);
         } catch { showAlert(text.error, text.failedToUploadPhoto); }
