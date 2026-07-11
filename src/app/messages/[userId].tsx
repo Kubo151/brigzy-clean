@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import {
     View, Text, ScrollView, TextInput, Pressable, AppState,
-    KeyboardAvoidingView, Platform, Image, ActivityIndicator, StyleSheet,
+    KeyboardAvoidingView, Platform, Image, ActivityIndicator, StyleSheet, Modal,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ChevronLeft, Send, Paperclip, Mic, Square, Play, Pause } from "lucide-react-native";
+import { ChevronLeft, Send, Paperclip, Mic, Square, Play, Pause, Pencil, Trash2, X } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 import {
@@ -26,11 +26,18 @@ interface Message {
     message_type?: 'text' | 'system' | 'image' | 'audio';
     media_path?: string | null;
     media_duration_seconds?: number | null;
+    edited_at?: string | null;
+    deleted_at?: string | null;
 }
 interface UserProfile {
     id: string; name: string; display_name: string | null;
     avatar_url: string | null; role: string;
 }
+interface Reaction {
+    id: string; message_id: string; user_id: string; emoji: string;
+}
+
+const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 
 export default function ChatScreen() {
     const { userId, jobId } = useLocalSearchParams<{ userId: string; jobId?: string }>();
@@ -39,11 +46,14 @@ export default function ChatScreen() {
     const st = useMemo(() => makeStyles(C), [C]);
 
     const [messages, setMessages] = useState<Message[]>([]);
+    const [reactions, setReactions] = useState<Reaction[]>([]);
     const [newMessage, setNewMessage] = useState("");
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [otherUser, setOtherUser] = useState<UserProfile | null>(null);
+    const [activeMessage, setActiveMessage] = useState<Message | null>(null);
+    const [editingMessage, setEditingMessage] = useState<Message | null>(null);
     const scrollViewRef = useRef<ScrollView>(null);
     // The realtime callback must read the CURRENT user id — a state value would
     // be captured as null in the closure created before the session loads.
@@ -71,6 +81,26 @@ export default function ChatScreen() {
                         setMessages(prev => prev.some(m => m.id === newMsg.id) ? prev : [...prev, newMsg]);
                         scrollViewRef.current?.scrollToEnd({ animated: true });
                     }
+                })
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' }, (payload) => {
+                    const updated = payload.new as Message;
+                    const me = currentUserIdRef.current;
+                    if ((updated.sender_id === userId && updated.receiver_id === me) ||
+                        (updated.sender_id === me && updated.receiver_id === userId)) {
+                        setMessages(prev => prev.map(m => m.id === updated.id ? updated : m));
+                    }
+                })
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'message_reactions' }, (payload) => {
+                    const r = payload.new as Reaction;
+                    setReactions(prev => prev.some(x => x.id === r.id) ? prev : [...prev, r]);
+                })
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'message_reactions' }, (payload) => {
+                    const r = payload.new as Reaction;
+                    setReactions(prev => prev.map(x => x.id === r.id ? r : x));
+                })
+                .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'message_reactions' }, (payload) => {
+                    const r = payload.old as Reaction;
+                    setReactions(prev => prev.filter(x => x.id !== r.id));
                 })
                 .subscribe((status) => {
                     if (disposed) return;
@@ -119,6 +149,11 @@ export default function ChatScreen() {
                 setMessages(messagesData);
                 const unreadIds = messagesData.filter(msg => msg.receiver_id === session.user.id && !msg.read).map(msg => msg.id);
                 if (unreadIds.length > 0) await supabase.from('messages').update({ read: true }).in('id', unreadIds);
+                const ids = messagesData.map(m => m.id);
+                if (ids.length > 0) {
+                    const { data: reactionsData } = await supabase.from('message_reactions').select('*').in('message_id', ids);
+                    if (reactionsData) setReactions(reactionsData);
+                }
             }
         } catch (e) { console.error('Error:', e); }
         finally { setLoading(false); }
@@ -126,6 +161,7 @@ export default function ChatScreen() {
 
     const sendMessage = async () => {
         if (!newMessage.trim() || !currentUserId || sending) return;
+        if (editingMessage) { await saveEdit(); return; }
         setSending(true);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         try {
@@ -142,6 +178,68 @@ export default function ChatScreen() {
             }
         } catch (e) { console.error('Error:', e); }
         finally { setSending(false); }
+    };
+
+    const startEdit = (message: Message) => {
+        setActiveMessage(null);
+        setEditingMessage(message);
+        setNewMessage(message.content);
+    };
+
+    const cancelEdit = () => {
+        setEditingMessage(null);
+        setNewMessage("");
+    };
+
+    const saveEdit = async () => {
+        if (!editingMessage || !newMessage.trim()) return;
+        setSending(true);
+        try {
+            const trimmed = newMessage.trim();
+            const { data: updated, error } = await supabase.from('messages')
+                .update({ content: trimmed, edited_at: new Date().toISOString() })
+                .eq('id', editingMessage.id).select().single();
+            if (error) { showAlert('Chyba', 'Nepodarilo sa upraviť správu'); }
+            else if (updated) {
+                setMessages(prev => prev.map(m => m.id === updated.id ? updated as Message : m));
+                setEditingMessage(null);
+                setNewMessage("");
+            }
+        } catch (e) { console.error('Error:', e); }
+        finally { setSending(false); }
+    };
+
+    const deleteMessage = (message: Message) => {
+        setActiveMessage(null);
+        showAlert('Vymazať správu?', 'Táto akcia sa nedá vrátiť späť.', [
+            {
+                text: 'Vymazať', style: 'destructive', onPress: async () => {
+                    const { data: updated, error } = await supabase.from('messages')
+                        .update({ deleted_at: new Date().toISOString(), content: '', media_path: null })
+                        .eq('id', message.id).select().single();
+                    if (!error && updated) setMessages(prev => prev.map(m => m.id === updated.id ? updated as Message : m));
+                },
+            },
+            { text: 'Zrušiť', style: 'cancel' },
+        ]);
+    };
+
+    const toggleReaction = async (messageId: string, emoji: string) => {
+        if (!currentUserId) return;
+        const mine = reactions.find(r => r.message_id === messageId && r.user_id === currentUserId);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setActiveMessage(null);
+        if (mine && mine.emoji === emoji) {
+            setReactions(prev => prev.filter(r => r.id !== mine.id));
+            await supabase.from('message_reactions').delete().eq('id', mine.id);
+        } else if (mine) {
+            setReactions(prev => prev.map(r => r.id === mine.id ? { ...r, emoji } : r));
+            await supabase.from('message_reactions').update({ emoji }).eq('id', mine.id);
+        } else {
+            const { data: inserted } = await supabase.from('message_reactions')
+                .insert({ message_id: messageId, user_id: currentUserId, emoji }).select().single();
+            if (inserted) setReactions(prev => [...prev, inserted as Reaction]);
+        }
     };
 
     const sendMediaMessage = async (messageType: 'image' | 'audio', mediaPath: string, durationSeconds?: number) => {
@@ -297,29 +395,58 @@ export default function ChatScreen() {
                             const isSent = message.sender_id === currentUserId;
                             const showTime = index === 0 || new Date(message.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() > 300000;
                             const signedUrl = message.media_path ? signedUrlCache.current.get(message.media_path) : undefined;
+                            const msgReactions = reactions.filter(r => r.message_id === message.id);
+                            const isDeleted = !!message.deleted_at;
                             return (
                                 <View key={message.id} style={{ marginBottom: 8 }}>
                                     {showTime && <Text style={[st.timestamp, { color: C.muted }]}>{formatTime(message.created_at)}</Text>}
-                                    <View style={{ flexDirection: 'row', justifyContent: isSent ? 'flex-end' : 'flex-start' }}>
-                                        {message.message_type === 'image' ? (
+                                    <Pressable
+                                        onLongPress={() => !isDeleted && setActiveMessage(message)}
+                                        delayLongPress={350}
+                                        style={{ flexDirection: 'row', justifyContent: isSent ? 'flex-end' : 'flex-start' }}
+                                    >
+                                        {isDeleted ? (
+                                            <View style={[st.bubble, st.deletedBubble, { borderColor: C.hair }]}>
+                                                <Text style={[st.bubbleText, { color: C.muted, fontStyle: 'italic' }]}>Správa bola vymazaná</Text>
+                                            </View>
+                                        ) : message.message_type === 'image' ? (
                                             <ImageMessageBubble url={signedUrl} isSent={isSent} C={C} />
                                         ) : message.message_type === 'audio' ? (
                                             <AudioMessageBubble url={signedUrl} durationSeconds={message.media_duration_seconds ?? 0} isSent={isSent} C={C} />
                                         ) : isSent ? (
                                             <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={[st.bubble, { borderBottomRightRadius: 5 }]}>
                                                 <Text style={[st.bubbleText, { color: C.onAccent }]}>{message.content}</Text>
+                                                {message.edited_at && <Text style={[st.editedLabel, { color: C.onAccent }]}>upravené</Text>}
                                             </LinearGradient>
                                         ) : (
                                             <ClaySurface radius={18} style={{ maxWidth: '78%' }} contentStyle={{ paddingHorizontal: 14, paddingVertical: 10 }}>
                                                 <Text style={[st.bubbleText, { color: C.text }]}>{message.content}</Text>
+                                                {message.edited_at && <Text style={[st.editedLabel, { color: C.muted }]}>upravené</Text>}
                                             </ClaySurface>
                                         )}
-                                    </View>
+                                    </Pressable>
+                                    {!isDeleted && msgReactions.length > 0 && (
+                                        <ReactionPills
+                                            reactions={msgReactions} currentUserId={currentUserId}
+                                            isSent={isSent} C={C}
+                                            onToggle={(emoji) => toggleReaction(message.id, emoji)}
+                                        />
+                                    )}
                                 </View>
                             );
                         })
                     )}
                 </ScrollView>
+
+                {editingMessage && (
+                    <View style={[st.editingBar, { backgroundColor: C.cLo, borderTopColor: C.hair }]}>
+                        <Pencil size={14} color={C.accent} strokeWidth={2.2} />
+                        <Text style={[st.editingBarText, { color: C.text }]} numberOfLines={1}>Upravujete správu</Text>
+                        <Pressable onPress={cancelEdit} accessibilityLabel="Zrušiť úpravu">
+                            <X size={18} color={C.muted} strokeWidth={2.2} />
+                        </Pressable>
+                    </View>
+                )}
 
                 {/* Input */}
                 <View style={[st.inputBar, { backgroundColor: C.bg, borderTopColor: C.hair }]}>
@@ -339,11 +466,13 @@ export default function ChatScreen() {
                         </>
                     ) : (
                         <>
-                            <Pressable onPress={attachPress} disabled={sending} accessibilityLabel="Priložiť fotku">
-                                <ClaySurface radius={22} style={{ width: 44, height: 44 }} contentStyle={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
-                                    <Paperclip size={19} color={C.muted} strokeWidth={2} />
-                                </ClaySurface>
-                            </Pressable>
+                            {!editingMessage && (
+                                <Pressable onPress={attachPress} disabled={sending} accessibilityLabel="Priložiť fotku">
+                                    <ClaySurface radius={22} style={{ width: 44, height: 44 }} contentStyle={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+                                        <Paperclip size={19} color={C.muted} strokeWidth={2} />
+                                    </ClaySurface>
+                                </Pressable>
+                            )}
                             <ClayInset radius={22} style={{ flex: 1 }} contentStyle={{ paddingHorizontal: 16, paddingVertical: 10 }}>
                                 <TextInput
                                     value={newMessage} onChangeText={setNewMessage}
@@ -352,7 +481,11 @@ export default function ChatScreen() {
                                     style={[st.textInput, { color: C.text }]}
                                 />
                             </ClayInset>
-                            <Pressable onPress={canSend ? sendMessage : toggleRecording} disabled={sending} accessibilityLabel={canSend ? 'Odoslať správu' : 'Nahrať hlasovku'}>
+                            <Pressable
+                                onPress={canSend ? sendMessage : (editingMessage ? undefined : toggleRecording)}
+                                disabled={sending || (!canSend && !!editingMessage)}
+                                accessibilityLabel={canSend ? (editingMessage ? 'Uložiť úpravu' : 'Odoslať správu') : 'Nahrať hlasovku'}
+                            >
                                 {canSend ? (
                                     <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={st.sendBtn}>
                                         {sending ? <ActivityIndicator size="small" color={C.onAccent} /> : <Send size={18} color={C.onAccent} strokeWidth={2.2} />}
@@ -367,6 +500,17 @@ export default function ChatScreen() {
                     )}
                 </View>
             </KeyboardAvoidingView>
+
+            <MessageActionSheet
+                message={activeMessage}
+                isOwn={!!activeMessage && activeMessage.sender_id === currentUserId}
+                canEdit={!!activeMessage && activeMessage.sender_id === currentUserId && (!activeMessage.message_type || activeMessage.message_type === 'text')}
+                onClose={() => setActiveMessage(null)}
+                onReact={(emoji) => activeMessage && toggleReaction(activeMessage.id, emoji)}
+                onEdit={() => activeMessage && startEdit(activeMessage)}
+                onDelete={() => activeMessage && deleteMessage(activeMessage)}
+                C={C}
+            />
         </SafeAreaView>
     );
 }
@@ -389,6 +533,10 @@ const makeStyles = (C: ClayColors) => StyleSheet.create({
     recordingIndicator: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 22, borderWidth: 1, paddingHorizontal: 16, paddingVertical: 13 },
     recordingDot: { width: 9, height: 9, borderRadius: 5, backgroundColor: '#ef4444' },
     recordingText: { fontSize: 14, fontWeight: '600' },
+    deletedBubble: { borderWidth: 1, borderStyle: 'dashed' },
+    editedLabel: { fontSize: 10, fontWeight: '600', opacity: 0.7, marginTop: 3 },
+    editingBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, borderTopWidth: StyleSheet.hairlineWidth, gap: 8 },
+    editingBarText: { flex: 1, fontSize: 12.5, fontWeight: '600' },
 });
 
 function ImageMessageBubble({ url, isSent, C }: { url?: string; isSent: boolean; C: ClayColors }) {
@@ -448,4 +596,80 @@ const chatMediaStyles = StyleSheet.create({
     audioPlayBtn: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
     audioTrack: { height: 3, borderRadius: 2, overflow: 'hidden' },
     audioTrackFill: { height: 3, borderRadius: 2 },
+});
+
+function ReactionPills({ reactions, currentUserId, isSent, onToggle, C }: {
+    reactions: Reaction[]; currentUserId: string | null; isSent: boolean;
+    onToggle: (emoji: string) => void; C: ClayColors;
+}) {
+    const groups = new Map<string, Reaction[]>();
+    for (const r of reactions) groups.set(r.emoji, [...(groups.get(r.emoji) ?? []), r]);
+    return (
+        <View style={[st2.reactionRow, { justifyContent: isSent ? 'flex-end' : 'flex-start' }]}>
+            {Array.from(groups.entries()).map(([emoji, group]) => {
+                const mine = group.some(r => r.user_id === currentUserId);
+                return (
+                    <Pressable
+                        key={emoji}
+                        onPress={() => onToggle(emoji)}
+                        style={[st2.reactionPill, {
+                            backgroundColor: mine ? C.accentDim : C.cLo,
+                            borderColor: mine ? C.accent : C.hair,
+                        }]}
+                    >
+                        <Text style={st2.reactionEmoji}>{emoji}</Text>
+                        {group.length > 1 && <Text style={[st2.reactionCount, { color: mine ? C.accent : C.muted }]}>{group.length}</Text>}
+                    </Pressable>
+                );
+            })}
+        </View>
+    );
+}
+
+function MessageActionSheet({ message, isOwn, canEdit, onClose, onReact, onEdit, onDelete, C }: {
+    message: Message | null; isOwn: boolean; canEdit: boolean;
+    onClose: () => void; onReact: (emoji: string) => void;
+    onEdit: () => void; onDelete: () => void; C: ClayColors;
+}) {
+    return (
+        <Modal visible={!!message} transparent animationType="fade" onRequestClose={onClose}>
+            <Pressable style={st2.sheetBackdrop} onPress={onClose}>
+                <Pressable style={[st2.sheetContent, { backgroundColor: C.bg }]} onPress={(e) => e.stopPropagation()}>
+                    <View style={st2.sheetEmojiRow}>
+                        {QUICK_REACTIONS.map(emoji => (
+                            <Pressable key={emoji} onPress={() => onReact(emoji)} style={[st2.sheetEmojiBtn, { backgroundColor: C.cLo }]}>
+                                <Text style={st2.sheetEmojiText}>{emoji}</Text>
+                            </Pressable>
+                        ))}
+                    </View>
+                    {isOwn && canEdit && (
+                        <Pressable onPress={onEdit} style={[st2.sheetActionRow, { borderTopColor: C.hair }]}>
+                            <Pencil size={18} color={C.text} strokeWidth={2} />
+                            <Text style={[st2.sheetActionText, { color: C.text }]}>Upraviť</Text>
+                        </Pressable>
+                    )}
+                    {isOwn && (
+                        <Pressable onPress={onDelete} style={[st2.sheetActionRow, { borderTopColor: C.hair }]}>
+                            <Trash2 size={18} color="#ef4444" strokeWidth={2} />
+                            <Text style={[st2.sheetActionText, { color: '#ef4444' }]}>Vymazať</Text>
+                        </Pressable>
+                    )}
+                </Pressable>
+            </Pressable>
+        </Modal>
+    );
+}
+
+const st2 = StyleSheet.create({
+    reactionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
+    reactionPill: { flexDirection: 'row', alignItems: 'center', gap: 3, borderRadius: 12, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1 },
+    reactionEmoji: { fontSize: 12 },
+    reactionCount: { fontSize: 11, fontWeight: '700' },
+    sheetBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+    sheetContent: { borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingTop: 16, paddingBottom: 30, paddingHorizontal: 16 },
+    sheetEmojiRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4, marginBottom: 14 },
+    sheetEmojiBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+    sheetEmojiText: { fontSize: 24 },
+    sheetActionRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 13, borderTopWidth: StyleSheet.hairlineWidth },
+    sheetActionText: { fontSize: 15, fontWeight: '600' },
 });
