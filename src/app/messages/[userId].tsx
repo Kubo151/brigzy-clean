@@ -5,18 +5,27 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ChevronLeft, Send } from "lucide-react-native";
+import { ChevronLeft, Send, Paperclip, Mic, Square, Play, Pause } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import * as ImagePicker from "expo-image-picker";
+import {
+    useAudioRecorder, useAudioRecorderState, RecordingPresets,
+    requestRecordingPermissionsAsync, useAudioPlayer, useAudioPlayerStatus,
+} from "expo-audio";
 import { supabase } from "@/lib/supabase";
 import { useClay } from "@/lib/useClay";
 import type { ClayColors } from "@/lib/useClay";
 import * as Haptics from "expo-haptics";
 import { ClaySurface, ClayInset } from "@/components/clay";
 import { goBack } from '@/lib/nav';
+import { showAlert } from '@/lib/notify';
 
 interface Message {
     id: string; content: string; sender_id: string;
     receiver_id: string; created_at: string; read: boolean;
+    message_type?: 'text' | 'system' | 'image' | 'audio';
+    media_path?: string | null;
+    media_duration_seconds?: number | null;
 }
 interface UserProfile {
     id: string; name: string; display_name: string | null;
@@ -135,6 +144,106 @@ export default function ChatScreen() {
         finally { setSending(false); }
     };
 
+    const sendMediaMessage = async (messageType: 'image' | 'audio', mediaPath: string, durationSeconds?: number) => {
+        if (!currentUserId) return;
+        const fallbackContent = messageType === 'image' ? '📷 Fotka' : `🎤 Hlasová správa${durationSeconds ? ` (${durationSeconds}s)` : ''}`;
+        const { data: inserted, error } = await supabase.from('messages').insert({
+            sender_id: currentUserId, receiver_id: userId,
+            content: fallbackContent, job_id: jobId || null, read: false,
+            message_type: messageType, media_path: mediaPath,
+            media_duration_seconds: durationSeconds ?? null,
+        }).select().single();
+        if (error) { showAlert('Chyba', 'Nepodarilo sa odoslať správu'); return; }
+        if (inserted) setMessages(prev => prev.some(m => m.id === inserted.id) ? prev : [...prev, inserted as Message]);
+        setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
+    };
+
+    const uploadChatMedia = async (uri: string, ext: string, contentType: string) => {
+        const response = await fetch(uri);
+        const blob = await response.blob();
+        const path = `${currentUserId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error } = await supabase.storage.from('chat-media').upload(path, blob, { contentType });
+        if (error) throw error;
+        return path;
+    };
+
+    const pickAndSendImage = async (useCamera: boolean) => {
+        try {
+            const { status } = useCamera
+                ? await ImagePicker.requestCameraPermissionsAsync()
+                : await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') { showAlert('Chyba', 'Je potrebné povolenie'); return; }
+            const result = useCamera
+                ? await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.6 })
+                : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.6 });
+            if (result.canceled || !result.assets[0]) return;
+            setSending(true);
+            const asset = result.assets[0];
+            // asset.uri is a blob: URI on web (no real file extension in it) —
+            // derive the extension from mimeType, never from the URI string.
+            const mimeType = asset.mimeType || 'image/jpeg';
+            const ext = mimeType.split('/')[1]?.split('+')[0] || 'jpg';
+            const path = await uploadChatMedia(asset.uri, ext, mimeType);
+            await sendMediaMessage('image', path);
+        } catch { showAlert('Chyba', 'Nepodarilo sa nahrať fotku'); }
+        finally { setSending(false); }
+    };
+
+    const attachPress = () => {
+        // showAlert's web fallback is window.confirm() — only 2 outcomes, so a
+        // 3-button native picker can't map cleanly to web. On web go straight
+        // to the file/gallery picker (the common case); native gets the choice.
+        if (Platform.OS === 'web') { pickAndSendImage(false); return; }
+        showAlert('Pridať fotku', undefined, [
+            { text: 'Fotoaparát', onPress: () => pickAndSendImage(true) },
+            { text: 'Galéria', onPress: () => pickAndSendImage(false) },
+            { text: 'Zrušiť', style: 'cancel' },
+        ]);
+    };
+
+    const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+    const recorderState = useAudioRecorderState(audioRecorder, 200);
+
+    const toggleRecording = async () => {
+        if (recorderState.isRecording) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            await audioRecorder.stop();
+            const uri = audioRecorder.uri;
+            const durationSeconds = Math.round((recorderState.durationMillis || 0) / 1000);
+            if (uri && durationSeconds > 0) {
+                setSending(true);
+                try {
+                    const ext = Platform.OS === 'web' ? 'webm' : 'm4a';
+                    const contentType = Platform.OS === 'web' ? 'audio/webm' : 'audio/m4a';
+                    const path = await uploadChatMedia(uri, ext, contentType);
+                    await sendMediaMessage('audio', path, durationSeconds);
+                } catch { showAlert('Chyba', 'Nepodarilo sa odoslať hlasovú správu'); }
+                finally { setSending(false); }
+            }
+            return;
+        }
+        const { granted } = await requestRecordingPermissionsAsync();
+        if (!granted) { showAlert('Chyba', 'Je potrebné povolenie na nahrávanie zvuku'); return; }
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        await audioRecorder.prepareToRecordAsync();
+        audioRecorder.record();
+    };
+
+    const signedUrlCache = useRef<Map<string, string>>(new Map());
+    const [, forceSignedUrlRerender] = useState(0);
+    useEffect(() => {
+        const missing = messages.filter(m => m.media_path && !signedUrlCache.current.has(m.media_path));
+        if (missing.length === 0) return;
+        (async () => {
+            for (const m of missing) {
+                if (!m.media_path) continue;
+                const { data } = await supabase.storage.from('chat-media').createSignedUrl(m.media_path, 3600);
+                if (data?.signedUrl) signedUrlCache.current.set(m.media_path, data.signedUrl);
+            }
+            forceSignedUrlRerender(n => n + 1);
+        })();
+    }, [messages]);
+
     const formatTime = (d: string) => new Date(d).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' });
     const initial = (otherUser?.display_name || otherUser?.name)?.charAt(0).toUpperCase() || '?';
     const canSend = !!newMessage.trim() && !sending;
@@ -187,11 +296,16 @@ export default function ChatScreen() {
                         messages.map((message, index) => {
                             const isSent = message.sender_id === currentUserId;
                             const showTime = index === 0 || new Date(message.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() > 300000;
+                            const signedUrl = message.media_path ? signedUrlCache.current.get(message.media_path) : undefined;
                             return (
                                 <View key={message.id} style={{ marginBottom: 8 }}>
                                     {showTime && <Text style={[st.timestamp, { color: C.muted }]}>{formatTime(message.created_at)}</Text>}
                                     <View style={{ flexDirection: 'row', justifyContent: isSent ? 'flex-end' : 'flex-start' }}>
-                                        {isSent ? (
+                                        {message.message_type === 'image' ? (
+                                            <ImageMessageBubble url={signedUrl} isSent={isSent} C={C} />
+                                        ) : message.message_type === 'audio' ? (
+                                            <AudioMessageBubble url={signedUrl} durationSeconds={message.media_duration_seconds ?? 0} isSent={isSent} C={C} />
+                                        ) : isSent ? (
                                             <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={[st.bubble, { borderBottomRightRadius: 5 }]}>
                                                 <Text style={[st.bubbleText, { color: C.onAccent }]}>{message.content}</Text>
                                             </LinearGradient>
@@ -209,25 +323,48 @@ export default function ChatScreen() {
 
                 {/* Input */}
                 <View style={[st.inputBar, { backgroundColor: C.bg, borderTopColor: C.hair }]}>
-                    <ClayInset radius={22} style={{ flex: 1 }} contentStyle={{ paddingHorizontal: 16, paddingVertical: 10 }}>
-                        <TextInput
-                            value={newMessage} onChangeText={setNewMessage}
-                            placeholder="Napíšte správu..." placeholderTextColor={C.muted}
-                            multiline maxLength={500}
-                            style={[st.textInput, { color: C.text }]}
-                        />
-                    </ClayInset>
-                    <Pressable onPress={sendMessage} disabled={!canSend}>
-                        {canSend ? (
-                            <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={st.sendBtn}>
-                                {sending ? <ActivityIndicator size="small" color={C.onAccent} /> : <Send size={18} color={C.onAccent} strokeWidth={2.2} />}
-                            </LinearGradient>
-                        ) : (
-                            <View style={[st.sendBtn, { backgroundColor: C.cLo, borderWidth: 1, borderColor: C.hair }]}>
-                                <Send size={18} color={C.muted} strokeWidth={2} />
+                    {recorderState.isRecording ? (
+                        <>
+                            <View style={[st.recordingIndicator, { backgroundColor: C.cLo, borderColor: C.hair }]}>
+                                <View style={st.recordingDot} />
+                                <Text style={[st.recordingText, { color: C.text }]}>
+                                    Nahrávam... {Math.round((recorderState.durationMillis || 0) / 1000)}s
+                                </Text>
                             </View>
-                        )}
-                    </Pressable>
+                            <Pressable onPress={toggleRecording} accessibilityLabel="Zastaviť nahrávanie a odoslať">
+                                <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={st.sendBtn}>
+                                    <Square size={16} color={C.onAccent} strokeWidth={2.2} fill={C.onAccent} />
+                                </LinearGradient>
+                            </Pressable>
+                        </>
+                    ) : (
+                        <>
+                            <Pressable onPress={attachPress} disabled={sending} accessibilityLabel="Priložiť fotku">
+                                <ClaySurface radius={22} style={{ width: 44, height: 44 }} contentStyle={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+                                    <Paperclip size={19} color={C.muted} strokeWidth={2} />
+                                </ClaySurface>
+                            </Pressable>
+                            <ClayInset radius={22} style={{ flex: 1 }} contentStyle={{ paddingHorizontal: 16, paddingVertical: 10 }}>
+                                <TextInput
+                                    value={newMessage} onChangeText={setNewMessage}
+                                    placeholder="Napíšte správu..." placeholderTextColor={C.muted}
+                                    multiline maxLength={500}
+                                    style={[st.textInput, { color: C.text }]}
+                                />
+                            </ClayInset>
+                            <Pressable onPress={canSend ? sendMessage : toggleRecording} disabled={sending} accessibilityLabel={canSend ? 'Odoslať správu' : 'Nahrať hlasovku'}>
+                                {canSend ? (
+                                    <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={st.sendBtn}>
+                                        {sending ? <ActivityIndicator size="small" color={C.onAccent} /> : <Send size={18} color={C.onAccent} strokeWidth={2.2} />}
+                                    </LinearGradient>
+                                ) : (
+                                    <View style={[st.sendBtn, { backgroundColor: C.cLo, borderWidth: 1, borderColor: C.hair }]}>
+                                        {sending ? <ActivityIndicator size="small" color={C.muted} /> : <Mic size={18} color={C.muted} strokeWidth={2} />}
+                                    </View>
+                                )}
+                            </Pressable>
+                        </>
+                    )}
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -249,4 +386,66 @@ const makeStyles = (C: ClayColors) => StyleSheet.create({
     inputBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderTopWidth: StyleSheet.hairlineWidth, gap: 8 },
     textInput: { fontSize: 15, maxHeight: 100, fontWeight: '500' },
     sendBtn: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
+    recordingIndicator: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 22, borderWidth: 1, paddingHorizontal: 16, paddingVertical: 13 },
+    recordingDot: { width: 9, height: 9, borderRadius: 5, backgroundColor: '#ef4444' },
+    recordingText: { fontSize: 14, fontWeight: '600' },
+});
+
+function ImageMessageBubble({ url, isSent, C }: { url?: string; isSent: boolean; C: ClayColors }) {
+    if (!url) {
+        return (
+            <View style={[chatMediaStyles.imageBubble, { backgroundColor: C.cLo, alignItems: 'center', justifyContent: 'center' }]}>
+                <ActivityIndicator size="small" color={C.muted} />
+            </View>
+        );
+    }
+    return (
+        <Pressable onPress={() => Platform.OS === 'web' && typeof window !== 'undefined' && window.open(url, '_blank')}>
+            <Image source={{ uri: url }} style={chatMediaStyles.imageBubble} resizeMode="cover" />
+        </Pressable>
+    );
+}
+
+function AudioMessageBubble({ url, durationSeconds, isSent, C }: { url?: string; durationSeconds: number; isSent: boolean; C: ClayColors }) {
+    const player = useAudioPlayer(url ?? null);
+    const status = useAudioPlayerStatus(player);
+    const totalSeconds = status.duration > 0 ? status.duration : durationSeconds;
+    const progress = totalSeconds > 0 ? Math.min((status.currentTime || 0) / totalSeconds, 1) : 0;
+
+    const toggle = () => {
+        if (!url) return;
+        if (status.playing) player.pause();
+        else { if (status.currentTime >= totalSeconds && totalSeconds > 0) player.seekTo(0); player.play(); }
+    };
+
+    const bg = isSent
+        ? { backgroundColor: C.accent }
+        : { backgroundColor: C.cLo, borderWidth: 1, borderColor: C.hair };
+    const fg = isSent ? C.onAccent : C.text;
+
+    return (
+        <View style={[chatMediaStyles.audioBubble, bg]}>
+            <Pressable onPress={toggle} style={[chatMediaStyles.audioPlayBtn, { backgroundColor: isSent ? 'rgba(255,255,255,0.25)' : C.cHi }]}>
+                {!url ? <ActivityIndicator size="small" color={fg} /> : status.playing
+                    ? <Pause size={15} color={fg} strokeWidth={2.4} fill={fg} />
+                    : <Play size={15} color={fg} strokeWidth={2.4} fill={fg} />}
+            </Pressable>
+            <View style={{ flex: 1 }}>
+                <View style={[chatMediaStyles.audioTrack, { backgroundColor: isSent ? 'rgba(255,255,255,0.3)' : C.hair }]}>
+                    <View style={[chatMediaStyles.audioTrackFill, { width: `${progress * 100}%`, backgroundColor: fg }]} />
+                </View>
+                <Text style={{ fontSize: 11, fontWeight: '600', color: fg, marginTop: 5, opacity: 0.85 }}>
+                    {Math.round(totalSeconds)}s
+                </Text>
+            </View>
+        </View>
+    );
+}
+
+const chatMediaStyles = StyleSheet.create({
+    imageBubble: { width: 200, height: 200, borderRadius: 18, overflow: 'hidden' },
+    audioBubble: { flexDirection: 'row', alignItems: 'center', gap: 10, maxWidth: '78%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10, minWidth: 170 },
+    audioPlayBtn: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
+    audioTrack: { height: 3, borderRadius: 2, overflow: 'hidden' },
+    audioTrackFill: { height: 3, borderRadius: 2 },
 });
