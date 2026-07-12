@@ -287,6 +287,7 @@ export default function EmployerJobDetailScreen() {
                                         <Pressable
                                             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(`/messages/${applicant.worker.id}?jobId=${job.id}`); }}
                                             hitSlop={8}
+                                            accessibilityLabel={`Napísať správu uchádzačovi ${applicant.worker.display_name || ''}`}
                                         >
                                             <ClaySurface radius={12} style={{ width: 38, height: 38 }} contentStyle={{ width: 38, height: 38, alignItems: 'center', justifyContent: 'center' }}>
                                                 <MessageCircle size={17} color={C.accent} strokeWidth={2} />

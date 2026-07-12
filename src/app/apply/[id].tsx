@@ -84,7 +84,7 @@ export default function ApplyScreen() {
                 return;
             }
             const { error } = await supabase.from("applications").insert({
-                job_id: job.id, worker_id: currentUser.id, status: "pending",
+                job_id: job.id, worker_id: currentUser.id, worker_user_id: currentUser.id, status: "pending",
                 message: message.trim(), created_at: new Date().toISOString(),
             });
             if (error) {

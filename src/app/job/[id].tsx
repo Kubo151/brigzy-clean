@@ -323,7 +323,8 @@ export default function JobDetailScreen() {
                 {/* Bottom bar */}
                 <View style={[styles.bottomBar, { backgroundColor: C.bg, borderTopColor: C.hair }]}>
                     <Pressable onPress={() => router.push(`/messages/${job.employerId}${job.id ? `?jobId=${job.id}` : ''}`)}
-                        style={({ pressed }) => [pressed && { transform: [{ scale: 0.96 }] }]}>
+                        style={({ pressed }) => [pressed && { transform: [{ scale: 0.96 }] }]}
+                        accessibilityLabel="Napísať správu zadávateľovi">
                         <ClaySurface radius={16} style={{ width: 54, height: 54 }} contentStyle={{ width: 54, height: 54, alignItems: 'center', justifyContent: 'center' }}>
                             <MessageSquare size={22} color={C.text} strokeWidth={2} />
                         </ClaySurface>
