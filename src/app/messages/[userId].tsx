@@ -5,7 +5,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ChevronLeft, Send, Paperclip, Mic, Square, Play, Pause, Pencil, Trash2, X } from "lucide-react-native";
+import { ChevronLeft, Send, Paperclip, Mic, Square, Play, Pause, Pencil, Trash2, X, Handshake, Check, Clock3 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 import {
@@ -36,6 +36,16 @@ interface UserProfile {
 interface Reaction {
     id: string; message_id: string; user_id: string; emoji: string;
 }
+interface Negotiation {
+    id: string; application_id: string; round: number;
+    proposed_by: 'worker' | 'poster'; rate_cents: number;
+    rate_type: 'hourly' | 'fixed'; note: string | null;
+    currency: string; status: 'pending' | 'accepted' | 'rejected' | 'expired';
+    created_at: string;
+}
+interface NegotiationApp {
+    id: string; status: string; negotiated_rate_cents: number | null;
+}
 
 const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 
@@ -54,10 +64,24 @@ export default function ChatScreen() {
     const [otherUser, setOtherUser] = useState<UserProfile | null>(null);
     const [activeMessage, setActiveMessage] = useState<Message | null>(null);
     const [editingMessage, setEditingMessage] = useState<Message | null>(null);
+
+    // S2 price negotiation (only when this chat is scoped to a job via ?jobId=)
+    const [negotiationApp, setNegotiationApp] = useState<NegotiationApp | null>(null);
+    const [myNegRole, setMyNegRole] = useState<'worker' | 'poster' | null>(null);
+    const [jobPayType, setJobPayType] = useState<'hourly' | 'fixed'>('hourly');
+    const [negotiations, setNegotiations] = useState<Negotiation[]>([]);
+    const [proposeVisible, setProposeVisible] = useState(false);
+    const [proposeAmount, setProposeAmount] = useState('');
+    const [proposeNote, setProposeNote] = useState('');
+    const [proposeRateType, setProposeRateType] = useState<'hourly' | 'fixed'>('hourly');
+    const [negotiating, setNegotiating] = useState(false);
+
     const scrollViewRef = useRef<ScrollView>(null);
     // The realtime callback must read the CURRENT user id — a state value would
     // be captured as null in the closure created before the session loads.
     const currentUserIdRef = useRef<string | null>(null);
+    const negotiationAppIdRef = useRef<string | null>(null);
+    useEffect(() => { negotiationAppIdRef.current = negotiationApp?.id ?? null; }, [negotiationApp]);
 
     useEffect(() => {
         // Realtime sockets die silently (mobile browsers kill them in the
@@ -101,6 +125,16 @@ export default function ChatScreen() {
                 .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'message_reactions' }, (payload) => {
                     const r = payload.old as Reaction;
                     setReactions(prev => prev.filter(x => x.id !== r.id));
+                })
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'price_negotiations' }, (payload) => {
+                    const n = payload.new as Negotiation;
+                    if (n.application_id !== negotiationAppIdRef.current) return;
+                    setNegotiations(prev => prev.some(x => x.id === n.id) ? prev : [...prev, n]);
+                })
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'price_negotiations' }, (payload) => {
+                    const n = payload.new as Negotiation;
+                    if (n.application_id !== negotiationAppIdRef.current) return;
+                    setNegotiations(prev => prev.map(x => x.id === n.id ? n : x));
                 })
                 .subscribe((status) => {
                     if (disposed) return;
@@ -157,6 +191,79 @@ export default function ChatScreen() {
             }
         } catch (e) { console.error('Error:', e); }
         finally { setLoading(false); }
+    };
+
+    // S2: resolve which party is worker/poster for this job + load the
+    // application + its negotiation history. Runs once jobId+currentUserId
+    // are known (not on every poll — negotiation state updates via realtime).
+    useEffect(() => {
+        if (!jobId || !currentUserId) return;
+        (async () => {
+            const { data: job } = await supabase.from('jobs')
+                .select('id, poster_user_id, employer_id, pay_type').eq('id', jobId).maybeSingle();
+            if (!job) return;
+            const posterUserId = job.poster_user_id ?? job.employer_id;
+            setJobPayType((job.pay_type as 'hourly' | 'fixed') ?? 'hourly');
+            setProposeRateType((job.pay_type as 'hourly' | 'fixed') ?? 'hourly');
+
+            let role: 'worker' | 'poster' | null = null;
+            let workerId: string | null = null;
+            if (currentUserId === posterUserId) { role = 'poster'; workerId = userId as string; }
+            else if (userId === posterUserId) { role = 'worker'; workerId = currentUserId; }
+            if (!role || !workerId) return;
+            setMyNegRole(role);
+
+            const { data: app } = await supabase.from('applications')
+                .select('id, status, negotiated_rate_cents')
+                .eq('job_id', jobId)
+                .or(`worker_id.eq.${workerId},worker_user_id.eq.${workerId}`)
+                .maybeSingle();
+            if (!app) return;
+            setNegotiationApp(app);
+
+            const { data: negs } = await supabase.from('price_negotiations')
+                .select('*').eq('application_id', app.id).order('round', { ascending: true });
+            if (negs) setNegotiations(negs);
+        })();
+    }, [jobId, currentUserId, userId]);
+
+    const latestNegotiation = negotiations.length > 0 ? negotiations[negotiations.length - 1] : null;
+
+    const submitProposal = async () => {
+        if (!negotiationApp || negotiating) return;
+        const eur = parseFloat(proposeAmount.replace(',', '.'));
+        if (!eur || eur <= 0) { showAlert('Chyba', 'Zadajte platnú sumu'); return; }
+        setNegotiating(true);
+        try {
+            const { data, error } = await supabase.functions.invoke('negotiate-price', {
+                body: {
+                    application_id: negotiationApp.id, action: 'propose',
+                    rate_cents: Math.round(eur * 100), rate_type: proposeRateType,
+                    note: proposeNote.trim() || undefined,
+                },
+            });
+            if (error || data?.error) throw error ?? new Error(data.error);
+            setNegotiations(prev => [...prev, data.negotiation]);
+            setProposeVisible(false);
+            setProposeAmount(''); setProposeNote('');
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } catch (e) { console.error(e); showAlert('Chyba', 'Nepodarilo sa odoslať návrh'); }
+        finally { setNegotiating(false); }
+    };
+
+    const respondToProposal = async (action: 'accept' | 'reject') => {
+        if (!negotiationApp || !latestNegotiation || negotiating) return;
+        setNegotiating(true);
+        try {
+            const { data, error } = await supabase.functions.invoke('negotiate-price', {
+                body: { application_id: negotiationApp.id, action, negotiation_id: latestNegotiation.id },
+            });
+            if (error || data?.error) throw error ?? new Error(data.error);
+            setNegotiations(prev => prev.map(n => n.id === data.negotiation.id ? data.negotiation : n));
+            if (data.application) setNegotiationApp(prev => prev ? { ...prev, negotiated_rate_cents: data.application.negotiated_rate_cents } : prev);
+            Haptics.notificationAsync(action === 'accept' ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning);
+        } catch (e) { console.error(e); showAlert('Chyba', 'Akcia zlyhala'); }
+        finally { setNegotiating(false); }
     };
 
     const sendMessage = async () => {
@@ -438,6 +545,56 @@ export default function ChatScreen() {
                     )}
                 </ScrollView>
 
+                {negotiationApp && negotiationApp.status === 'pending' && (
+                    <View style={[st.negBar, { backgroundColor: C.cLo, borderTopColor: C.hair }]}>
+                        {!latestNegotiation ? (
+                            <Pressable onPress={() => setProposeVisible(true)} style={st.negRow}>
+                                <Handshake size={16} color={C.accent} strokeWidth={2.2} />
+                                <Text style={[st.negText, { color: C.accent }]}>Navrhnúť sumu</Text>
+                            </Pressable>
+                        ) : latestNegotiation.status === 'accepted' ? (
+                            <View style={st.negRow}>
+                                <Check size={16} color={C.green} strokeWidth={2.4} />
+                                <Text style={[st.negText, { color: C.green }]}>
+                                    Dohodnutá suma: €{(latestNegotiation.rate_cents / 100).toFixed(2)}{latestNegotiation.rate_type === 'hourly' ? '/h' : ''}
+                                </Text>
+                            </View>
+                        ) : latestNegotiation.status === 'pending' && latestNegotiation.proposed_by === myNegRole ? (
+                            <View style={st.negRow}>
+                                <Clock3 size={16} color={C.muted} strokeWidth={2.2} />
+                                <Text style={[st.negText, { color: C.muted }]}>
+                                    Čakáte na odpoveď — €{(latestNegotiation.rate_cents / 100).toFixed(2)}{latestNegotiation.rate_type === 'hourly' ? '/h' : ''}
+                                </Text>
+                            </View>
+                        ) : latestNegotiation.status === 'pending' ? (
+                            <View>
+                                <Text style={[st.negText, { color: C.text, marginBottom: 8 }]}>
+                                    Návrh: €{(latestNegotiation.rate_cents / 100).toFixed(2)}{latestNegotiation.rate_type === 'hourly' ? '/h' : ''}
+                                    {latestNegotiation.note ? ` — ${latestNegotiation.note}` : ''}
+                                </Text>
+                                <View style={{ flexDirection: 'row', gap: 8 }}>
+                                    <Pressable disabled={negotiating} onPress={() => respondToProposal('accept')} style={[st.negBtn, { backgroundColor: C.green }]}>
+                                        <Text style={st.negBtnText}>Prijať</Text>
+                                    </Pressable>
+                                    <Pressable disabled={negotiating} onPress={() => respondToProposal('reject')} style={[st.negBtn, { backgroundColor: C.red }]}>
+                                        <Text style={st.negBtnText}>Odmietnuť</Text>
+                                    </Pressable>
+                                    <Pressable disabled={negotiating} onPress={() => setProposeVisible(true)} style={[st.negBtn, { backgroundColor: C.cHi, borderWidth: 1, borderColor: C.hair }]}>
+                                        <Text style={[st.negBtnText, { color: C.text }]}>Protinávrh</Text>
+                                    </Pressable>
+                                </View>
+                            </View>
+                        ) : negotiations.length >= 3 ? (
+                            <Text style={[st.negText, { color: C.muted }]}>Maximálny počet kôl vyjednávania dosiahnutý</Text>
+                        ) : (
+                            <Pressable onPress={() => setProposeVisible(true)} style={st.negRow}>
+                                <Handshake size={16} color={C.accent} strokeWidth={2.2} />
+                                <Text style={[st.negText, { color: C.accent }]}>Posledný návrh zamietnutý — navrhnúť novú sumu</Text>
+                            </Pressable>
+                        )}
+                    </View>
+                )}
+
                 {editingMessage && (
                     <View style={[st.editingBar, { backgroundColor: C.cLo, borderTopColor: C.hair }]}>
                         <Pencil size={14} color={C.accent} strokeWidth={2.2} />
@@ -511,6 +668,43 @@ export default function ChatScreen() {
                 onDelete={() => activeMessage && deleteMessage(activeMessage)}
                 C={C}
             />
+
+            <Modal visible={proposeVisible} transparent animationType="fade" onRequestClose={() => setProposeVisible(false)}>
+                <Pressable style={st.sheetBackdropAlt} onPress={() => setProposeVisible(false)}>
+                    <Pressable style={[st.proposeSheet, { backgroundColor: C.bg }]} onPress={(e) => e.stopPropagation()}>
+                        <Text style={[st.proposeTitle, { color: C.text }]}>Navrhnúť sumu</Text>
+                        <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
+                            {(['hourly', 'fixed'] as const).map(t => (
+                                <Pressable key={t} onPress={() => setProposeRateType(t)}
+                                    style={[st.rateTypeBtn, { backgroundColor: proposeRateType === t ? C.accent : C.cLo }]}>
+                                    <Text style={[st.rateTypeText, { color: proposeRateType === t ? C.onAccent : C.text }]}>
+                                        {t === 'hourly' ? 'Na hodinu' : 'Pevná suma'}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </View>
+                        <ClayInset radius={14} style={{ marginBottom: 10 }} contentStyle={{ paddingHorizontal: 14, paddingVertical: 10 }}>
+                            <TextInput
+                                value={proposeAmount} onChangeText={setProposeAmount}
+                                placeholder="Suma v €" placeholderTextColor={C.muted}
+                                keyboardType="decimal-pad"
+                                style={[st.proposeInput, { color: C.text }]}
+                            />
+                        </ClayInset>
+                        <ClayInset radius={14} style={{ marginBottom: 16 }} contentStyle={{ paddingHorizontal: 14, paddingVertical: 10 }}>
+                            <TextInput
+                                value={proposeNote} onChangeText={setProposeNote}
+                                placeholder="Poznámka (nepovinné)" placeholderTextColor={C.muted}
+                                maxLength={200}
+                                style={[st.proposeInput, { color: C.text }]}
+                            />
+                        </ClayInset>
+                        <Pressable disabled={negotiating} onPress={submitProposal} style={[st.negBtn, { backgroundColor: C.accent, paddingVertical: 13 }]}>
+                            {negotiating ? <ActivityIndicator size="small" color={C.onAccent} /> : <Text style={st.negBtnText}>Odoslať návrh</Text>}
+                        </Pressable>
+                    </Pressable>
+                </Pressable>
+            </Modal>
         </SafeAreaView>
     );
 }
@@ -537,6 +731,17 @@ const makeStyles = (C: ClayColors) => StyleSheet.create({
     editedLabel: { fontSize: 10, fontWeight: '600', opacity: 0.7, marginTop: 3 },
     editingBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, borderTopWidth: StyleSheet.hairlineWidth, gap: 8 },
     editingBarText: { flex: 1, fontSize: 12.5, fontWeight: '600' },
+    negBar: { paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: StyleSheet.hairlineWidth },
+    negRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    negText: { fontSize: 13.5, fontWeight: '700', flexShrink: 1 },
+    negBtn: { flex: 1, paddingVertical: 9, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+    negBtnText: { fontSize: 13, fontWeight: '800', color: '#fff' },
+    sheetBackdropAlt: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', padding: 24 },
+    proposeSheet: { width: '100%', maxWidth: 380, borderRadius: 20, padding: 20 },
+    proposeTitle: { fontSize: 17, fontWeight: '800', marginBottom: 16 },
+    rateTypeBtn: { flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center' },
+    rateTypeText: { fontSize: 13, fontWeight: '700' },
+    proposeInput: { fontSize: 15, fontWeight: '500' },
 });
 
 function ImageMessageBubble({ url, isSent, C }: { url?: string; isSent: boolean; C: ClayColors }) {

@@ -4,7 +4,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { ChevronLeft, MapPin, Clock, Users, XCircle, Star, Zap, BadgeCheck, ShieldCheck } from "lucide-react-native";
+import { ChevronLeft, MapPin, Clock, Users, XCircle, Star, Zap, BadgeCheck, ShieldCheck, MessageCircle } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { useClay } from "@/lib/useClay";
@@ -265,24 +265,34 @@ export default function EmployerJobDetailScreen() {
                             const isSelecting = selectingId === applicant.id;
                             return (
                                 <ClaySurface key={applicant.id} radius={18} style={{ marginBottom: 12 }} contentStyle={{ padding: 16 }}>
-                                    {/* Spec P4: tap worker name/avatar → W13 public profile */}
-                                    <Pressable
-                                        onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(`/user/${applicant.worker.id}`); }}
-                                        style={({ pressed }) => [styles.applicantHeader, pressed && { opacity: 0.7 }]}
-                                    >
-                                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.applicantAvatar}>
-                                            <Text style={[styles.applicantInitial, { color: C.onAccent }]}>{applicant.worker.display_name?.[0]?.toUpperCase() || "?"}</Text>
-                                        </LinearGradient>
-                                        <View style={{ flex: 1 }}>
-                                            <View style={styles.nameRow}>
-                                                <Text style={[styles.applicantName, { color: C.text }]}>{applicant.worker.display_name || "Unknown"}</Text>
-                                                {applicant.worker.brigzy_verified && (
-                                                    <BadgeCheck size={17} color={C.accent} strokeWidth={2.2} />
-                                                )}
+                                    <View style={styles.applicantHeader}>
+                                        {/* Spec P4: tap worker name/avatar → W13 public profile */}
+                                        <Pressable
+                                            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(`/user/${applicant.worker.id}`); }}
+                                            style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }, pressed && { opacity: 0.7 }]}
+                                        >
+                                            <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.applicantAvatar}>
+                                                <Text style={[styles.applicantInitial, { color: C.onAccent }]}>{applicant.worker.display_name?.[0]?.toUpperCase() || "?"}</Text>
+                                            </LinearGradient>
+                                            <View style={{ flex: 1 }}>
+                                                <View style={styles.nameRow}>
+                                                    <Text style={[styles.applicantName, { color: C.text }]}>{applicant.worker.display_name || "Unknown"}</Text>
+                                                    {applicant.worker.brigzy_verified && (
+                                                        <BadgeCheck size={17} color={C.accent} strokeWidth={2.2} />
+                                                    )}
+                                                </View>
+                                                <Text style={[styles.applicantDate, { color: C.muted }]}>{text.applied} {new Date(applicant.created_at).toLocaleDateString()}</Text>
                                             </View>
-                                            <Text style={[styles.applicantDate, { color: C.muted }]}>{text.applied} {new Date(applicant.created_at).toLocaleDateString()}</Text>
-                                        </View>
-                                    </Pressable>
+                                        </Pressable>
+                                        <Pressable
+                                            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(`/messages/${applicant.worker.id}?jobId=${job.id}`); }}
+                                            hitSlop={8}
+                                        >
+                                            <ClaySurface radius={12} style={{ width: 38, height: 38 }} contentStyle={{ width: 38, height: 38, alignItems: 'center', justifyContent: 'center' }}>
+                                                <MessageCircle size={17} color={C.accent} strokeWidth={2} />
+                                            </ClaySurface>
+                                        </Pressable>
+                                    </View>
 
                                     {/* P4 rank stats: rating · XP · verified */}
                                     <View style={styles.statsRow}>
