@@ -79,6 +79,21 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: 'escrow_not_resolvable', state: escrow?.state ?? null }, 409);
     }
 
+    if (dispute_id) {
+      const { data: disputeRow, error: disputeFetchError } = await admin
+        .from('disputes')
+        .select('id, booking_id')
+        .eq('id', dispute_id)
+        .maybeSingle();
+      if (disputeFetchError) throw disputeFetchError;
+      if (!disputeRow) return jsonResponse({ error: 'dispute_not_found' }, 404);
+      // Cross-entity check: a dispute_id for a different booking must not be
+      // able to resolve/close out over this booking's escrow.
+      if (disputeRow.booking_id !== booking.id) {
+        return jsonResponse({ error: 'dispute_booking_mismatch' }, 400);
+      }
+    }
+
     const { data: job } = await admin.from('jobs').select('title').eq('id', booking.job_id).maybeSingle();
 
     const pct = resolution === 'release_worker' ? 100 : resolution === 'refund_poster' ? 0 : split_pct;
@@ -86,15 +101,25 @@ Deno.serve(async (req: Request) => {
     const refundCents = escrow.amount_cents - payoutCents;
     const now = new Date().toISOString();
 
-    const { error: escrowUpdateError } = await admin
+    // Conditional on state still being resolvable — the read above and this
+    // write aren't atomic, so two concurrent calls (double-click, two admins)
+    // could both pass the earlier check. Only the request that actually flips
+    // the row proceeds to move money; the loser gets a clean 409 instead of a
+    // second wallet_ledger credit for the same escrow.
+    const { data: escrowUpdateRows, error: escrowUpdateError } = await admin
       .from('escrow_transactions')
       .update({
         state: payoutCents === 0 ? 'refunded' : 'cleared',
         released_at: now,
         released_amount_cents: payoutCents,
       })
-      .eq('id', escrow.id);
+      .eq('id', escrow.id)
+      .in('state', ['pending', 'disputed'])
+      .select('id');
     if (escrowUpdateError) throw escrowUpdateError;
+    if (!escrowUpdateRows || escrowUpdateRows.length === 0) {
+      return jsonResponse({ error: 'escrow_already_resolved' }, 409);
+    }
 
     const { error: bookingUpdateError } = await admin
       .from('bookings')
@@ -132,13 +157,18 @@ Deno.serve(async (req: Request) => {
       if (disputeError) throw disputeError;
     }
 
-    await admin.from('admin_actions').insert({
+    const { error: auditError } = await admin.from('admin_actions').insert({
       admin_user_id: user.id,
       action: dispute_id ? 'resolve_dispute' : 'manual_escrow_resolution',
       entity_type: 'booking',
       entity_id: booking.id,
       payload_json: { resolution, split_pct: pct, reason, dispute_id, payoutCents, refundCents },
     });
+    // Money already moved by this point — don't fail the request over a logging
+    // write, but don't swallow it silently either (a tool that moves money needs
+    // its audit trail to be trustworthy; a silent gap here would look identical
+    // to the write actually succeeding).
+    if (auditError) console.error('[admin-resolve-booking] audit log write failed', auditError);
 
     return jsonResponse({
       booking_id: booking.id,
