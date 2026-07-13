@@ -57,6 +57,11 @@ interface MyReview {
     revealed_at: string | null;
 }
 
+interface MyDispute {
+    id: string;
+    status: string;
+}
+
 const eur = (cents: number) => `€${(cents / 100).toFixed(2)}`;
 
 export default function BookingHubScreen() {
@@ -76,6 +81,10 @@ export default function BookingHubScreen() {
     const [reviewStars, setReviewStars] = useState(0);
     const [reviewComment, setReviewComment] = useState('');
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+    const [myDispute, setMyDispute] = useState<MyDispute | null>(null);
+    const [disputeFormVisible, setDisputeFormVisible] = useState(false);
+    const [disputeDescription, setDisputeDescription] = useState('');
+    const [isSubmittingDispute, setIsSubmittingDispute] = useState(false);
 
     const load = useCallback(async () => {
         if (!id) return;
@@ -83,7 +92,7 @@ export default function BookingHubScreen() {
             const { data: { user } } = await supabase.auth.getUser();
             setMyUserId(user?.id ?? null);
 
-            const [bookingRes, contractRes, reviewRes] = await Promise.all([
+            const [bookingRes, contractRes, reviewRes, disputeRes] = await Promise.all([
                 supabase
                     .from('bookings')
                     .select('id, job_id, worker_user_id, poster_user_id, status, agreed_amount_cents, service_fee_cents, currency, escrow_id, contract_id, check_in_at, check_out_at, job:job_id(title, company_name, pay_type), worker:worker_user_id(display_name), poster:poster_user_id(display_name)')
@@ -102,11 +111,21 @@ export default function BookingHubScreen() {
                         .eq('from_user_id', user.id)
                         .maybeSingle()
                     : Promise.resolve({ data: null }),
+                user
+                    ? supabase
+                        .from('disputes')
+                        .select('id, status')
+                        .eq('booking_id', id)
+                        .eq('raised_by', user.id)
+                        .in('status', ['open', 'info_requested'])
+                        .maybeSingle()
+                    : Promise.resolve({ data: null }),
             ]);
             if (bookingRes.error) throw bookingRes.error;
             setBooking(bookingRes.data as unknown as BookingDetail);
             setContract((contractRes.data as ContractState) ?? null);
             setMyReview((reviewRes.data as MyReview) ?? null);
+            setMyDispute((disputeRes.data as MyDispute) ?? null);
         } catch (e) {
             console.error('❌ [BookingHub] load failed:', e);
         } finally {
@@ -170,6 +189,34 @@ export default function BookingHubScreen() {
             showAlert(text.error, text.selectionFailed);
         } finally {
             setIsReleasing(false);
+        }
+    };
+
+    const handleSubmitDispute = async () => {
+        if (!booking || !myUserId || isSubmittingDispute || disputeDescription.trim().length < 3) return;
+        setIsSubmittingDispute(true);
+        try {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            const raisedAgainst = myUserId === booking.worker_user_id ? booking.poster_user_id : booking.worker_user_id;
+            const { error } = await supabase.from('disputes').insert({
+                booking_id: booking.id,
+                raised_by: myUserId,
+                raised_against: raisedAgainst,
+                category: 'other',
+                description: disputeDescription.trim(),
+                status: 'open',
+            });
+            if (error) throw error;
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            setDisputeFormVisible(false);
+            setDisputeDescription('');
+            showAlert(text.reportProblem, text.reportProblemSubmitted);
+            await load();
+        } catch (e) {
+            console.error('❌ [BookingHub] dispute submit failed:', e);
+            showAlert(text.error, text.reportProblemFailed);
+        } finally {
+            setIsSubmittingDispute(false);
         }
     };
 
@@ -425,6 +472,45 @@ export default function BookingHubScreen() {
                         </Text>
                     </View>
                 )}
+
+                {/* S8 stub — raise a dispute, once escrow is funded and not already cancelled/disputed */}
+                {escrowDone && status !== 'cancelled' && status !== 'disputed' && (
+                    myDispute ? (
+                        <View style={[styles.infoBox, { backgroundColor: C.red + '1E', marginTop: 12 }]}>
+                            <XCircle size={18} color={C.red} strokeWidth={2} />
+                            <Text style={[styles.infoText, { color: C.red }]}>{text.reportProblemAlreadyOpen}</Text>
+                        </View>
+                    ) : disputeFormVisible ? (
+                        <ClaySurface radius={20} style={{ marginTop: 12 }} contentStyle={{ padding: 18 }}>
+                            <Text style={[styles.reviewTitle, { color: C.text }]}>{text.reportProblemTitle}</Text>
+                            <TextInput
+                                value={disputeDescription}
+                                onChangeText={setDisputeDescription}
+                                placeholder={text.reportProblemDescriptionPlaceholder}
+                                placeholderTextColor={C.muted}
+                                multiline
+                                style={[styles.reviewInput, { color: C.text, backgroundColor: C.cLo, borderColor: C.hair }]}
+                            />
+                            {isSubmittingDispute ? (
+                                <ActivityIndicator size="large" color={C.accent} style={{ marginVertical: 10 }} />
+                            ) : (
+                                <ClayButton
+                                    label={text.reportProblemSubmit}
+                                    icon={<XCircle size={17} color={C.onAccent} strokeWidth={2.2} />}
+                                    onPress={handleSubmitDispute}
+                                    style={disputeDescription.trim().length < 3 ? { opacity: 0.5 } : undefined}
+                                />
+                            )}
+                        </ClaySurface>
+                    ) : (
+                        <Pressable
+                            onPress={() => { Haptics.selectionAsync(); setDisputeFormVisible(true); }}
+                            style={({ pressed }) => [styles.reportProblemLink, pressed && { opacity: 0.6 }]}
+                        >
+                            <Text style={[styles.reportProblemLinkText, { color: C.muted }]}>{text.reportProblem}</Text>
+                        </Pressable>
+                    )
+                )}
             </ScrollView>
 
             {/* S5 — fund sheet (poster, escrow_pending) */}
@@ -464,4 +550,6 @@ const styles = StyleSheet.create({
     starsRow: { flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 16 },
     reviewInput: { borderRadius: 14, borderWidth: 1, padding: 13, fontSize: 14, minHeight: 76, textAlignVertical: 'top', marginBottom: 14 },
     blindNote: { fontSize: 12, fontWeight: '600', textAlign: 'center', marginTop: 12 },
+    reportProblemLink: { alignItems: 'center', paddingVertical: 14, marginTop: 4 },
+    reportProblemLinkText: { fontSize: 13, fontWeight: '600', textDecorationLine: 'underline' },
 });

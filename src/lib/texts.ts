@@ -248,6 +248,13 @@ interface TextMap {
   posterLabel: string;
   bookingCancelled: string;
   bookingDisputed: string;
+  reportProblem: string;
+  reportProblemTitle: string;
+  reportProblemDescriptionPlaceholder: string;
+  reportProblemSubmit: string;
+  reportProblemSubmitted: string;
+  reportProblemAlreadyOpen: string;
+  reportProblemFailed: string;
   waitingForRelease: string;
   checkInWorker: string;
   checkOutWorker: string;
@@ -648,6 +655,13 @@ const texts: Record<Language, TextMap> = {
     posterLabel: 'Poster',
     bookingCancelled: 'Booking cancelled',
     bookingDisputed: 'Booking in dispute',
+    reportProblem: 'Report a problem',
+    reportProblemTitle: 'What went wrong?',
+    reportProblemDescriptionPlaceholder: 'Describe what happened…',
+    reportProblemSubmit: 'Submit report',
+    reportProblemSubmitted: 'Reported. Our team will review it and get back to you.',
+    reportProblemAlreadyOpen: 'You already reported a problem on this booking — we\'re reviewing it.',
+    reportProblemFailed: 'Could not submit the report. Please try again.',
     waitingForRelease: 'Waiting for the poster to approve the work',
     checkInWorker: 'Check in worker',
     checkOutWorker: 'Check out worker',
@@ -1046,6 +1060,13 @@ const texts: Record<Language, TextMap> = {
     posterLabel: 'Zadávateľ',
     bookingCancelled: 'Rezervácia zrušená',
     bookingDisputed: 'Rezervácia v spore',
+    reportProblem: 'Nahlásiť problém',
+    reportProblemTitle: 'Čo sa stalo?',
+    reportProblemDescriptionPlaceholder: 'Opíš, čo sa stalo…',
+    reportProblemSubmit: 'Odoslať nahlásenie',
+    reportProblemSubmitted: 'Nahlásené. Náš tím sa na to pozrie a ozve sa ti.',
+    reportProblemAlreadyOpen: 'Už si na tejto rezervácii nahlásil/a problém — riešime to.',
+    reportProblemFailed: 'Nahlásenie sa nepodarilo odoslať. Skús to znova.',
     waitingForRelease: 'Čaká sa na schválenie práce zadávateľom',
     checkInWorker: 'Check-in brigádnika',
     checkOutWorker: 'Check-out brigádnika',
