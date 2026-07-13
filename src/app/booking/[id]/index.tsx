@@ -489,6 +489,7 @@ export default function BookingHubScreen() {
                                 placeholder={text.reportProblemDescriptionPlaceholder}
                                 placeholderTextColor={C.muted}
                                 multiline
+                                maxLength={2000}
                                 style={[styles.reviewInput, { color: C.text, backgroundColor: C.cLo, borderColor: C.hair }]}
                             />
                             {isSubmittingDispute ? (
