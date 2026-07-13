@@ -2,12 +2,20 @@
 title: Project Status — where we are / resume here
 type: status
 status: living
-updated: 2026-06-07
+updated: 2026-07-12
 ---
 
 # Project Status — Brigzy.sk
 
 > Read this first on any new session. One-screen summary of where we are and what happens next.
+
+## ⚠️ Note on staleness (added 2026-07-12)
+Everything below this note (from "🔑 Resume phrase" through "▶️ RESUME HERE (2026-06-12)") describes
+the **pre-build planning phase** and is now historically stale — the app is no longer "not started",
+it's mid-rebuild with the escrow loop, P2 wizard, and chat (media/reactions/edit/delete/price
+negotiation) all shipped and E2E tested. **For actual current build state, read
+`docs/Changelog-2026-07.md`** (updated continuously per commit) instead of trusting the sections below.
+Kept the old planning content in place as a historical record rather than rewriting it.
 
 ## 🔑 Resume phrase (owner pastes this to start a new conversation)
 > *„Pokračujeme na Brigzy. Najprv si načítaj projektovú pamäť: `C:\WORK\brigzy-clean\docs\Project-Status.md` a `docs\00-INDEX.md`, plus `C:\Claude-memory\brigzy.md`. Účtovník potvrdil, WAITING skončil — sme CLEARED TO BUILD (od právnika čakáme už len vzory zmlúv, non-blocking). Ideme detailne plánovať ako appka funguje/vyzerá a potom prerábame celú appku. Zhrň kde sme a opýtaj sa čo ďalej."*
@@ -15,7 +23,7 @@ updated: 2026-06-07
 **Obsidian vault location (personal):** `C:\Claude-memory\` (note: `brigzy.md`).
 **Detailed project vault:** `C:\WORK\brigzy-clean\docs\` (this folder).
 
-## ▶️ RESUME HERE (2026-06-12)
+## ▶️ RESUME HERE (2026-06-12) — historical, see staleness note above
 **[[UX-Spec]] is COMPLETE** — B1 Entry/Auth · B2 Worker · B3 Poster · B4 Shared sheets
 (S9 insurance ⏸ paused pending FinExpert agreement) · B5 Gamification/Verified ·
 Part C → [[Admin-Panel-Spec]] (interný Next.js admin web).

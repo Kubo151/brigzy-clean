@@ -1,8 +1,8 @@
 ---
-title: Changelog — build sessions 5.–7. júla 2026
+title: Changelog — build sessions 5.–12. júla 2026
 type: changelog
 status: living
-updated: 2026-07-07
+updated: 2026-07-12
 ---
 
 # Changelog — 5.–7. júl 2026
@@ -53,9 +53,58 @@ updated: 2026-07-07
 - REST E2E: celý loop fix aj hodinovka (36 € escrow → 0,25 h → 2,25 € payout, 33,75 € refund ✓).
 - Chrome E2E: login → role switch → P4 ranking → S5 → podpisy oboch → release → wallet kredit ✓.
 
-## 📌 Známe veci / ďalšie kroky
+## 📌 Známe veci / ďalšie kroky (stav k 7.7.)
 - QR dochádzka (W7/S6) — tlačidlá hotové, QR sken je kozmetika navrch.
 - S7 review, W1 mapa, P2 wizard s auto-deriváciou zmluvy — podľa Demo-Build-Plan.
 - Nadčas nad odhad hodín = S4 Dodatok (post-demo).
 - Browser autofill sa bije s login formulárom (pri deme vyčistiť polia).
 - Demo účty: lucia/marek/jana/pavel `@demo.brigzy.sk`, heslo `Brigzy2026!`, OTP `123456`.
+
+---
+
+# Pokračovanie — 8.–12. júl 2026
+
+> Commity: `60cd775`, `713d169`, `648b453`, `2f544e3`, `1cf29a9`, `0a84bbc`, `09c48cd`, `7c7147d`,
+> `a8c4f49`, `b5d95d5`. Zaznamenané spätne 12.7. (owner nemal čas priebežne diktovať pamäť).
+
+## 8. júl — W7/S6 QR dochádzka + P2 wizard
+- **QR attendance (W7/S6)** — rotujúci QR check-in/out podľa UX-Spec, na existujúcom `attendance` endpointe.
+- **P2 post-job wizard** — `(tabs)/add.tsx` prepísaný z jednostránkového formulára na 7-krokový wizard
+  (Kategória → Popis s Firma/Súkromná osoba prefill z `companies` → Odmena s live fee preview →
+  Miesto → Rozvrh → Nastavenia → Súhrn s auto-derivovaným typom zmluvy). `sign-contract` edge fn opravená
+  aby odvodzovala typ zmluvy podľa v2.7 §3 namiesto natvrdo `zmluva_o_dielo`. E2E overené (B2B+Výsledok →
+  DoVP, C2C → Zmluva o dielo bez ohľadu na task_nature).
+
+## 12. júl — chat dospel: médiá, reakcie/edit/delete, cenové vyjednávanie
+- **Chat foto + hlasové správy** — `messages.media_path` (privátna storage cesta) + `media_duration_seconds`,
+  nový privátny bucket `chat-media` (RLS: uploader + obe strany správy). Fotoaparát/galéria, mikrofón cez
+  `expo-audio`. Web gotcha: `ImagePicker` `asset.uri` je na webe `blob:` bez prípony → extension sa berie
+  z `asset.mimeType`.
+- **Avatar bucket fix** — `avatars` bucket v produkčnom Supabase vôbec neexistoval (upload padal potichu);
+  navyše sa `avatar_url` zapisoval len do `auth.users` metadát, nie do `public.users` (odkiaľ ho číta chat/
+  verejný profil/zoznam uchádzačov). Obe opravené.
+- **Chat reakcie/edit/delete** — `messages.edited_at`/`deleted_at` (soft delete s tombstone), tabuľka
+  `message_reactions` (1 reakcia/user/správa), long-press bottom sheet s 6 emoji + Upraviť/Vymazať.
+- **Bezpečnostná oprava RLS (security review)** — Postgres RLS UPDATE politiky gatujú len *riadky*, nie
+  *stĺpce`. Sender mohol cez `.update()` prepísať ľubovoľný stĺpec vlastnej správy vrátane `media_path` →
+  keďže storage RLS pre `chat-media` povoľuje čítanie obom stranám správy odkazujúcej na danú cestu, dalo sa
+  takto vygenerovať signed URL na cudzí objekt v bucket-e (IDOR). Fix: `BEFORE UPDATE` trigger, ktorý
+  vynucuje presný column-scope (sender: len `content`/`deleted_at`; receiver: len `read`). Pozri
+  [[feedback_rls_patterns]] pre všeobecný vzor.
+- **Právne dokumenty od právnika** — 12 v1 šablón zmlúv (DoVP/DoPČ/ZoD/VOP/DPA/atď.) + 6 v2 šablón
+  označených právnikom ako "final", plus kompletná dátová mapa appky (screeny + DB schéma + storage +
+  edge funkcie + spracovatelia) pre právnu/účtovnú kontrolu. **Spôsob podpisu je teraz uzamknutý:
+  vlastnoručne+foto ALEBO KEP/eID** — owner zámerne necháva mock SMS-OTP flow v appke, kým šablóny nie sú
+  definitívne finálne.
+- **S2 cenové vyjednávanie v chate** — `negotiate-price` edge fn na `price_negotiations` (propose/accept/
+  reject, max 3 kolá; nová ponuka počas čakajúceho kola = automatický reject predošlej a počíta sa ako
+  protiponuka; odpovedať môže len protistrana posledného navrhovateľa; len na `status='pending'`
+  prihláškach). Prijatie zapíše `applications.negotiated_rate_cents`, ktoré už `select-applicant` číta →
+  booking automaticky preberie dohodnutú sadzbu. Pripnutý panel nad chat inputom ukazuje živý stav
+  vyjednávania. `job-employer` karty uchádzačov dostali ikonu správy (predtým nemal poster ako napísať
+  uchádzačovi). E2E overené naživo.
+- **Fix: dohody miznuli po reloade** — RLS pre `price_negotiations` kontrolovala len `applications.
+  worker_user_id`, ale apply flow zapisoval len legacy `worker_id` → `worker_user_id` ostávalo `null`,
+  brigádnik po refreshi stratil celú históriu vyjednávania (aj už dohodnuté). Fix: RLS aj zápis teraz
+  fallback-ujú cez oba stĺpce (`worker_id`/`worker_user_id`, `employer_id`/`poster_user_id`) — **pozor,
+  tento vzor legacy/nový stĺpec sa v schéme opakuje, neber ako dané že je vyplnený len nový stĺpec.**
