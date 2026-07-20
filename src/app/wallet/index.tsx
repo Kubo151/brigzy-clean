@@ -1,14 +1,14 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import {
-    View, Text, ScrollView, Pressable, FlatList, Modal, StyleSheet, Platform,
+    View, Text, ScrollView, Pressable, FlatList, Modal, StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
 import { ArrowLeft, Bell, Hourglass, CheckCircle, Building2, Plus, ChevronRight, Wallet as WalletIcon, Clock } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
-import { useClay } from '@/lib/useClay';
-import type { ClayColors } from '@/lib/useClay';
+import { useFlint, RADIUS } from '@/lib/useFlint';
+import type { FlintColors } from '@/lib/useFlint';
+import { IconButton, Button } from '@/components/ui';
 import { goBack } from '@/lib/nav';
 
 const PRESET_AMOUNTS = [20, 50, 100];
@@ -56,7 +56,7 @@ const maskIBAN = (iban: string): string => {
 };
 
 export default function WalletScreen() {
-    const C = useClay();
+    const C = useFlint();
     const styles = useMemo(() => makeStyles(C), [C]);
     const [withdrawalModalVisible, setWithdrawalModalVisible] = useState(false);
     const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
@@ -179,27 +179,28 @@ export default function WalletScreen() {
         }
     };
 
-    const renderTransaction = ({ item }: { item: TxItem }) => {
+    const renderTransaction = ({ item, index }: { item: TxItem; index: number }) => {
         const StatusIcon = getStatusIcon(item.status);
         const isNegative = item.amount < 0;
         return (
-            <View style={styles.transactionItem}>
-                <View style={[styles.transactionIcon, { backgroundColor: getStatusColor(item.status) + '22' }]}>
-                    <StatusIcon size={20} color={getStatusColor(item.status)} strokeWidth={2} />
-                </View>
-                <View style={styles.transactionContent}>
-                    <Text style={styles.transactionTitle}>{item.title}</Text>
-                    <Text style={styles.transactionSubtitle}>{item.company} • {item.date}</Text>
-                </View>
-                <View style={styles.transactionRight}>
-                    <Text style={[styles.transactionAmount, { color: isNegative ? C.red : C.green }]}>
-                        {isNegative ? '−' : '+'}€{Math.abs(item.amount).toFixed(2)}
-                    </Text>
-                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '22' }]}>
+            <>
+                {index > 0 && <View style={styles.txDivider} />}
+                <View style={styles.transactionItem}>
+                    <View style={[styles.transactionIcon, { backgroundColor: getStatusColor(item.status) + '22' }]}>
+                        <StatusIcon size={18} color={getStatusColor(item.status)} strokeWidth={2} />
+                    </View>
+                    <View style={styles.transactionContent}>
+                        <Text style={styles.transactionTitle}>{item.title}</Text>
+                        <Text style={styles.transactionSubtitle}>{item.company} • {item.date}</Text>
+                    </View>
+                    <View style={styles.transactionRight}>
+                        <Text style={[styles.transactionAmount, { color: isNegative ? C.red : C.green }]}>
+                            {isNegative ? '−' : '+'}€{Math.abs(item.amount).toFixed(2)}
+                        </Text>
                         <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>{getStatusText(item.status)}</Text>
                     </View>
                 </View>
-            </View>
+            </>
         );
     };
 
@@ -217,36 +218,24 @@ export default function WalletScreen() {
             </View>
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
-                {/* Balance Card */}
-                <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.1, y: 0 }} end={{ x: 0.9, y: 1 }} style={styles.balanceCard}>
-                    <LinearGradient colors={['rgba(255,255,255,0.22)', 'transparent']} style={styles.balanceSheen} />
-                    <View style={styles.balanceBadge}>
-                        <View style={styles.badgeDot} />
-                        <Text style={styles.badgeText}>Dostupné prostriedky</Text>
-                    </View>
+                {/* Balance — giant centered number floating on bg, per Flint v3 recipe (no card behind it) */}
+                <View style={styles.balanceWrap}>
+                    <Text style={styles.balanceLabel}>Disponibilný zostatok</Text>
                     <View style={styles.balanceAmount}>
                         <Text style={styles.currencySymbol}>€</Text>
                         <Text style={styles.balanceMain}>{Math.floor(availableBalance)}</Text>
                         <Text style={styles.balanceCents}>.{(availableBalance % 1).toFixed(2).slice(2)}</Text>
                     </View>
-                    {pendingAmount > 0 ? (
-                        <View style={styles.pendingRow}>
-                            <View style={styles.pendingDot} />
-                            <Text style={styles.pendingText}>€{pendingAmount.toFixed(2)} čaká na potvrdenie brigády</Text>
-                        </View>
-                    ) : (
-                        <View style={{ marginBottom: 20 }} />
+                    {pendingAmount > 0 && (
+                        <Text style={styles.pendingText}>€{pendingAmount.toFixed(2)} čaká na potvrdenie brigády</Text>
                     )}
-                    <View style={styles.balanceButtons}>
-                        <Pressable style={styles.withdrawButton} onPress={handleWithdraw}>
-                            <WalletIcon size={17} color={C.accent} strokeWidth={2.2} />
-                            <Text style={styles.withdrawButtonText}>Vybrať peniaze</Text>
-                        </Pressable>
-                        <Pressable style={styles.historyButton} onPress={() => router.push('/wallet/history')}>
-                            <Text style={styles.historyButtonText}>História</Text>
-                        </Pressable>
-                    </View>
-                </LinearGradient>
+                </View>
+
+                {/* Quick actions — circular icon buttons, the app's other deliberate accent moment */}
+                <View style={styles.actionRow}>
+                    <IconButton icon={<WalletIcon size={20} color={C.text} strokeWidth={2} />} label="Vybrať" onPress={handleWithdraw} />
+                    <IconButton icon={<Clock size={20} color={C.text} strokeWidth={2} />} label="História" onPress={() => router.push('/wallet/history')} />
+                </View>
 
                 {/* Stats Row */}
                 <View style={styles.statsRow}>
@@ -272,18 +261,20 @@ export default function WalletScreen() {
                             <Text style={styles.viewAllText}>Zobraziť všetky</Text>
                         </Pressable>
                     </View>
-                    <FlatList
-                        data={transactions}
-                        renderItem={renderTransaction}
-                        keyExtractor={(item) => item.id}
-                        scrollEnabled={false}
-                        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-                        ListEmptyComponent={
-                            <Text style={{ color: C.muted, fontSize: 13.5, fontWeight: '500', textAlign: 'center', paddingVertical: 24 }}>
-                                Zatiaľ žiadne transakcie
-                            </Text>
-                        }
-                    />
+                    {transactions.length === 0 ? (
+                        <Text style={{ color: C.muted, fontSize: 13.5, fontWeight: '500', textAlign: 'center', paddingVertical: 24 }}>
+                            Zatiaľ žiadne transakcie
+                        </Text>
+                    ) : (
+                        <View style={styles.transactionsCard}>
+                            <FlatList
+                                data={transactions}
+                                renderItem={renderTransaction}
+                                keyExtractor={(item) => item.id}
+                                scrollEnabled={false}
+                            />
+                        </View>
+                    )}
                 </View>
             </ScrollView>
 
@@ -325,11 +316,11 @@ export default function WalletScreen() {
                             </Pressable>
                         )}
 
-                        <Pressable style={[styles.confirmButton, (!selectedAmount || !savedIBAN) && styles.confirmButtonDisabled]} onPress={handleConfirmWithdrawal} disabled={!selectedAmount || !savedIBAN}>
-                            <Text style={styles.confirmButtonText}>
-                                {!savedIBAN ? 'Najprv pridaj bankový účet' : selectedAmount ? `Potvrdiť výber €${selectedAmount.toFixed(2)}` : 'Vyber sumu'}
-                            </Text>
-                        </Pressable>
+                        <Button
+                            label={!savedIBAN ? 'Najprv pridaj bankový účet' : selectedAmount ? `Potvrdiť výber €${selectedAmount.toFixed(2)}` : 'Vyber sumu'}
+                            onPress={handleConfirmWithdrawal}
+                            disabled={!selectedAmount || !savedIBAN}
+                        />
                     </Pressable>
                 </Pressable>
             </Modal>
@@ -337,68 +328,62 @@ export default function WalletScreen() {
     );
 }
 
-const makeStyles = (C: ClayColors) => StyleSheet.create({
+const makeStyles = (C: FlintColors) => StyleSheet.create({
     container: { flex: 1, backgroundColor: C.bg },
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14 },
     iconBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-    headerTitle: { fontSize: 19, fontWeight: '800', color: C.text, letterSpacing: -0.4 },
+    headerTitle: { fontSize: 17, fontWeight: '600', color: C.text },
     content: { flex: 1, paddingHorizontal: 20 },
-    balanceCard: { borderRadius: 24, padding: 24, marginBottom: 18, overflow: 'hidden', ...Platform.select({ ios: { shadowColor: C.accentShadow.color, shadowOffset: { width: 0, height: 10 }, shadowOpacity: C.accentShadow.opacity, shadowRadius: 20 }, android: { elevation: 8 } }) },
-    balanceSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '45%' },
-    balanceBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, alignSelf: 'flex-start', marginBottom: 16 },
-    badgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: C.onAccent, marginRight: 6 },
-    badgeText: { fontSize: 11.5, color: C.onAccent, fontWeight: '700' },
-    balanceAmount: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
-    currencySymbol: { fontSize: 30, fontWeight: '800', color: C.onAccent, marginTop: 6 },
-    balanceMain: { fontSize: 56, fontWeight: '800', color: C.onAccent, lineHeight: 60, letterSpacing: -1 },
-    balanceCents: { fontSize: 30, fontWeight: '800', color: C.onAccent, marginTop: 6 },
-    pendingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-    pendingDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#FFD60A', marginRight: 8 },
-    pendingText: { fontSize: 13, color: 'rgba(255,255,255,0.85)', fontWeight: '600' },
-    balanceButtons: { flexDirection: 'row', gap: 12 },
-    withdrawButton: { flex: 1, flexDirection: 'row', gap: 7, backgroundColor: '#FFF', paddingVertical: 14, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-    withdrawButtonText: { fontSize: 14.5, fontWeight: '800', color: C.accent },
-    historyButton: { flex: 1, backgroundColor: 'rgba(255,255,255,0.2)', paddingVertical: 14, borderRadius: 14, alignItems: 'center' },
-    historyButtonText: { fontSize: 14.5, fontWeight: '800', color: '#FFF' },
+
+    balanceWrap: { alignItems: 'center', paddingVertical: 12, marginBottom: 24 },
+    balanceLabel: { fontSize: 13, fontWeight: '600', color: C.muted, marginBottom: 6 },
+    balanceAmount: { flexDirection: 'row', alignItems: 'flex-start' },
+    currencySymbol: { fontSize: 26, fontWeight: '800', color: C.text, marginTop: 6 },
+    balanceMain: { fontSize: 48, fontWeight: '800', color: C.text, lineHeight: 52, letterSpacing: -1.4 },
+    balanceCents: { fontSize: 26, fontWeight: '800', color: C.text, marginTop: 6 },
+    pendingText: { fontSize: 12.5, color: C.muted, fontWeight: '600', marginTop: 6 },
+
+    actionRow: { flexDirection: 'row', justifyContent: 'center', gap: 32, marginBottom: 28 },
+
     statsRow: { flexDirection: 'row', gap: 12, marginBottom: 22 },
-    statCard: { flex: 1, backgroundColor: C.cHi, borderRadius: 18, padding: 16, borderWidth: 1, borderColor: C.hair, ...Platform.select({ ios: { shadowColor: C.darkShadow.color, shadowOffset: { width: 3, height: 4 }, shadowOpacity: C.darkShadow.opacity * 0.7, shadowRadius: 9 }, android: { elevation: 2 } }) },
-    statIconBox: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+    statCard: { flex: 1, backgroundColor: C.card, borderRadius: RADIUS.lg, padding: 16 },
+    statIconBox: { width: 38, height: 38, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
     statLabel: { fontSize: 12.5, color: C.muted, marginBottom: 4, fontWeight: '600' },
-    statValue: { fontSize: 23, fontWeight: '800', color: C.text, marginBottom: 4, letterSpacing: -0.5 },
+    statValue: { fontSize: 23, fontWeight: '700', color: C.text, marginBottom: 4, letterSpacing: -0.5 },
     statSubtext: { fontSize: 11.5, color: C.muted, fontWeight: '500' },
+
     transactionsSection: { marginBottom: 24 },
     transactionsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
-    transactionsTitle: { fontSize: 17, fontWeight: '800', color: C.text, letterSpacing: -0.3 },
+    transactionsTitle: { fontSize: 17, fontWeight: '600', color: C.text },
     viewAllText: { fontSize: 13, color: C.accent, fontWeight: '700' },
-    transactionItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.cHi, borderRadius: 16, padding: 12, borderWidth: 1, borderColor: C.hair },
-    transactionIcon: { width: 40, height: 40, borderRadius: 13, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+    transactionsCard: { backgroundColor: C.card, borderRadius: RADIUS.lg, paddingHorizontal: 4 },
+    txDivider: { height: 1, backgroundColor: C.divider, marginLeft: 52 },
+    transactionItem: { flexDirection: 'row', alignItems: 'center', padding: 12 },
+    transactionIcon: { width: 36, height: 36, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
     transactionContent: { flex: 1 },
-    transactionTitle: { fontSize: 14.5, fontWeight: '700', color: C.text, marginBottom: 3 },
+    transactionTitle: { fontSize: 14.5, fontWeight: '600', color: C.text, marginBottom: 3 },
     transactionSubtitle: { fontSize: 12.5, color: C.muted, fontWeight: '500' },
     transactionRight: { alignItems: 'flex-end' },
-    transactionAmount: { fontSize: 15.5, fontWeight: '800', marginBottom: 4 },
-    statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 7 },
-    statusText: { fontSize: 10.5, fontWeight: '800' },
-    modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-    modalContent: { backgroundColor: C.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 24, paddingBottom: 40 },
-    modalHandle: { width: 40, height: 4, backgroundColor: C.hair, borderRadius: 2, alignSelf: 'center', marginBottom: 20 },
-    modalTitle: { fontSize: 21, fontWeight: '800', color: C.text, marginBottom: 20, letterSpacing: -0.4 },
-    modalBalance: { backgroundColor: C.cHi, borderRadius: 14, padding: 16, marginBottom: 24, borderWidth: 1, borderColor: C.hair },
+    transactionAmount: { fontSize: 15, fontWeight: '700', marginBottom: 2 },
+    statusText: { fontSize: 11, fontWeight: '600' },
+
+    modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+    modalContent: { backgroundColor: C.card, borderTopLeftRadius: RADIUS.xl, borderTopRightRadius: RADIUS.xl, padding: 24, paddingBottom: 40 },
+    modalHandle: { width: 36, height: 4, backgroundColor: C.card2, borderRadius: 2, alignSelf: 'center', marginBottom: 20 },
+    modalTitle: { fontSize: 19, fontWeight: '700', color: C.text, marginBottom: 20 },
+    modalBalance: { backgroundColor: C.card2, borderRadius: RADIUS.md, padding: 16, marginBottom: 24 },
     modalBalanceLabel: { fontSize: 12.5, color: C.muted, marginBottom: 4, fontWeight: '600' },
-    modalBalanceAmount: { fontSize: 28, fontWeight: '800', color: C.text, letterSpacing: -0.5 },
-    modalSectionTitle: { fontSize: 14.5, fontWeight: '800', color: C.text, marginBottom: 12 },
+    modalBalanceAmount: { fontSize: 28, fontWeight: '700', color: C.text, letterSpacing: -0.5 },
+    modalSectionTitle: { fontSize: 14.5, fontWeight: '700', color: C.text, marginBottom: 12 },
     presetButtons: { flexDirection: 'row', gap: 8, marginBottom: 24 },
-    presetButton: { flex: 1, backgroundColor: C.cHi, paddingVertical: 12, borderRadius: 12, alignItems: 'center', borderWidth: 2, borderColor: C.hair },
-    presetButtonActive: { backgroundColor: C.accentDim, borderColor: C.accent },
-    presetButtonText: { fontSize: 14.5, fontWeight: '700', color: C.muted },
-    presetButtonTextActive: { color: C.accent },
-    bankAccountRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.cHi, borderRadius: 14, padding: 16, marginBottom: 24, borderWidth: 1, borderColor: C.hair },
+    presetButton: { flex: 1, backgroundColor: C.card2, paddingVertical: 12, borderRadius: RADIUS.md, alignItems: 'center' },
+    presetButtonActive: { backgroundColor: C.accent },
+    presetButtonText: { fontSize: 14.5, fontWeight: '600', color: C.muted },
+    presetButtonTextActive: { color: C.onAccent },
+    bankAccountRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card2, borderRadius: RADIUS.md, padding: 16, marginBottom: 24 },
     bankAccountInfo: { flex: 1, marginLeft: 12 },
     bankAccountLabel: { fontSize: 12.5, color: C.muted, marginBottom: 2, fontWeight: '600' },
-    bankAccountNumber: { fontSize: 14.5, fontWeight: '700', color: C.text },
-    addBankButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: C.accentDim, borderRadius: 14, padding: 16, marginBottom: 24, borderWidth: 1, borderColor: C.accent, borderStyle: 'dashed', gap: 8 },
-    addBankText: { fontSize: 14.5, fontWeight: '800', color: C.accent },
-    confirmButton: { backgroundColor: C.accent, paddingVertical: 16, borderRadius: 16, alignItems: 'center' },
-    confirmButtonDisabled: { backgroundColor: C.hair },
-    confirmButtonText: { fontSize: 15.5, fontWeight: '800', color: C.onAccent },
+    bankAccountNumber: { fontSize: 14.5, fontWeight: '600', color: C.text },
+    addBankButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: C.accentDim, borderRadius: RADIUS.md, padding: 16, marginBottom: 24, gap: 8 },
+    addBankText: { fontSize: 14.5, fontWeight: '700', color: C.accent },
 });

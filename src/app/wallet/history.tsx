@@ -3,11 +3,10 @@ import { View, Text, Pressable, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { ArrowLeft, Hourglass, CheckCircle, Building2 } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
-import { useClay } from '@/lib/useClay';
-import type { ClayColors } from '@/lib/useClay';
-import { ClaySurface } from '@/components/clay';
+import { useFlint, RADIUS } from '@/lib/useFlint';
+import type { FlintColors } from '@/lib/useFlint';
+import { Chip } from '@/components/ui';
 import { goBack } from '@/lib/nav';
 
 type TransactionStatus = 'pending' | 'cleared' | 'withdrawn';
@@ -36,7 +35,7 @@ const FILTERS: { key: FilterType; label: string }[] = [
 ];
 
 export default function HistoryScreen() {
-    const C = useClay();
+    const C = useFlint();
     const styles = useMemo(() => makeStyles(C), [C]);
     const [activeFilter, setActiveFilter] = useState<FilterType>('all');
     const [transactions, setTransactions] = useState<TxItem[]>([]);
@@ -135,9 +134,7 @@ export default function HistoryScreen() {
                     <Text style={[styles.transactionAmount, { color: isNegative ? C.red : C.green }]}>
                         {isNegative ? '−' : '+'}€{Math.abs(item.amount).toFixed(2)}
                     </Text>
-                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '22' }]}>
-                        <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>{getStatusText(item.status)}</Text>
-                    </View>
+                    <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>{getStatusText(item.status)}</Text>
                 </View>
             </View>
         );
@@ -147,31 +144,23 @@ export default function HistoryScreen() {
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.header}>
                 <Pressable onPress={() => goBack()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={styles.backBtn}>
                         <ArrowLeft size={22} color={C.text} strokeWidth={2} />
-                    </ClaySurface>
+                    </View>
                 </Pressable>
                 <Text style={styles.headerTitle}>História transakcií</Text>
                 <View style={{ width: 42 }} />
             </View>
 
             <View style={styles.filterRow}>
-                {FILTERS.map((filter) => {
-                    const active = activeFilter === filter.key;
-                    return (
-                        <Pressable key={filter.key} onPress={() => setActiveFilter(filter.key)}>
-                            {active ? (
-                                <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.filterButton}>
-                                    <Text style={[styles.filterText, { color: C.onAccent, fontWeight: '800' }]}>{filter.label}</Text>
-                                </LinearGradient>
-                            ) : (
-                                <View style={[styles.filterButton, { backgroundColor: C.cHi, borderWidth: 1, borderColor: C.hair }]}>
-                                    <Text style={[styles.filterText, { color: C.muted, fontWeight: '700' }]}>{filter.label}</Text>
-                                </View>
-                            )}
-                        </Pressable>
-                    );
-                })}
+                {FILTERS.map((filter) => (
+                    <Chip
+                        key={filter.key}
+                        label={filter.label}
+                        active={activeFilter === filter.key}
+                        onPress={() => setActiveFilter(filter.key)}
+                    />
+                ))}
             </View>
 
             <FlatList
@@ -193,25 +182,23 @@ export default function HistoryScreen() {
     );
 }
 
-const makeStyles = (C: ClayColors) => StyleSheet.create({
+const makeStyles = (C: FlintColors) => StyleSheet.create({
     container: { flex: 1, backgroundColor: C.bg },
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14 },
-    headerTitle: { fontSize: 18, fontWeight: '800', color: C.text, letterSpacing: -0.3 },
+    backBtn: { width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center', backgroundColor: C.card2 },
+    headerTitle: { fontSize: 17, fontWeight: '600', color: C.text },
     filterRow: { flexDirection: 'row', paddingHorizontal: 20, marginBottom: 16, gap: 8, flexWrap: 'wrap' },
-    filterButton: { paddingHorizontal: 16, paddingVertical: 9, borderRadius: 11 },
-    filterText: { fontSize: 13 },
     listContent: { paddingHorizontal: 20, paddingBottom: 40 },
-    transactionItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.cHi, borderRadius: 16, padding: 13, borderWidth: 1, borderColor: C.hair },
-    transactionIcon: { width: 40, height: 40, borderRadius: 13, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+    transactionItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, borderRadius: RADIUS.lg, padding: 13 },
+    transactionIcon: { width: 40, height: 40, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
     transactionContent: { flex: 1 },
-    transactionTitle: { fontSize: 14.5, fontWeight: '700', color: C.text, marginBottom: 3 },
+    transactionTitle: { fontSize: 14.5, fontWeight: '600', color: C.text, marginBottom: 3 },
     transactionSubtitle: { fontSize: 12.5, color: C.muted, fontWeight: '500' },
     transactionRight: { alignItems: 'flex-end' },
-    transactionAmount: { fontSize: 15.5, fontWeight: '800', marginBottom: 4 },
-    statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 7 },
-    statusText: { fontSize: 10.5, fontWeight: '800' },
+    transactionAmount: { fontSize: 15, fontWeight: '700', marginBottom: 2 },
+    statusText: { fontSize: 11, fontWeight: '600' },
     emptyState: { alignItems: 'center', paddingTop: 60 },
     emptyIcon: { fontSize: 48, marginBottom: 16 },
-    emptyText: { fontSize: 18, fontWeight: '800', color: C.text, marginBottom: 8 },
+    emptyText: { fontSize: 18, fontWeight: '700', color: C.text, marginBottom: 8 },
     emptySubtext: { fontSize: 14, color: C.muted, fontWeight: '500' },
 });

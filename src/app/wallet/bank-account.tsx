@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
     View, Text, TextInput, Pressable, ScrollView, StyleSheet,
-    Alert, KeyboardAvoidingView, Platform,
+    KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { ArrowLeft, ChevronDown, Check, Landmark } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
-import { useClay } from '@/lib/useClay';
-import type { ClayColors } from '@/lib/useClay';
-import { ClaySurface, ClayInset, ClayIconBox } from '@/components/clay';
+import { useFlint, RADIUS } from '@/lib/useFlint';
+import type { FlintColors } from '@/lib/useFlint';
+import { Button, Divider } from '@/components/ui';
 import { goBack } from '@/lib/nav';
 import { showAlert } from '@/lib/notify';
 
@@ -29,7 +27,7 @@ const isValidSKIBAN = (iban: string): boolean => {
 };
 
 export default function BankAccountScreen() {
-    const C = useClay();
+    const C = useFlint();
     const styles = useMemo(() => makeStyles(C), [C]);
     const [iban, setIban] = useState('');
     const [bankName, setBankName] = useState('');
@@ -86,9 +84,9 @@ export default function BankAccountScreen() {
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.header}>
                 <Pressable onPress={() => goBack()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={styles.backBtn}>
                         <ArrowLeft size={22} color={C.text} strokeWidth={2} />
-                    </ClaySurface>
+                    </View>
                 </Pressable>
                 <Text style={styles.headerTitle}>Bankový účet</Text>
                 <View style={{ width: 42 }} />
@@ -97,40 +95,40 @@ export default function BankAccountScreen() {
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
                 <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                     {/* Info Card */}
-                    <ClaySurface radius={18} style={{ marginBottom: 26 }} contentStyle={styles.infoCard}>
-                        <ClayIconBox size={44} radius={14} style={{ marginRight: 12 }}><Landmark size={22} color={C.accent} strokeWidth={2} /></ClayIconBox>
+                    <View style={styles.infoCard}>
+                        <View style={styles.infoIcon}><Landmark size={22} color={C.accent} strokeWidth={2} /></View>
                         <Text style={styles.infoText}>Pridaj bankový účet pre výber peňazí z peňaženky. Údaje sú bezpečne uložené.</Text>
-                    </ClaySurface>
+                    </View>
 
                     {/* Bank Name */}
                     <Text style={styles.label}>Banka</Text>
                     <Pressable onPress={() => setShowBankPicker(!showBankPicker)}>
-                        <ClayInset radius={14} contentStyle={styles.dropdown}>
+                        <View style={styles.dropdown}>
                             <Text style={[styles.dropdownText, !bankName && { color: C.muted }]}>{bankName || 'Vyber banku'}</Text>
                             <ChevronDown size={20} color={C.muted} strokeWidth={2} />
-                        </ClayInset>
+                        </View>
                     </Pressable>
 
                     {showBankPicker && (
-                        <ClaySurface radius={14} style={{ marginTop: 8 }}>
+                        <View style={styles.pickerCard}>
                             {SK_BANKS.map((bank, i) => {
                                 const active = bankName === bank;
                                 return (
                                     <React.Fragment key={bank}>
-                                        {i > 0 && <View style={{ height: 1, backgroundColor: C.hair, marginLeft: 16 }} />}
+                                        {i > 0 && <Divider />}
                                         <Pressable style={[styles.pickerItem, active && { backgroundColor: C.accentDim }]} onPress={() => { setBankName(bank); setShowBankPicker(false); }}>
-                                            <Text style={[styles.pickerItemText, { color: active ? C.accent : C.text, fontWeight: active ? '800' : '600' }]}>{bank}</Text>
+                                            <Text style={[styles.pickerItemText, { color: active ? C.accent : C.text, fontWeight: active ? '700' : '600' }]}>{bank}</Text>
                                             {active && <Check size={18} color={C.accent} strokeWidth={2.6} />}
                                         </Pressable>
                                     </React.Fragment>
                                 );
                             })}
-                        </ClaySurface>
+                        </View>
                     )}
 
                     {/* IBAN Input */}
                     <Text style={[styles.label, { marginTop: 24 }]}>IBAN</Text>
-                    <ClayInset radius={14}>
+                    <View style={styles.ibanField}>
                         <TextInput
                             style={styles.input}
                             value={iban}
@@ -141,7 +139,7 @@ export default function BankAccountScreen() {
                             maxLength={29}
                             keyboardType="default"
                         />
-                    </ClayInset>
+                    </View>
                     {cleanIban.length > 0 && (
                         <Text style={[styles.validationText, { color: isValidSKIBAN(cleanIban) ? C.green : C.red }]}>
                             {isValidSKIBAN(cleanIban) ? '✓ Platný IBAN' : `${cleanIban.length}/24 znakov${!cleanIban.startsWith('SK') ? ' • musí začínať SK' : ''}`}
@@ -149,37 +147,34 @@ export default function BankAccountScreen() {
                     )}
 
                     {/* Save Button */}
-                    <Pressable onPress={handleSave} disabled={!isValid || saving} style={({ pressed }) => [styles.saveWrap, Platform.select({
-                        ios: { shadowColor: C.accentShadow.color, shadowOffset: { width: 0, height: 6 }, shadowOpacity: isValid ? C.accentShadow.opacity : 0, shadowRadius: 14 },
-                        android: { elevation: isValid ? 6 : 0 },
-                    }), { opacity: !isValid ? 0.45 : pressed ? 0.9 : 1 }]}>
-                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.saveButton}>
-                            <LinearGradient colors={['rgba(255,255,255,0.28)', 'transparent']} style={styles.saveSheen} />
-                            <Text style={styles.saveButtonText}>{saving ? 'Ukladám...' : 'Uložiť účet'}</Text>
-                        </LinearGradient>
-                    </Pressable>
+                    <Button
+                        label={saving ? 'Ukladám...' : 'Uložiť účet'}
+                        onPress={handleSave}
+                        disabled={!isValid || saving}
+                        style={{ marginTop: 32, marginBottom: 40 }}
+                    />
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
 
-const makeStyles = (C: ClayColors) => StyleSheet.create({
+const makeStyles = (C: FlintColors) => StyleSheet.create({
     container: { flex: 1, backgroundColor: C.bg },
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14 },
-    headerTitle: { fontSize: 18, fontWeight: '800', color: C.text, letterSpacing: -0.3 },
+    backBtn: { width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center', backgroundColor: C.card2 },
+    headerTitle: { fontSize: 17, fontWeight: '600', color: C.text },
     content: { flex: 1, paddingHorizontal: 20 },
-    infoCard: { flexDirection: 'row', padding: 16, alignItems: 'center' },
+    infoCard: { flexDirection: 'row', padding: 16, alignItems: 'center', backgroundColor: C.card, borderRadius: RADIUS.lg, marginBottom: 26 },
+    infoIcon: { width: 44, height: 44, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center', backgroundColor: C.accentDim, marginRight: 12 },
     infoText: { flex: 1, fontSize: 13.5, color: C.muted, lineHeight: 20, fontWeight: '500' },
-    label: { fontSize: 13, fontWeight: '800', color: C.text, marginBottom: 8, letterSpacing: -0.2 },
-    dropdown: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 },
+    label: { fontSize: 13, fontWeight: '700', color: C.text, marginBottom: 8 },
+    dropdown: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: C.card2, borderRadius: RADIUS.md },
     dropdownText: { fontSize: 15, color: C.text, fontWeight: '600' },
+    pickerCard: { marginTop: 8, backgroundColor: C.card, borderRadius: RADIUS.md, overflow: 'hidden' },
     pickerItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14 },
     pickerItemText: { fontSize: 15 },
+    ibanField: { backgroundColor: C.card2, borderRadius: RADIUS.md },
     input: { padding: 16, fontSize: 17, fontWeight: '600', color: C.text, letterSpacing: 1 },
     validationText: { fontSize: 13, marginTop: 8, fontWeight: '700' },
-    saveWrap: { borderRadius: 16, overflow: 'hidden', marginTop: 32, marginBottom: 40 },
-    saveButton: { paddingVertical: 16, borderRadius: 16, alignItems: 'center', overflow: 'hidden' },
-    saveSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '50%' },
-    saveButtonText: { fontSize: 15.5, fontWeight: '800', color: C.onAccent },
 });
