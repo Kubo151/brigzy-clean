@@ -6,13 +6,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { ChevronLeft, MapPin, FileText, ChevronRight } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
-import { LinearGradient } from "expo-linear-gradient";
 import { useText } from "@/lib/useText";
 import { supabase } from "@/lib/supabase";
 import useAppStore from "@/lib/state/app-store";
-import { useClay } from "@/lib/useClay";
-import type { ClayColors } from "@/lib/useClay";
-import { ClaySurface, ClayInset, ClayIconBox, ClayButton } from "@/components/clay";
+import { useFlint, RADIUS } from "@/lib/useFlint";
+import { Button } from "@/components/ui";
 import { goBack } from '@/lib/nav';
 
 type ApplicationStatus = "pending" | "accepted" | "rejected" | "completed";
@@ -27,7 +25,7 @@ interface Application {
 
 export default function MyApplicationsScreen() {
   const router = useRouter();
-  const C = useClay();
+  const C = useFlint();
   const text = useText();
   const currentUser = useAppStore((s) => s.currentUser);
 
@@ -111,9 +109,9 @@ export default function MyApplicationsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-          <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={[styles.backBtn, { backgroundColor: C.card2 }]}>
             <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
-          </ClaySurface>
+          </View>
         </Pressable>
         <Text style={[styles.headerTitle, { color: C.text }]}>Moje prihlášky</Text>
         <View style={{ width: 42 }} />
@@ -121,22 +119,18 @@ export default function MyApplicationsScreen() {
 
       {/* Segmented tabs */}
       <View style={{ paddingHorizontal: 20, marginBottom: 8 }}>
-        <ClayInset radius={14} contentStyle={styles.tabRow}>
+        <View style={[styles.tabRow, { backgroundColor: C.card2 }]}>
           {tabs.map(tab => {
             const active = activeTab === tab.id;
             return (
               <Pressable key={tab.id} onPress={() => { Haptics.selectionAsync(); setActiveTab(tab.id); }} style={{ flex: 1 }}>
-                {active ? (
-                  <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.tabBtn}>
-                    <Text style={[styles.tabText, { color: C.onAccent, fontWeight: '800' }]}>{tab.label}</Text>
-                  </LinearGradient>
-                ) : (
-                  <View style={styles.tabBtn}><Text style={[styles.tabText, { color: C.muted, fontWeight: '700' }]}>{tab.label}</Text></View>
-                )}
+                <View style={[styles.tabBtn, active && { backgroundColor: C.accent }]}>
+                  <Text style={[styles.tabText, { color: active ? C.onAccent : C.muted, fontWeight: active ? '700' : '600' }]}>{tab.label}</Text>
+                </View>
               </Pressable>
             );
           })}
-        </ClayInset>
+        </View>
       </View>
 
       {/* Content */}
@@ -144,20 +138,20 @@ export default function MyApplicationsScreen() {
         <View style={styles.center}><ActivityIndicator size="large" color={C.accent} /></View>
       ) : activeApplications.length === 0 ? (
         <View style={styles.emptyWrap}>
-          <ClayIconBox size={88} radius={28}><FileText size={40} color={C.accent} strokeWidth={1.6} /></ClayIconBox>
+          <View style={[styles.emptyIcon, { backgroundColor: C.card2 }]}><FileText size={40} color={C.accent} strokeWidth={1.6} /></View>
           <Text style={[styles.emptyTitle, { color: C.text }]}>Žiadne prihlášky</Text>
           <Text style={[styles.emptyDesc, { color: C.muted }]}>Hľadajte prácu a prihlasujte sa</Text>
-          <ClayButton label="Nájsť brigády" onPress={() => router.push("/(tabs)/")} style={{ paddingHorizontal: 28 }} />
+          <Button label="Nájsť brigády" onPress={() => router.push("/(tabs)/")} style={{ paddingHorizontal: 28 }} />
         </View>
       ) : (
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 100 }}>
-          <ClaySurface radius={18}>
+          <View style={{ backgroundColor: C.card, borderRadius: RADIUS.lg }}>
             {activeApplications.map((app, index) => {
               const info = getStatusInfo(app.status);
               const bookingId = bookingsByJob[app.job.id];
               return (
                 <React.Fragment key={app.id}>
-                  {index > 0 && <View style={{ height: 1, backgroundColor: C.hair, marginLeft: 16 }} />}
+                  {index > 0 && <View style={{ height: 1, backgroundColor: C.divider, marginLeft: 16 }} />}
                   <Pressable
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -184,7 +178,7 @@ export default function MyApplicationsScreen() {
                 </React.Fragment>
               );
             })}
-          </ClaySurface>
+          </View>
         </ScrollView>
       )}
     </SafeAreaView>
@@ -193,19 +187,21 @@ export default function MyApplicationsScreen() {
 
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 },
-  headerTitle: { fontSize: 18, fontWeight: '800', letterSpacing: -0.3 },
-  tabRow: { flexDirection: 'row', padding: 4, gap: 4 },
+  backBtn: { width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
+  headerTitle: { fontSize: 17, fontWeight: '600' },
+  tabRow: { flexDirection: 'row', padding: 4, gap: 4, borderRadius: RADIUS.md },
   tabBtn: { paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
   tabText: { fontSize: 13.5 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, gap: 0 },
-  emptyTitle: { fontSize: 21, fontWeight: '800', marginBottom: 8, marginTop: 20, letterSpacing: -0.4 },
+  emptyIcon: { width: 88, height: 88, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center' },
+  emptyTitle: { fontSize: 21, fontWeight: '700', marginBottom: 8, marginTop: 20, letterSpacing: -0.4 },
   emptyDesc: { fontSize: 14, textAlign: 'center', marginBottom: 24, fontWeight: '500' },
   appRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14 },
   statusDot: { width: 7, height: 7, borderRadius: 4 },
-  statusLabel: { fontSize: 11.5, fontWeight: '800' },
+  statusLabel: { fontSize: 11.5, fontWeight: '700' },
   timeAgo: { fontSize: 11, marginLeft: 'auto', fontWeight: '600' },
-  appTitle: { fontSize: 16, fontWeight: '800', marginBottom: 4, letterSpacing: -0.3 },
+  appTitle: { fontSize: 16, fontWeight: '700', marginBottom: 4, letterSpacing: -0.3 },
   appLocation: { fontSize: 13, marginRight: 'auto', fontWeight: '500' },
-  appPay: { fontSize: 14, fontWeight: '800' },
+  appPay: { fontSize: 14, fontWeight: '700' },
 });

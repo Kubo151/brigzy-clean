@@ -9,9 +9,9 @@ import * as Haptics from "expo-haptics";
 import { useText } from "@/lib/useText";
 import { supabase } from "@/lib/supabase";
 import useAppStore from "@/lib/state/app-store";
-import { useClay } from "@/lib/useClay";
+import { useFlint, RADIUS } from "@/lib/useFlint";
 import type { JobCategory } from "@/lib/types";
-import { ClaySurface, ClayIconBox, ClayButton } from "@/components/clay";
+import { Button } from "@/components/ui";
 import { goBack } from '@/lib/nav';
 
 type JobStatus = "open" | "in_progress" | "completed" | "cancelled";
@@ -31,7 +31,7 @@ interface EmployerJob {
 
 export default function MyJobsScreen() {
   const router = useRouter();
-  const C = useClay();
+  const C = useFlint();
   const text = useText();
   const currentUser = useAppStore((s) => s.currentUser);
 
@@ -86,9 +86,9 @@ export default function MyJobsScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
       <View style={styles.header}>
         <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-          <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={[styles.backBtn, { backgroundColor: C.card2 }]}>
             <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
-          </ClaySurface>
+          </View>
         </Pressable>
         <Text style={[styles.headerTitle, { color: C.text }]}>{text.myJobs}</Text>
         <View style={{ width: 42 }} />
@@ -104,17 +104,17 @@ export default function MyJobsScreen() {
           </View>
         ) : jobs.length === 0 ? (
           <View style={styles.emptyWrap}>
-            <ClayIconBox size={88} radius={28}><Briefcase size={40} color={C.accent} strokeWidth={1.6} /></ClayIconBox>
+            <View style={[styles.emptyIcon, { backgroundColor: C.card2 }]}><Briefcase size={40} color={C.accent} strokeWidth={1.6} /></View>
             <Text style={[styles.emptyTitle, { color: C.text }]}>{text.noJobsPostedYet}</Text>
             <Text style={[styles.emptyDesc, { color: C.muted }]}>{text.postYourFirstJob}</Text>
-            <ClayButton label={text.postAJob} onPress={() => router.push("/(tabs)/add")} style={{ paddingHorizontal: 28 }} />
+            <Button label={text.postAJob} onPress={() => router.push("/(tabs)/add")} style={{ paddingHorizontal: 28 }} />
           </View>
         ) : (
           <View style={styles.listWrap}>
-            <ClaySurface radius={18}>
+            <View style={{ backgroundColor: C.card, borderRadius: RADIUS.lg }}>
               {jobs.map((job, index) => (
                 <React.Fragment key={job.id}>
-                  {index > 0 && <View style={{ height: 1, backgroundColor: C.hair, marginLeft: 16 }} />}
+                  {index > 0 && <View style={{ height: 1, backgroundColor: C.divider, marginLeft: 16 }} />}
                   <Pressable
                     onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(`/job-employer/${job.id}`); }}
                     style={({ pressed }) => [styles.jobRow, pressed && { opacity: 0.7 }]}
@@ -141,7 +141,7 @@ export default function MyJobsScreen() {
                   </Pressable>
                 </React.Fragment>
               ))}
-            </ClaySurface>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -151,19 +151,21 @@ export default function MyJobsScreen() {
 
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 },
-  headerTitle: { fontSize: 18, fontWeight: '800', letterSpacing: -0.3 },
+  backBtn: { width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
+  headerTitle: { fontSize: 17, fontWeight: '600' },
   center: { alignItems: 'center', justifyContent: 'center', paddingVertical: 64 },
   loadingText: { marginTop: 16, fontSize: 14, fontWeight: '600' },
   emptyWrap: { alignItems: 'center', paddingVertical: 64, paddingHorizontal: 32 },
-  emptyTitle: { fontSize: 21, fontWeight: '800', marginBottom: 8, marginTop: 20, letterSpacing: -0.4 },
+  emptyIcon: { width: 88, height: 88, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center' },
+  emptyTitle: { fontSize: 21, fontWeight: '700', marginBottom: 8, marginTop: 20, letterSpacing: -0.4 },
   emptyDesc: { fontSize: 14, textAlign: 'center', marginBottom: 24, fontWeight: '500' },
   listWrap: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 100 },
   jobRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 15 },
   statusDot: { width: 7, height: 7, borderRadius: 4 },
-  statusText: { fontSize: 11.5, fontWeight: '800' },
+  statusText: { fontSize: 11.5, fontWeight: '700' },
   appBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 7 },
-  appBadgeText: { fontSize: 11, fontWeight: '800' },
-  jobTitle: { fontSize: 16, fontWeight: '800', marginBottom: 4, letterSpacing: -0.3 },
+  appBadgeText: { fontSize: 11, fontWeight: '700' },
+  jobTitle: { fontSize: 16, fontWeight: '700', marginBottom: 4, letterSpacing: -0.3 },
   jobLocation: { fontSize: 13, marginRight: 'auto', fontWeight: '500' },
-  jobPay: { fontSize: 14, fontWeight: '800' },
+  jobPay: { fontSize: 14, fontWeight: '700' },
 });

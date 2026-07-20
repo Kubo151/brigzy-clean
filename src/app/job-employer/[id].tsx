@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from "react";
 import {
-    View, Text, ScrollView, Pressable, ActivityIndicator, Alert, StyleSheet,
+    View, Text, ScrollView, Pressable, ActivityIndicator, StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { ChevronLeft, MapPin, Clock, Users, XCircle, Star, Zap, BadgeCheck, ShieldCheck, MessageCircle } from "lucide-react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
-import { useClay } from "@/lib/useClay";
+import { useFlint, RADIUS } from "@/lib/useFlint";
 import { useText } from "@/lib/useText";
 import { supabase } from "@/lib/supabase";
 import useAppStore from "@/lib/state/app-store";
-import { ClaySurface, ClayIconBox } from "@/components/clay";
 import { EscrowConfirmSheet, type EscrowBooking } from "@/components/EscrowConfirmSheet";
 import { goBack } from '@/lib/nav';
 import { showAlert } from '@/lib/notify';
@@ -64,7 +62,7 @@ interface JobDetail {
 export default function EmployerJobDetailScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const text = useText();
     const currentUser = useAppStore((s) => s.currentUser);
 
@@ -207,9 +205,9 @@ export default function EmployerJobDetailScreen() {
             {/* Header */}
             <View style={styles.header}>
                 <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={[styles.backBtn, { backgroundColor: C.card2 }]}>
                         <ChevronLeft size={20} color={C.text} strokeWidth={2.2} />
-                    </ClaySurface>
+                    </View>
                 </Pressable>
                 <Text style={[styles.headerTitle, { color: C.text }]} numberOfLines={1}>{job.title}</Text>
             </View>
@@ -217,7 +215,7 @@ export default function EmployerJobDetailScreen() {
             <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                 {/* Job Info Card */}
                 <View style={styles.cardSection}>
-                    <ClaySurface radius={20} style={{ marginBottom: 20 }} contentStyle={{ padding: 18 }}>
+                    <View style={[styles.card, { backgroundColor: C.card, padding: 18, marginBottom: 20 }]}>
                         <Text style={[styles.companyName, { color: C.muted }]}>{job.company_name}</Text>
                         <View style={styles.metaRow}>
                             <MapPin size={15} color={C.muted} strokeWidth={1.9} />
@@ -227,11 +225,11 @@ export default function EmployerJobDetailScreen() {
                             <Clock size={15} color={C.muted} strokeWidth={1.9} />
                             <Text style={[styles.metaText, { color: C.muted }]}>{job.duration}</Text>
                         </View>
-                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.payBadge}>
+                        <View style={[styles.payBadge, { backgroundColor: C.accent }]}>
                             <Text style={[styles.payAmount, { color: C.onAccent }]}>€{job.pay_amount}</Text>
                             <Text style={[styles.payType, { color: C.onAccent }]}>{job.pay_type === "hourly" ? text.perHour : text.fixedPrice}</Text>
-                        </LinearGradient>
-                    </ClaySurface>
+                        </View>
+                    </View>
 
                     <Text style={[styles.sectionLabel, { color: C.text }]}>{text.aboutThisJob}</Text>
                     <Text style={[styles.descText, { color: C.muted }]}>{job.description}</Text>
@@ -242,7 +240,7 @@ export default function EmployerJobDetailScreen() {
                     <Text style={[styles.applicantTitle, { color: C.text }]}>{text.applicants} ({job.applications.length})</Text>
 
                     {/* Segmented Tabs */}
-                    <ClaySurface radius={14} style={{ marginBottom: 16 }} contentStyle={styles.segControl}>
+                    <View style={[styles.segControl, { backgroundColor: C.card2, marginBottom: 16 }]}>
                         {tabs.map((tab) => {
                             const isActive = selectedTab === tab.key;
                             return (
@@ -252,11 +250,11 @@ export default function EmployerJobDetailScreen() {
                                 </Pressable>
                             );
                         })}
-                    </ClaySurface>
+                    </View>
 
                     {filteredApplicants.length === 0 ? (
                         <View style={styles.emptyApplicants}>
-                            <ClayIconBox size={64} radius={20}><Users size={30} color={C.accent} strokeWidth={1.6} /></ClayIconBox>
+                            <View style={[styles.iconBoxLg, { backgroundColor: C.card2 }]}><Users size={30} color={C.accent} strokeWidth={1.6} /></View>
                             <Text style={[styles.emptyText, { color: C.muted }]}>{text.noApplicantsInCategory}</Text>
                         </View>
                     ) : (
@@ -264,16 +262,16 @@ export default function EmployerJobDetailScreen() {
                             const booking = bookingsByWorker[applicant.worker.id];
                             const isSelecting = selectingId === applicant.id;
                             return (
-                                <ClaySurface key={applicant.id} radius={18} style={{ marginBottom: 12 }} contentStyle={{ padding: 16 }}>
+                                <View key={applicant.id} style={[styles.card, { backgroundColor: C.card, padding: 16, marginBottom: 12 }]}>
                                     <View style={styles.applicantHeader}>
                                         {/* Spec P4: tap worker name/avatar → W13 public profile */}
                                         <Pressable
                                             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(`/user/${applicant.worker.id}`); }}
                                             style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }, pressed && { opacity: 0.7 }]}
                                         >
-                                            <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.applicantAvatar}>
+                                            <View style={[styles.applicantAvatar, { backgroundColor: C.accent }]}>
                                                 <Text style={[styles.applicantInitial, { color: C.onAccent }]}>{applicant.worker.display_name?.[0]?.toUpperCase() || "?"}</Text>
-                                            </LinearGradient>
+                                            </View>
                                             <View style={{ flex: 1 }}>
                                                 <View style={styles.nameRow}>
                                                     <Text style={[styles.applicantName, { color: C.text }]}>{applicant.worker.display_name || "Unknown"}</Text>
@@ -289,9 +287,9 @@ export default function EmployerJobDetailScreen() {
                                             hitSlop={8}
                                             accessibilityLabel={`Napísať správu uchádzačovi ${applicant.worker.display_name || ''}`}
                                         >
-                                            <ClaySurface radius={12} style={{ width: 38, height: 38 }} contentStyle={{ width: 38, height: 38, alignItems: 'center', justifyContent: 'center' }}>
+                                            <View style={[styles.msgBtn, { backgroundColor: C.card2 }]}>
                                                 <MessageCircle size={17} color={C.accent} strokeWidth={2} />
-                                            </ClaySurface>
+                                            </View>
                                         </Pressable>
                                     </View>
 
@@ -343,14 +341,14 @@ export default function EmployerJobDetailScreen() {
                                                     </>}
                                             </Pressable>
                                             {applicant.status === "pending" && (
-                                                <Pressable onPress={() => updateApplicationStatus(applicant.id, "rejected")} style={({ pressed }) => [styles.actionBtn, { backgroundColor: C.cLo, borderWidth: 1, borderColor: C.hair }, pressed && { opacity: 0.85 }]}>
+                                                <Pressable onPress={() => updateApplicationStatus(applicant.id, "rejected")} style={({ pressed }) => [styles.actionBtn, { backgroundColor: C.card2 }, pressed && { opacity: 0.85 }]}>
                                                     <XCircle size={18} color={C.text} strokeWidth={2} />
                                                     <Text style={[styles.actionBtnText, { color: C.text }]}>{text.reject}</Text>
                                                 </Pressable>
                                             )}
                                         </View>
                                     ) : null}
-                                </ClaySurface>
+                                </View>
                             );
                         })
                     )}
@@ -372,36 +370,40 @@ const styles = StyleSheet.create({
     root: { flex: 1 },
     centered: { flex: 1, alignItems: "center", justifyContent: "center" },
     header: { flexDirection: "row", alignItems: "center", paddingHorizontal: 20, paddingVertical: 12, gap: 12 },
-    headerTitle: { fontSize: 19, fontWeight: "800", flex: 1, letterSpacing: -0.4 },
+    backBtn: { width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
+    headerTitle: { fontSize: 19, fontWeight: "700", flex: 1, letterSpacing: -0.4 },
+    card: { borderRadius: RADIUS.lg },
     cardSection: { padding: 20 },
     companyName: { fontSize: 14, marginBottom: 8, fontWeight: '600' },
     metaRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 6 },
     metaText: { fontSize: 14, fontWeight: '500' },
-    payBadge: { alignSelf: 'flex-start', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 13, marginTop: 14 },
-    payAmount: { fontSize: 19, fontWeight: "800", letterSpacing: -0.4 },
+    payBadge: { alignSelf: 'flex-start', paddingHorizontal: 16, paddingVertical: 10, borderRadius: RADIUS.md, marginTop: 14 },
+    payAmount: { fontSize: 19, fontWeight: "700", letterSpacing: -0.4 },
     payType: { fontSize: 12, marginTop: 1, fontWeight: '600' },
-    sectionLabel: { fontSize: 16, fontWeight: "800", marginBottom: 8, letterSpacing: -0.3 },
+    sectionLabel: { fontSize: 16, fontWeight: "700", marginBottom: 8, letterSpacing: -0.3 },
     descText: { fontSize: 14, lineHeight: 21, fontWeight: '500' },
     applicantSection: { paddingHorizontal: 20, paddingBottom: 40 },
-    applicantTitle: { fontSize: 18, fontWeight: "800", marginBottom: 14, letterSpacing: -0.3 },
-    segControl: { flexDirection: "row", padding: 4 },
+    applicantTitle: { fontSize: 18, fontWeight: "700", marginBottom: 14, letterSpacing: -0.3 },
+    segControl: { flexDirection: "row", padding: 4, borderRadius: RADIUS.md },
     segTab: { flex: 1, paddingVertical: 9, borderRadius: 10, alignItems: "center" },
-    segTabText: { fontSize: 11.5, fontWeight: "800" },
+    segTabText: { fontSize: 11.5, fontWeight: "700" },
     emptyApplicants: { alignItems: "center", paddingVertical: 40, gap: 14 },
+    iconBoxLg: { width: 64, height: 64, borderRadius: RADIUS.lg, alignItems: 'center', justifyContent: 'center' },
     emptyText: { fontSize: 14, fontWeight: '500' },
     applicantHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 12 },
+    msgBtn: { width: 38, height: 38, borderRadius: RADIUS.sm, alignItems: 'center', justifyContent: 'center' },
     nameRow: { flexDirection: "row", alignItems: "center", gap: 6 },
     statsRow: { flexDirection: "row", gap: 8, marginBottom: 12, flexWrap: "wrap" },
     statChip: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 },
-    statChipText: { fontSize: 12.5, fontWeight: "800" },
-    bookingPill: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, paddingVertical: 11, borderRadius: 13 },
-    bookingPillText: { fontSize: 13.5, fontWeight: "800" },
+    statChipText: { fontSize: 12.5, fontWeight: "700" },
+    bookingPill: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, paddingVertical: 11, borderRadius: RADIUS.md },
+    bookingPillText: { fontSize: 13.5, fontWeight: "700" },
     applicantAvatar: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center" },
-    applicantInitial: { fontSize: 20, fontWeight: "800" },
-    applicantName: { fontSize: 16, fontWeight: "800", letterSpacing: -0.3 },
+    applicantInitial: { fontSize: 20, fontWeight: "700" },
+    applicantName: { fontSize: 16, fontWeight: "700", letterSpacing: -0.3 },
     applicantDate: { fontSize: 12, marginTop: 2, fontWeight: '500' },
     applicantMsg: { fontSize: 14, lineHeight: 21, marginBottom: 12, fontWeight: '500' },
     actionRow: { flexDirection: "row", gap: 10 },
-    actionBtn: { flex: 1, paddingVertical: 12, borderRadius: 13, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
-    actionBtnText: { color: "#FFFFFF", fontSize: 14, fontWeight: "800" },
+    actionBtn: { flex: 1, paddingVertical: 12, borderRadius: RADIUS.md, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
+    actionBtnText: { color: "#FFFFFF", fontSize: 14, fontWeight: "700" },
 });

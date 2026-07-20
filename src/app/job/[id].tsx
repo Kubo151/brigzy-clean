@@ -12,16 +12,15 @@ import {
     Package, FileText, Zap,
 } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
-import { LinearGradient } from "expo-linear-gradient";
 import { supabase } from "@/lib/supabase";
 import useAppStore from "@/lib/state/app-store";
 import { useText } from "@/lib/useText";
 import type { Job } from "@/lib/types";
 import { JOB_CATEGORIES } from "@/lib/types";
 import useThemeStore from "@/lib/state/theme-store";
-import { useClay } from "@/lib/useClay";
-import type { ClayColors } from "@/lib/useClay";
-import { ClaySurface, ClayInset, ClayButton, ClayPill, ClayIconBox } from "@/components/clay";
+import { useFlint, RADIUS } from "@/lib/useFlint";
+import type { FlintColors } from "@/lib/useFlint";
+import { Button } from "@/components/ui";
 import JobLocationMap from "@/components/JobLocationMap";
 import { goBack } from '@/lib/nav';
 
@@ -39,18 +38,18 @@ const getCategoryIcon = (category: string) => {
     }
 };
 
-// ─── small round clay icon button (header) ───
-function ClayIconButton({ children, onPress, active, C }: {
-    children: React.ReactNode; onPress: () => void; active?: boolean; C: ClayColors;
+// ─── small round flat icon button (header) ───
+function HeaderIconButton({ children, onPress, active, C }: {
+    children: React.ReactNode; onPress: () => void; active?: boolean; C: FlintColors;
 }) {
     return (
         <Pressable onPress={onPress} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }], opacity: 0.85 }]}>
-            <ClaySurface radius={15} style={{ width: 44, height: 44 }} contentStyle={{
+            <View style={{
                 width: 44, height: 44, alignItems: 'center', justifyContent: 'center',
-                backgroundColor: active ? C.accentDim : 'transparent', borderRadius: 15,
+                backgroundColor: active ? C.accentDim : C.card2, borderRadius: RADIUS.md,
             }}>
                 {children}
-            </ClaySurface>
+            </View>
         </Pressable>
     );
 }
@@ -59,7 +58,7 @@ export default function JobDetailScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const text = useText();
-    const C = useClay();
+    const C = useFlint();
     const language = useThemeStore((s) => s.language);
 
     const currentUser = useAppStore((s) => s.currentUser);
@@ -163,8 +162,8 @@ export default function JobDetailScreen() {
     if (error || !job) {
         return (
             <SafeAreaView style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
-                <Text style={{ fontSize: 18, fontWeight: '800', color: C.text, marginBottom: 16 }}>{error || "Pozícia sa nenašla"}</Text>
-                <ClayButton label="Späť" onPress={() => goBack()} />
+                <Text style={{ fontSize: 18, fontWeight: '700', color: C.text, marginBottom: 16 }}>{error || "Pozícia sa nenašla"}</Text>
+                <Button label="Späť" onPress={() => goBack()} />
             </SafeAreaView>
         );
     }
@@ -180,17 +179,17 @@ export default function JobDetailScreen() {
     const formatSalary = () => job.salaryType === "hourly" ? `${job.salaryAmount} €/h` : `${job.salaryAmount} €`;
 
     const SectionLabel = ({ children }: { children: string }) => (
-        <Text style={{ fontSize: 10.5, fontWeight: '800', color: C.muted, letterSpacing: 0.7, textTransform: 'uppercase', marginBottom: 10 }}>{children}</Text>
+        <Text style={{ fontSize: 11, fontWeight: '700', color: C.muted, letterSpacing: 0.7, textTransform: 'uppercase', marginBottom: 10 }}>{children}</Text>
     );
 
     const InfoCell = ({ icon, label, value, big }: { icon: React.ReactNode; label: string; value: string; big?: boolean }) => (
-        <ClaySurface radius={18} style={{ flex: 1 }} contentStyle={{ padding: 14 }}>
+        <View style={{ flex: 1, backgroundColor: C.card, borderRadius: RADIUS.lg, padding: 14 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                 {icon}
-                <Text style={{ fontSize: 12, color: C.muted, fontWeight: '700' }}>{label}</Text>
+                <Text style={{ fontSize: 12, color: C.muted, fontWeight: '600' }}>{label}</Text>
             </View>
-            <Text style={{ fontSize: big ? 19 : 15, fontWeight: '800', color: C.text, letterSpacing: -0.3 }} numberOfLines={1}>{value}</Text>
-        </ClaySurface>
+            <Text style={{ fontSize: big ? 19 : 15, fontWeight: '700', color: C.text, letterSpacing: -0.3 }} numberOfLines={1}>{value}</Text>
+        </View>
     );
 
     return (
@@ -199,36 +198,33 @@ export default function JobDetailScreen() {
             <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
                 {/* Header */}
                 <View style={styles.header}>
-                    <ClayIconButton onPress={() => goBack()} C={C}>
+                    <HeaderIconButton onPress={() => goBack()} C={C}>
                         <ChevronLeft size={20} color={C.text} strokeWidth={2.2} />
-                    </ClayIconButton>
+                    </HeaderIconButton>
                     <View style={{ flexDirection: 'row', gap: 10 }}>
-                        <ClayIconButton onPress={handleShare} C={C}>
+                        <HeaderIconButton onPress={handleShare} C={C}>
                             <MoreHorizontal size={20} color={C.text} strokeWidth={2.2} />
-                        </ClayIconButton>
+                        </HeaderIconButton>
                         <Animated.View style={{ transform: [{ scale: heartScale }] }}>
-                            <ClayIconButton onPress={handleSaveToggle} active={isSaved} C={C}>
+                            <HeaderIconButton onPress={handleSaveToggle} active={isSaved} C={C}>
                                 <Heart size={20} color={isSaved ? C.accent : C.muted} fill={isSaved ? C.accent : "transparent"} strokeWidth={2} />
-                            </ClayIconButton>
+                            </HeaderIconButton>
                         </Animated.View>
                     </View>
                 </View>
 
                 <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 120 }}>
                     {/* Hero card */}
-                    <ClaySurface radius={22} style={{ marginTop: 6 }} contentStyle={{ padding: 18 }}>
+                    <View style={{ marginTop: 6, backgroundColor: C.card, borderRadius: RADIUS.lg, padding: 18 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <ClayIconBox size={52} radius={17}>
+                            <View style={{ width: 52, height: 52, borderRadius: RADIUS.lg, alignItems: 'center', justifyContent: 'center', backgroundColor: C.accentDim }}>
                                 <CategoryIcon size={26} color={C.accent} strokeWidth={1.9} />
-                            </ClayIconBox>
-                            <LinearGradient
-                                colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }}
-                                style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12 }}
-                            >
-                                <Text style={{ fontSize: 15, fontWeight: '800', color: C.onAccent, letterSpacing: -0.3 }}>{formatSalary()}</Text>
-                            </LinearGradient>
+                            </View>
+                            <View style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.md, backgroundColor: C.accent }}>
+                                <Text style={{ fontSize: 15, fontWeight: '700', color: C.onAccent, letterSpacing: -0.3 }}>{formatSalary()}</Text>
+                            </View>
                         </View>
-                        <Text style={{ fontSize: 21, fontWeight: '800', color: C.text, letterSpacing: -0.5, marginTop: 14 }}>{jobTitle}</Text>
+                        <Text style={{ fontSize: 21, fontWeight: '700', color: C.text, letterSpacing: -0.5, marginTop: 14 }}>{jobTitle}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 }}>
                             <MapPin size={15} color={C.muted} strokeWidth={2} />
                             <Text style={{ fontSize: 13.5, color: C.muted, fontWeight: '600' }}>{jobLocation}</Text>
@@ -248,17 +244,16 @@ export default function JobDetailScreen() {
                         {/* tags */}
                         <View style={{ flexDirection: 'row', gap: 8, marginTop: 14 }}>
                             <View style={{ backgroundColor: C.accentDim, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 9 }}>
-                                <Text style={{ fontSize: 11.5, fontWeight: '800', color: C.accent }}>{categoryName}</Text>
+                                <Text style={{ fontSize: 11.5, fontWeight: '700', color: C.accent }}>{categoryName}</Text>
                             </View>
                             {job.isUrgent && (
-                                <LinearGradient colors={[C.sosFrom, C.sosTo]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                                    style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 9 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 9, backgroundColor: C.red }}>
                                     <Zap size={12} color="#FFF" fill="#FFF" strokeWidth={0} />
-                                    <Text style={{ fontSize: 11.5, fontWeight: '800', color: '#FFF' }}>URGENTNÉ</Text>
-                                </LinearGradient>
+                                    <Text style={{ fontSize: 11.5, fontWeight: '700', color: '#FFF' }}>URGENTNÉ</Text>
+                                </View>
                             )}
                         </View>
-                    </ClaySurface>
+                    </View>
 
                     {/* Info grid */}
                     <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
@@ -273,13 +268,13 @@ export default function JobDetailScreen() {
                     </View>
 
                     {/* Description */}
-                    <ClaySurface radius={22} style={{ marginTop: 14 }} contentStyle={{ padding: 16 }}>
+                    <View style={{ marginTop: 14, backgroundColor: C.card, borderRadius: RADIUS.lg, padding: 16 }}>
                         <SectionLabel>Popis pozície</SectionLabel>
                         <Text style={{ fontSize: 14, lineHeight: 22, color: C.muted, fontWeight: '500' }}>{jobDesc}</Text>
-                    </ClaySurface>
+                    </View>
 
                     {/* Requirements */}
-                    <ClaySurface radius={22} style={{ marginTop: 14 }} contentStyle={{ padding: 16 }}>
+                    <View style={{ marginTop: 14, backgroundColor: C.card, borderRadius: RADIUS.lg, padding: 16 }}>
                         <SectionLabel>Požiadavky</SectionLabel>
                         <View style={{ gap: 12 }}>
                             {(jobRequirements.length > 0
@@ -298,44 +293,46 @@ export default function JobDetailScreen() {
                                 </View>
                             ))}
                         </View>
-                    </ClaySurface>
+                    </View>
 
-                    {/* Map */}
+                    {/* Map — out of scope for this redesign pass, left on the legacy color system */}
                     <View style={{ marginTop: 14 }}>
                         <SectionLabel>Lokácia</SectionLabel>
-                        <View style={{ borderRadius: 20, overflow: 'hidden' }}>
+                        <View style={{ borderRadius: RADIUS.lg, overflow: 'hidden' }}>
                             <JobLocationMap location={jobLocation} height={190} />
                         </View>
                     </View>
 
                     {/* Applicants */}
-                    <ClaySurface radius={22} style={{ marginTop: 14 }} contentStyle={{ flexDirection: 'row', alignItems: 'center', padding: 16 }}>
+                    <View style={{ marginTop: 14, flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: C.card, borderRadius: RADIUS.lg }}>
                         <View style={{ flex: 1 }}>
-                            <Text style={{ fontSize: 15, fontWeight: '800', color: C.text, marginBottom: 4 }}>{job.applicantsCount} uchádzačov</Text>
+                            <Text style={{ fontSize: 15, fontWeight: '700', color: C.text, marginBottom: 4 }}>{job.applicantsCount} uchádzačov</Text>
                             <Text style={{ fontSize: 12.5, color: C.muted, fontWeight: '600' }}>{job.applicantsCount === 0 ? 'Buď prvý kto sa prihlási' : 'Už sa prihlásili'}</Text>
                         </View>
-                        <ClayIconBox size={42} radius={13}><Users size={20} color={C.accent} strokeWidth={2} /></ClayIconBox>
-                    </ClaySurface>
+                        <View style={{ width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center', backgroundColor: C.accentDim }}>
+                            <Users size={20} color={C.accent} strokeWidth={2} />
+                        </View>
+                    </View>
 
                     <Text style={{ fontSize: 12, color: C.muted, fontWeight: '600', marginTop: 16 }}>Zverejnené {job.postedAt}</Text>
                 </ScrollView>
 
                 {/* Bottom bar */}
-                <View style={[styles.bottomBar, { backgroundColor: C.bg, borderTopColor: C.hair }]}>
+                <View style={[styles.bottomBar, { backgroundColor: C.bg }]}>
                     <Pressable onPress={() => router.push(`/messages/${job.employerId}${job.id ? `?jobId=${job.id}` : ''}`)}
                         style={({ pressed }) => [pressed && { transform: [{ scale: 0.96 }] }]}
                         accessibilityLabel="Napísať správu zadávateľovi">
-                        <ClaySurface radius={16} style={{ width: 54, height: 54 }} contentStyle={{ width: 54, height: 54, alignItems: 'center', justifyContent: 'center' }}>
+                        <View style={{ width: 54, height: 54, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center', backgroundColor: C.card2 }}>
                             <MessageSquare size={22} color={C.text} strokeWidth={2} />
-                        </ClaySurface>
+                        </View>
                     </Pressable>
                     {isApplied ? (
-                        <ClaySurface radius={18} style={{ flex: 1 }} contentStyle={{ height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                        <View style={{ flex: 1, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: C.greenDim, borderRadius: RADIUS.lg }}>
                             <Check size={20} color={C.green} strokeWidth={2.6} />
-                            <Text style={{ fontSize: 15, fontWeight: '800', color: C.green }}>Prihlásené</Text>
-                        </ClaySurface>
+                            <Text style={{ fontSize: 15, fontWeight: '700', color: C.green }}>Prihlásené</Text>
+                        </View>
                     ) : (
-                        <ClayButton label="Prihlásiť sa" onPress={handleApply} flex={1} style={{ height: 54 }} />
+                        <Button label="Prihlásiť sa" onPress={handleApply} flex={1} style={{ height: 54 }} />
                     )}
                 </View>
             </SafeAreaView>
@@ -345,5 +342,5 @@ export default function JobDetailScreen() {
 
 const styles = StyleSheet.create({
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 10 },
-    bottomBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingTop: 14, paddingBottom: 28, gap: 12, borderTopWidth: StyleSheet.hairlineWidth },
+    bottomBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingTop: 14, paddingBottom: 28, gap: 12 },
 });

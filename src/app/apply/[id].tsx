@@ -1,26 +1,24 @@
 import React, { useState, useEffect } from "react";
 import {
     View, Text, ScrollView, Pressable, TextInput, ActivityIndicator,
-    KeyboardAvoidingView, Platform, Alert, StyleSheet,
+    KeyboardAvoidingView, Platform, StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft, CheckCircle, MapPin, Building2, FileText } from "lucide-react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { supabase } from "@/lib/supabase";
 import useAppStore from "@/lib/state/app-store";
-import { useClay } from "@/lib/useClay";
+import { useFlint, RADIUS } from "@/lib/useFlint";
 import { useText } from "@/lib/useText";
 import type { Job } from "@/lib/types";
-import { ClaySurface, ClayInset, ClayIconBox } from "@/components/clay";
 import { goBack } from '@/lib/nav';
 import { showAlert } from '@/lib/notify';
 
 export default function ApplyScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const text = useText();
     const currentUser = useAppStore((s) => s.currentUser);
     const addAppliedJob = useAppStore((s) => s.addAppliedJob);
@@ -115,9 +113,9 @@ export default function ApplyScreen() {
     if (showSuccess) {
         return (
             <SafeAreaView style={[styles.centered, { backgroundColor: C.bg }]}>
-                <ClayIconBox size={88} radius={28} tintBg={C.greenDim}>
+                <View style={[styles.successIcon, { backgroundColor: C.greenDim }]}>
                     <CheckCircle size={46} color={C.green} strokeWidth={1.8} />
-                </ClayIconBox>
+                </View>
                 <Text style={[styles.successTitle, { color: C.text }]}>{text.applicationSent}</Text>
                 <Text style={[styles.successDesc, { color: C.muted }]}>{text.employerReceivedRequest}</Text>
             </SafeAreaView>
@@ -139,9 +137,9 @@ export default function ApplyScreen() {
             {/* Header */}
             <View style={styles.header}>
                 <Pressable onPress={() => goBack()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={[styles.backBtn, { backgroundColor: C.card2 }]}>
                         <ArrowLeft size={20} color={C.text} strokeWidth={2} />
-                    </ClaySurface>
+                    </View>
                 </Pressable>
                 <Text style={[styles.headerTitle, { color: C.text }]}>{text.applyForJob}</Text>
             </View>
@@ -149,7 +147,7 @@ export default function ApplyScreen() {
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     {/* Job Info Card */}
-                    <ClaySurface radius={20} style={{ marginBottom: 22 }} contentStyle={{ padding: 18 }}>
+                    <View style={[styles.jobCard, { backgroundColor: C.card }]}>
                         <Text style={[styles.jobTitle, { color: C.text }]}>{job.title}</Text>
                         <View style={styles.jobMeta}>
                             <Building2 size={14} color={C.muted} strokeWidth={1.9} />
@@ -159,7 +157,7 @@ export default function ApplyScreen() {
                             <MapPin size={14} color={C.muted} strokeWidth={1.9} />
                             <Text style={[styles.jobMetaText, { color: C.muted }]}>{job.location}</Text>
                         </View>
-                    </ClaySurface>
+                    </View>
 
                     {/* Message Section */}
                     <View style={styles.section}>
@@ -169,7 +167,7 @@ export default function ApplyScreen() {
                         </View>
                         <Text style={[styles.sectionHint, { color: C.muted }]}>{text.minCharacters}</Text>
 
-                        <ClayInset radius={16}>
+                        <View style={[styles.textAreaWrap, { backgroundColor: C.card2 }]}>
                             <TextInput
                                 style={[styles.textArea, { color: C.text }]}
                                 placeholder="Napíšte prečo ste vhodný pre túto prácu..."
@@ -180,20 +178,21 @@ export default function ApplyScreen() {
                                 maxLength={500}
                                 editable={!isSubmitting}
                             />
-                        </ClayInset>
+                        </View>
                         <Text style={[styles.charCount, { color: C.muted }]}>{message.length}/500</Text>
                     </View>
 
                     {/* Submit Button */}
-                    <Pressable onPress={handleSubmit} disabled={!canSubmit} style={({ pressed }) => [styles.submitBtn, Platform.select({
-                        ios: { shadowColor: C.accentShadow.color, shadowOffset: { width: 0, height: 6 }, shadowOpacity: canSubmit ? C.accentShadow.opacity : 0, shadowRadius: 14 },
-                        android: { elevation: canSubmit ? 6 : 0 },
-                        web: { boxShadow: canSubmit ? `3px 6px 16px ${C.accentSd}` : 'none' } as any,
-                    }), { opacity: pressed && canSubmit ? 0.9 : canSubmit ? 1 : 0.5 }]}>
-                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.submitGradient}>
-                            <LinearGradient colors={['rgba(255,255,255,0.28)', 'transparent']} style={styles.submitSheen} />
-                            {isSubmitting ? <ActivityIndicator color={C.onAccent} /> : <Text style={[styles.submitText, { color: C.onAccent }]}>{text.sendApplication}</Text>}
-                        </LinearGradient>
+                    <Pressable
+                        onPress={handleSubmit}
+                        disabled={!canSubmit}
+                        style={({ pressed }) => [
+                            styles.submitBtn,
+                            { backgroundColor: C.accent, opacity: canSubmit ? (pressed ? 0.9 : 1) : 0.5 },
+                            pressed && canSubmit && { transform: [{ scale: 0.98 }] },
+                        ]}
+                    >
+                        {isSubmitting ? <ActivityIndicator color={C.onAccent} /> : <Text style={[styles.submitText, { color: C.onAccent }]}>{text.sendApplication}</Text>}
                     </Pressable>
                 </ScrollView>
             </KeyboardAvoidingView>
@@ -204,22 +203,24 @@ export default function ApplyScreen() {
 const styles = StyleSheet.create({
     root: { flex: 1 },
     centered: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24 },
-    successTitle: { fontSize: 23, fontWeight: "800", textAlign: "center", marginBottom: 8, marginTop: 24, letterSpacing: -0.4 },
+    successIcon: { width: 88, height: 88, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center' },
+    successTitle: { fontSize: 23, fontWeight: "700", textAlign: "center", marginBottom: 8, marginTop: 24, letterSpacing: -0.4 },
     successDesc: { fontSize: 15, textAlign: "center", lineHeight: 22, fontWeight: '500' },
     header: { flexDirection: "row", alignItems: "center", paddingHorizontal: 20, paddingVertical: 12, gap: 14 },
-    headerTitle: { fontSize: 20, fontWeight: "800", letterSpacing: -0.4 },
+    backBtn: { width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
+    headerTitle: { fontSize: 20, fontWeight: "700", letterSpacing: -0.4 },
     scrollContent: { padding: 20, paddingBottom: 40 },
-    jobTitle: { fontSize: 19, fontWeight: "800", marginBottom: 10, letterSpacing: -0.4 },
+    jobCard: { borderRadius: RADIUS.lg, padding: 18, marginBottom: 22 },
+    jobTitle: { fontSize: 19, fontWeight: "700", marginBottom: 10, letterSpacing: -0.4 },
     jobMeta: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
     jobMetaText: { fontSize: 14, fontWeight: '600' },
     section: { marginBottom: 24 },
     sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
-    sectionTitle: { fontSize: 16, fontWeight: "800", letterSpacing: -0.3 },
+    sectionTitle: { fontSize: 16, fontWeight: "700", letterSpacing: -0.3 },
     sectionHint: { fontSize: 13, marginBottom: 12, marginLeft: 24, fontWeight: '500' },
+    textAreaWrap: { borderRadius: RADIUS.md },
     textArea: { padding: 16, fontSize: 15, minHeight: 150, textAlignVertical: "top", fontWeight: '500' },
     charCount: { fontSize: 12, marginTop: 8, textAlign: "right", fontWeight: '600' },
-    submitBtn: { borderRadius: 18, overflow: 'hidden', marginBottom: 20 },
-    submitGradient: { paddingVertical: 17, alignItems: "center", borderRadius: 18, overflow: 'hidden' },
-    submitSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '50%' },
-    submitText: { fontSize: 16, fontWeight: "800" },
+    submitBtn: { borderRadius: RADIUS.md, paddingVertical: 17, alignItems: "center", marginBottom: 20 },
+    submitText: { fontSize: 16, fontWeight: "700" },
 });
