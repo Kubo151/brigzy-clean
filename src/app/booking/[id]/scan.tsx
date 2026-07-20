@@ -4,10 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft, CheckCircle, XCircle, CameraOff } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { useClay } from '@/lib/useClay';
+import { useFlint, RADIUS } from '@/lib/useFlint';
 import { useText } from '@/lib/useText';
 import { supabase } from '@/lib/supabase';
-import { ClaySurface, ClayButton } from '@/components/clay';
+import { Button } from '@/components/ui';
 import { goBack } from '@/lib/nav';
 
 // S6 (poster side) — scan the worker's rotating QR to record check-in/out.
@@ -19,7 +19,7 @@ type ScanState = 'scanning' | 'success' | 'error' | 'camera_denied';
 export default function QrScanScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const text = useText();
 
     const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -138,9 +138,9 @@ export default function QrScanScreen() {
         <SafeAreaView style={[styles.root, { backgroundColor: '#000' }]} edges={['top']}>
             <View style={styles.header}>
                 <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); stopCamera(); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={styles.backBtn}>
                         <ChevronLeft size={20} color={C.text} strokeWidth={2.2} />
-                    </ClaySurface>
+                    </View>
                 </Pressable>
                 <Text style={styles.headerTitle}>{text.scanQrTitle}</Text>
             </View>
@@ -178,7 +178,7 @@ export default function QrScanScreen() {
                 <View style={styles.cameraWrap}>
                     <CameraOff size={56} color="#fff" strokeWidth={1.6} />
                     <Text style={[styles.overlayTitle, { marginTop: 16 }]}>{text.cameraDeniedHint}</Text>
-                    <ClayButton label={text.closeAction} onPress={() => goBack()} style={{ marginTop: 20 }} />
+                    <Button label={text.closeAction} onPress={() => goBack()} style={{ marginTop: 20 }} />
                 </View>
             )}
         </SafeAreaView>
@@ -194,6 +194,7 @@ const webVideoStyle = {
 const styles = StyleSheet.create({
     root: { flex: 1 },
     header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12, gap: 12 },
+    backBtn: { width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.14)' },
     headerTitle: { fontSize: 17, fontWeight: '800', color: '#fff', flex: 1, letterSpacing: -0.3 },
     cameraWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
     viewfinder: {

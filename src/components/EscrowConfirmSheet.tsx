@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { ShieldCheck, CheckCircle } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { useClay } from '@/lib/useClay';
+import { useFlint, RADIUS } from '@/lib/useFlint';
 import { useText } from '@/lib/useText';
 import { supabase } from '@/lib/supabase';
-import { ClaySheet, ClayButton, ClayIconBox } from '@/components/clay';
+import { Sheet, Button } from '@/components/ui';
 
 // S5 — escrow confirm sheet. Opens after P4 select; poster reviews the
 // breakdown and funds the escrow (demo mode: simulated charge server-side).
@@ -29,7 +29,7 @@ type Props = {
 const eur = (cents: number) => `€${(cents / 100).toFixed(2)}`;
 
 export function EscrowConfirmSheet({ visible, booking, onClose, onFunded }: Props) {
-    const C = useClay();
+    const C = useFlint();
     const text = useText();
     const [isPaying, setIsPaying] = useState(false);
     const [isFunded, setIsFunded] = useState(false);
@@ -61,17 +61,17 @@ export function EscrowConfirmSheet({ visible, booking, onClose, onFunded }: Prop
     };
 
     return (
-        <ClaySheet visible={visible} onClose={onClose} title={isFunded ? undefined : text.escrowConfirmTitle}>
+        <Sheet visible={visible} onClose={onClose} title={isFunded ? undefined : text.escrowConfirmTitle}>
             {!booking ? (
                 <ActivityIndicator size="large" color={C.accent} style={{ marginVertical: 40 }} />
             ) : isFunded ? (
                 <View style={styles.successWrap}>
-                    <ClayIconBox size={72} radius={24}>
+                    <View style={[styles.successIcon, { backgroundColor: C.greenDim }]}>
                         <CheckCircle size={36} color={C.green} strokeWidth={1.8} />
-                    </ClayIconBox>
+                    </View>
                     <Text style={[styles.successTitle, { color: C.text }]}>{text.escrowFunded}</Text>
                     <Text style={[styles.note, { color: C.muted, textAlign: 'center' }]}>{text.escrowFundedNote}</Text>
-                    <ClayButton label={text.done} onPress={onClose} style={{ alignSelf: 'stretch', marginTop: 20 }} />
+                    <Button label={text.done} onPress={onClose} style={{ alignSelf: 'stretch', marginTop: 20 }} />
                 </View>
             ) : (
                 <View>
@@ -83,7 +83,7 @@ export function EscrowConfirmSheet({ visible, booking, onClose, onFunded }: Prop
                         <Text style={[styles.rowLabel, { color: C.muted }]}>{text.serviceFee}</Text>
                         <Text style={[styles.rowValue, { color: C.text }]}>{eur(booking.service_fee_cents)}</Text>
                     </View>
-                    <View style={[styles.divider, { backgroundColor: C.hair }]} />
+                    <View style={[styles.divider, { backgroundColor: C.divider }]} />
                     <View style={styles.row}>
                         <Text style={[styles.totalLabel, { color: C.text }]}>{text.totalToPay}</Text>
                         <Text style={[styles.totalValue, { color: C.text }]}>{eur(booking.total_cents)}</Text>
@@ -99,7 +99,7 @@ export function EscrowConfirmSheet({ visible, booking, onClose, onFunded }: Prop
                     {isPaying ? (
                         <ActivityIndicator size="large" color={C.accent} style={{ marginVertical: 14 }} />
                     ) : (
-                        <ClayButton
+                        <Button
                             label={`${text.payNow} · ${eur(booking.total_cents)}`}
                             onPress={handlePay}
                             style={{ marginTop: 4 }}
@@ -107,7 +107,7 @@ export function EscrowConfirmSheet({ visible, booking, onClose, onFunded }: Prop
                     )}
                 </View>
             )}
-        </ClaySheet>
+        </Sheet>
     );
 }
 
@@ -122,5 +122,6 @@ const styles = StyleSheet.create({
     note: { fontSize: 13, lineHeight: 19, fontWeight: '500' },
     error: { fontSize: 13.5, fontWeight: '700', marginBottom: 12, textAlign: 'center' },
     successWrap: { alignItems: 'center', paddingTop: 10, gap: 14 },
+    successIcon: { width: 72, height: 72, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center' },
     successTitle: { fontSize: 19, fontWeight: '800', letterSpacing: -0.4 },
 });

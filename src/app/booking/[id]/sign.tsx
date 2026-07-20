@@ -6,10 +6,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { ChevronLeft, FileSignature, AlertTriangle, CheckCircle } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { useClay } from '@/lib/useClay';
+import { useFlint, RADIUS } from '@/lib/useFlint';
 import { useText } from '@/lib/useText';
 import { supabase } from '@/lib/supabase';
-import { ClaySurface, ClayButton, ClayIconBox, ClayInset } from '@/components/clay';
+import { Button } from '@/components/ui';
 import { goBack } from '@/lib/nav';
 
 // S3 — contract preview + mock-OTP sign. Full screen per UX-Spec (not a sheet).
@@ -39,7 +39,7 @@ const contractLabel = (job: SignBooking['job']) => {
 export default function ContractSignScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const text = useText();
 
     const [booking, setBooking] = useState<SignBooking | null>(null);
@@ -109,20 +109,20 @@ export default function ContractSignScreen() {
         <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={['top']}>
             <View style={styles.header}>
                 <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={[styles.backBtn, { backgroundColor: C.card2 }]}>
                         <ChevronLeft size={20} color={C.text} strokeWidth={2.2} />
-                    </ClaySurface>
+                    </View>
                 </Pressable>
                 <Text style={[styles.headerTitle, { color: C.text }]} numberOfLines={1}>{text.contractTitle}</Text>
             </View>
 
             {isSigned ? (
                 <View style={styles.successWrap}>
-                    <ClayIconBox size={72} radius={24}>
+                    <View style={[styles.successIcon, { backgroundColor: C.greenDim }]}>
                         <CheckCircle size={36} color={C.green} strokeWidth={1.8} />
-                    </ClayIconBox>
+                    </View>
                     <Text style={[styles.successTitle, { color: C.text }]}>{text.done}</Text>
-                    <ClayButton label={text.done} onPress={() => goBack()} style={{ alignSelf: 'stretch', marginTop: 16 }} />
+                    <Button label={text.done} onPress={() => goBack()} style={{ alignSelf: 'stretch', marginTop: 16 }} />
                 </View>
             ) : (
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -133,11 +133,11 @@ export default function ContractSignScreen() {
                     </View>
 
                     {/* Contract preview — type auto-derived server-side, never a user choice */}
-                    <ClaySurface radius={20} style={{ marginBottom: 18 }} contentStyle={{ padding: 20 }}>
+                    <View style={[styles.card, { backgroundColor: C.card, padding: 20, marginBottom: 18 }]}>
                         <Text style={[styles.contractHeading, { color: C.text }]}>{contractLabel(booking.job).name}</Text>
                         <Text style={[styles.contractSub, { color: C.muted }]}>{contractLabel(booking.job).ref} · VZOR</Text>
 
-                        <View style={[styles.divider, { backgroundColor: C.hair }]} />
+                        <View style={[styles.divider, { backgroundColor: C.divider }]} />
 
                         <Text style={[styles.clauseLabel, { color: C.muted }]}>Objednávateľ</Text>
                         <Text style={[styles.clauseValue, { color: C.text }]}>{booking.poster?.display_name ?? '—'}</Text>
@@ -154,17 +154,17 @@ export default function ContractSignScreen() {
                         <Text style={[styles.clauseLabel, { color: C.muted }]}>Odmena</Text>
                         <Text style={[styles.clauseValue, { color: C.text }]}>{eur(booking.agreed_amount_cents)}</Text>
 
-                        <View style={[styles.divider, { backgroundColor: C.hair }]} />
+                        <View style={[styles.divider, { backgroundColor: C.divider }]} />
                         <Text style={[styles.contractBody, { color: C.muted }]}>
                             Zmluvné strany sa dohodli, že zhotoviteľ vykoná dielo osobne a riadne v dohodnutom
                             termíne. Odmena je zabezpečená v úschove (escrow) a bude uvoľnená po schválení
                             vykonaného diela objednávateľom. Podpisom obe strany potvrdzujú súhlas s podmienkami.
                         </Text>
-                    </ClaySurface>
+                    </View>
 
                     {/* OTP input */}
                     <Text style={[styles.otpLabel, { color: C.text }]}>{text.enterOtp}</Text>
-                    <ClayInset radius={16} style={{ marginBottom: 8 }} contentStyle={styles.otpInputWrap}>
+                    <View style={[styles.otpInputWrap, { backgroundColor: C.card2, marginBottom: 8 }]}>
                         <TextInput
                             value={otp}
                             onChangeText={(v) => setOtp(v.replace(/\D/g, '').slice(0, 6))}
@@ -174,7 +174,7 @@ export default function ContractSignScreen() {
                             placeholderTextColor={C.muted}
                             style={[styles.otpInput, { color: C.text }]}
                         />
-                    </ClayInset>
+                    </View>
                     <Text style={[styles.otpHint, { color: C.muted }]}>{text.otpDemoHint}</Text>
 
                     {errorMsg && <Text style={[styles.error, { color: C.red }]}>{errorMsg}</Text>}
@@ -182,7 +182,7 @@ export default function ContractSignScreen() {
                     {isSigning ? (
                         <ActivityIndicator size="large" color={C.accent} style={{ marginVertical: 14 }} />
                     ) : (
-                        <ClayButton
+                        <Button
                             label={text.confirmSign}
                             icon={<FileSignature size={18} color={C.onAccent} strokeWidth={2.2} />}
                             onPress={handleSign}
@@ -199,21 +199,24 @@ const styles = StyleSheet.create({
     root: { flex: 1 },
     centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12, gap: 12 },
-    headerTitle: { fontSize: 19, fontWeight: '800', flex: 1, letterSpacing: -0.4 },
+    backBtn: { width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
+    headerTitle: { fontSize: 17, fontWeight: '600', flex: 1 },
     content: { padding: 20, paddingBottom: 48 },
-    warnBox: { flexDirection: 'row', alignItems: 'center', gap: 9, borderRadius: 13, padding: 12, marginBottom: 16 },
+    warnBox: { flexDirection: 'row', alignItems: 'center', gap: 9, borderRadius: RADIUS.md, padding: 12, marginBottom: 16 },
     warnText: { fontSize: 12.5, fontWeight: '700', flex: 1, lineHeight: 17 },
-    contractHeading: { fontSize: 20, fontWeight: '800', letterSpacing: -0.4 },
+    card: { borderRadius: RADIUS.lg },
+    contractHeading: { fontSize: 20, fontWeight: '700', letterSpacing: -0.4 },
     contractSub: { fontSize: 12, fontWeight: '600', marginTop: 3 },
     divider: { height: 1, marginVertical: 14 },
     clauseLabel: { fontSize: 11.5, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.4, marginTop: 10 },
     clauseValue: { fontSize: 15, fontWeight: '700', marginTop: 2 },
     contractBody: { fontSize: 13, lineHeight: 20, fontWeight: '500' },
-    otpLabel: { fontSize: 15, fontWeight: '800', marginBottom: 10, letterSpacing: -0.2 },
-    otpInputWrap: { paddingHorizontal: 18, paddingVertical: 4 },
-    otpInput: { fontSize: 24, fontWeight: '800', letterSpacing: 10, textAlign: 'center', paddingVertical: 10 },
+    otpLabel: { fontSize: 15, fontWeight: '700', marginBottom: 10 },
+    otpInputWrap: { paddingHorizontal: 18, paddingVertical: 4, borderRadius: RADIUS.md },
+    otpInput: { fontSize: 24, fontWeight: '700', letterSpacing: 10, textAlign: 'center', paddingVertical: 10 },
     otpHint: { fontSize: 12, fontWeight: '600', textAlign: 'center', marginBottom: 18 },
     error: { fontSize: 13.5, fontWeight: '700', marginBottom: 12, textAlign: 'center' },
     successWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
-    successTitle: { fontSize: 19, fontWeight: '800' },
+    successIcon: { width: 72, height: 72, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center' },
+    successTitle: { fontSize: 19, fontWeight: '700' },
 });

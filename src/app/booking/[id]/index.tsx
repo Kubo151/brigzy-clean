@@ -1,16 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import {
-    View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, Alert, StyleSheet,
+    View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { ChevronLeft, ShieldCheck, FileSignature, QrCode, CheckCircle, XCircle, Star } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { useClay } from '@/lib/useClay';
+import { useFlint, RADIUS } from '@/lib/useFlint';
 import { useText } from '@/lib/useText';
 import { supabase } from '@/lib/supabase';
-import { ClaySurface, ClayButton, ClayIconBox, ClayTimeline, type TimelineStep } from '@/components/clay';
+import { Button, Timeline, type TimelineStep } from '@/components/ui';
 import { EscrowConfirmSheet, type EscrowBooking } from '@/components/EscrowConfirmSheet';
 import { goBack } from '@/lib/nav';
 import { showAlert } from '@/lib/notify';
@@ -67,7 +66,7 @@ const eur = (cents: number) => `€${(cents / 100).toFixed(2)}`;
 export default function BookingHubScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const text = useText();
 
     const [booking, setBooking] = useState<BookingDetail | null>(null);
@@ -244,6 +243,8 @@ export default function BookingHubScreen() {
     const contractDone = ['in_progress', 'completed', 'cleared'].includes(status);
     const released = status === 'cleared';
 
+    // Fund -> sign ordering is a hard functional constraint (ADR-0006) — the
+    // timeline step order below must stay: escrow, contract, work, release.
     const steps: TimelineStep[] = [
         { label: text.stepEscrow, sublabel: eur(booking.agreed_amount_cents + booking.service_fee_cents), done: escrowDone, active: status === 'escrow_pending' },
         {
@@ -279,49 +280,49 @@ export default function BookingHubScreen() {
         <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={['top']}>
             <View style={styles.header}>
                 <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={[styles.backBtn, { backgroundColor: C.card2 }]}>
                         <ChevronLeft size={20} color={C.text} strokeWidth={2.2} />
-                    </ClaySurface>
+                    </View>
                 </Pressable>
                 <Text style={[styles.headerTitle, { color: C.text }]} numberOfLines={1}>{text.bookingTitle}</Text>
             </View>
 
             <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Job + parties card */}
-                <ClaySurface radius={20} style={{ marginBottom: 16 }} contentStyle={{ padding: 18 }}>
+                <View style={[styles.card, { backgroundColor: C.card, padding: 18, marginBottom: 16 }]}>
                     <Text style={[styles.jobTitle, { color: C.text }]}>{booking.job?.title ?? '—'}</Text>
                     <Text style={[styles.partyText, { color: C.muted }]}>
                         {(isPoster ? text.workerLabel : text.posterLabel)}: {otherName}
                     </Text>
-                    <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.payBadge}>
+                    <View style={[styles.payBadge, { backgroundColor: C.accent }]}>
                         <Text style={[styles.payAmount, { color: C.onAccent }]}>{eur(booking.agreed_amount_cents)}</Text>
                         {isPoster && (
                             <Text style={[styles.payFee, { color: C.onAccent }]}>+ {eur(booking.service_fee_cents)} {text.serviceFee.toLowerCase()}</Text>
                         )}
-                    </LinearGradient>
-                </ClaySurface>
+                    </View>
+                </View>
 
-                {/* Escrow loop timeline */}
-                <ClaySurface radius={20} style={{ marginBottom: 16 }} contentStyle={{ padding: 18 }}>
-                    <ClayTimeline steps={steps} />
-                </ClaySurface>
+                {/* Escrow loop timeline — order (fund -> sign) is a fixed business rule, do not reorder */}
+                <View style={[styles.card, { backgroundColor: C.card, padding: 18, marginBottom: 16 }]}>
+                    <Timeline steps={steps} />
+                </View>
 
                 {/* Status actions */}
                 {status === 'cancelled' && (
-                    <View style={[styles.infoBox, { backgroundColor: C.red + '1E' }]}>
+                    <View style={[styles.infoBox, { backgroundColor: C.redDim }]}>
                         <XCircle size={18} color={C.red} strokeWidth={2} />
                         <Text style={[styles.infoText, { color: C.red }]}>{text.bookingCancelled}</Text>
                     </View>
                 )}
                 {status === 'disputed' && (
-                    <View style={[styles.infoBox, { backgroundColor: C.red + '1E' }]}>
+                    <View style={[styles.infoBox, { backgroundColor: C.redDim }]}>
                         <XCircle size={18} color={C.red} strokeWidth={2} />
                         <Text style={[styles.infoText, { color: C.red }]}>{text.bookingDisputed}</Text>
                     </View>
                 )}
 
                 {status === 'escrow_pending' && isPoster && (
-                    <ClayButton
+                    <Button
                         label={text.fundEscrow}
                         icon={<ShieldCheck size={18} color={C.onAccent} strokeWidth={2.2} />}
                         onPress={() => setS5Visible(true)}
@@ -336,7 +337,7 @@ export default function BookingHubScreen() {
 
                 {status === 'awaiting_signatures' && (
                     canISign ? (
-                        <ClayButton
+                        <Button
                             label={text.signContract}
                             icon={<FileSignature size={18} color={C.onAccent} strokeWidth={2.2} />}
                             onPress={() => router.push(`/booking/${booking.id}/sign`)}
@@ -357,12 +358,12 @@ export default function BookingHubScreen() {
                             <ActivityIndicator size="large" color={C.accent} style={{ marginVertical: 14 }} />
                         ) : !booking.check_in_at ? (
                             <View style={{ gap: 10 }}>
-                                <ClayButton
+                                <Button
                                     label={text.scanQr}
                                     icon={<QrCode size={18} color={C.onAccent} strokeWidth={2.2} />}
                                     onPress={() => router.push(`/booking/${booking.id}/scan`)}
                                 />
-                                <ClayButton
+                                <Button
                                     label={text.checkInWorker}
                                     variant="ghost"
                                     onPress={() => handleAttendance('check_in')}
@@ -376,19 +377,19 @@ export default function BookingHubScreen() {
                                         {text.workingSince} {formatTime(booking.check_in_at)}
                                     </Text>
                                 </View>
-                                <ClayButton
+                                <Button
                                     label={text.scanQr}
                                     icon={<QrCode size={18} color={C.onAccent} strokeWidth={2.2} />}
                                     onPress={() => router.push(`/booking/${booking.id}/scan`)}
                                 />
-                                <ClayButton
+                                <Button
                                     label={text.checkOutWorker}
                                     variant="ghost"
                                     onPress={() => handleAttendance('check_out')}
                                 />
                             </View>
                         ) : (
-                            <ClayButton
+                            <Button
                                 label={text.approveAndRelease}
                                 icon={<CheckCircle size={18} color={C.onAccent} strokeWidth={2.2} />}
                                 onPress={handleRelease}
@@ -405,7 +406,7 @@ export default function BookingHubScreen() {
                                 </Text>
                             </View>
                             {!booking.check_out_at && (
-                                <ClayButton
+                                <Button
                                     label={text.showQr}
                                     icon={<QrCode size={18} color={C.onAccent} strokeWidth={2.2} />}
                                     onPress={() => router.push(`/booking/${booking.id}/qr`)}
@@ -417,9 +418,9 @@ export default function BookingHubScreen() {
 
                 {released && (
                     <View style={styles.releasedWrap}>
-                        <ClayIconBox size={64} radius={20}>
+                        <View style={[styles.releasedIcon, { backgroundColor: C.greenDim }]}>
                             <CheckCircle size={30} color={C.green} strokeWidth={1.8} />
-                        </ClayIconBox>
+                        </View>
                         <Text style={[styles.releasedTitle, { color: C.text }]}>{text.paymentReleased}</Text>
                         <Text style={[styles.releasedNote, { color: C.muted }]}>{text.paymentReleasedNote}</Text>
                     </View>
@@ -427,7 +428,7 @@ export default function BookingHubScreen() {
 
                 {/* S7 — blind two-way review */}
                 {released && !myReview && (
-                    <ClaySurface radius={20} style={{ marginTop: 8 }} contentStyle={{ padding: 18 }}>
+                    <View style={[styles.card, { backgroundColor: C.card, padding: 18, marginTop: 8 }]}>
                         <Text style={[styles.reviewTitle, { color: C.text }]}>
                             {text.leaveReviewTitle} · {otherName}
                         </Text>
@@ -449,12 +450,12 @@ export default function BookingHubScreen() {
                             placeholder={text.reviewCommentPlaceholder}
                             placeholderTextColor={C.muted}
                             multiline
-                            style={[styles.reviewInput, { color: C.text, backgroundColor: C.cLo, borderColor: C.hair }]}
+                            style={[styles.reviewInput, { color: C.text, backgroundColor: C.card2 }]}
                         />
                         {isSubmittingReview ? (
                             <ActivityIndicator size="large" color={C.accent} style={{ marginVertical: 10 }} />
                         ) : (
-                            <ClayButton
+                            <Button
                                 label={text.submitReview}
                                 icon={<Star size={17} color={C.onAccent} strokeWidth={2.2} />}
                                 onPress={handleSubmitReview}
@@ -462,10 +463,10 @@ export default function BookingHubScreen() {
                             />
                         )}
                         <Text style={[styles.blindNote, { color: C.muted }]}>{text.reviewBlindNote}</Text>
-                    </ClaySurface>
+                    </View>
                 )}
                 {released && myReview && (
-                    <View style={[styles.infoBox, { backgroundColor: C.greenDim ?? C.green + '1E', marginTop: 8 }]}>
+                    <View style={[styles.infoBox, { backgroundColor: C.greenDim, marginTop: 8 }]}>
                         <Star size={18} color={C.star} strokeWidth={2} fill={C.star} />
                         <Text style={[styles.infoText, { color: C.text }]}>
                             {text.reviewThanks} {myReview.revealed_at ? text.reviewRevealedNote : text.reviewBlindNote}
@@ -476,12 +477,12 @@ export default function BookingHubScreen() {
                 {/* S8 stub — raise a dispute, once escrow is funded and not already cancelled/disputed */}
                 {escrowDone && status !== 'cancelled' && status !== 'disputed' && (
                     myDispute ? (
-                        <View style={[styles.infoBox, { backgroundColor: C.red + '1E', marginTop: 12 }]}>
+                        <View style={[styles.infoBox, { backgroundColor: C.redDim, marginTop: 12 }]}>
                             <XCircle size={18} color={C.red} strokeWidth={2} />
                             <Text style={[styles.infoText, { color: C.red }]}>{text.reportProblemAlreadyOpen}</Text>
                         </View>
                     ) : disputeFormVisible ? (
-                        <ClaySurface radius={20} style={{ marginTop: 12 }} contentStyle={{ padding: 18 }}>
+                        <View style={[styles.card, { backgroundColor: C.card, padding: 18, marginTop: 12 }]}>
                             <Text style={[styles.reviewTitle, { color: C.text }]}>{text.reportProblemTitle}</Text>
                             <TextInput
                                 value={disputeDescription}
@@ -490,19 +491,19 @@ export default function BookingHubScreen() {
                                 placeholderTextColor={C.muted}
                                 multiline
                                 maxLength={2000}
-                                style={[styles.reviewInput, { color: C.text, backgroundColor: C.cLo, borderColor: C.hair }]}
+                                style={[styles.reviewInput, { color: C.text, backgroundColor: C.card2 }]}
                             />
                             {isSubmittingDispute ? (
                                 <ActivityIndicator size="large" color={C.accent} style={{ marginVertical: 10 }} />
                             ) : (
-                                <ClayButton
+                                <Button
                                     label={text.reportProblemSubmit}
                                     icon={<XCircle size={17} color={C.onAccent} strokeWidth={2.2} />}
                                     onPress={handleSubmitDispute}
                                     style={disputeDescription.trim().length < 3 ? { opacity: 0.5 } : undefined}
                                 />
                             )}
-                        </ClaySurface>
+                        </View>
                     ) : (
                         <Pressable
                             onPress={() => { Haptics.selectionAsync(); setDisputeFormVisible(true); }}
@@ -535,21 +536,24 @@ const styles = StyleSheet.create({
     root: { flex: 1 },
     centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12, gap: 12 },
-    headerTitle: { fontSize: 19, fontWeight: '800', flex: 1, letterSpacing: -0.4 },
+    backBtn: { width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
+    headerTitle: { fontSize: 17, fontWeight: '600', flex: 1 },
     content: { padding: 20, paddingBottom: 48 },
-    jobTitle: { fontSize: 18, fontWeight: '800', letterSpacing: -0.4, marginBottom: 6 },
+    card: { borderRadius: RADIUS.lg },
+    jobTitle: { fontSize: 18, fontWeight: '700', letterSpacing: -0.4, marginBottom: 6 },
     partyText: { fontSize: 13.5, fontWeight: '600', marginBottom: 12 },
-    payBadge: { alignSelf: 'flex-start', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 13 },
-    payAmount: { fontSize: 19, fontWeight: '800', letterSpacing: -0.4 },
+    payBadge: { alignSelf: 'flex-start', paddingHorizontal: 16, paddingVertical: 10, borderRadius: RADIUS.md },
+    payAmount: { fontSize: 19, fontWeight: '700', letterSpacing: -0.4 },
     payFee: { fontSize: 11.5, marginTop: 1, fontWeight: '600', opacity: 0.9 },
-    infoBox: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 14, padding: 14 },
+    infoBox: { flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: RADIUS.md, padding: 14 },
     infoText: { fontSize: 13.5, lineHeight: 19, fontWeight: '600', flex: 1 },
     releasedWrap: { alignItems: 'center', gap: 10, paddingVertical: 18 },
-    releasedTitle: { fontSize: 18, fontWeight: '800', letterSpacing: -0.4 },
+    releasedIcon: { width: 64, height: 64, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center' },
+    releasedTitle: { fontSize: 18, fontWeight: '700', letterSpacing: -0.4 },
     releasedNote: { fontSize: 13.5, fontWeight: '500', textAlign: 'center' },
-    reviewTitle: { fontSize: 16, fontWeight: '800', letterSpacing: -0.3, marginBottom: 14 },
+    reviewTitle: { fontSize: 16, fontWeight: '700', letterSpacing: -0.3, marginBottom: 14 },
     starsRow: { flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 16 },
-    reviewInput: { borderRadius: 14, borderWidth: 1, padding: 13, fontSize: 14, minHeight: 76, textAlignVertical: 'top', marginBottom: 14 },
+    reviewInput: { borderRadius: RADIUS.md, padding: 13, fontSize: 14, minHeight: 76, textAlignVertical: 'top', marginBottom: 14 },
     blindNote: { fontSize: 12, fontWeight: '600', textAlign: 'center', marginTop: 12 },
     reportProblemLink: { alignItems: 'center', paddingVertical: 14, marginTop: 4 },
     reportProblemLinkText: { fontSize: 13, fontWeight: '600', textDecorationLine: 'underline' },

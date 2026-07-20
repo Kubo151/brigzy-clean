@@ -5,10 +5,10 @@ import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import QRCode from 'react-native-qrcode-svg';
 import { Phone, Zap } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { useClay } from '@/lib/useClay';
+import { useFlint, RADIUS } from '@/lib/useFlint';
 import { useText } from '@/lib/useText';
 import { supabase } from '@/lib/supabase';
-import { ClaySurface, ClayButton } from '@/components/clay';
+import { Button } from '@/components/ui';
 import { goBack } from '@/lib/nav';
 
 // W7 — worker shows a big, auto-rotating QR for the poster to scan (S6).
@@ -37,7 +37,7 @@ const workedLabel = (checkIn: string, checkOut?: string | null) => {
 export default function QrShowScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const text = useText();
 
     const [booking, setBooking] = useState<BookingInfo | null>(null);
@@ -124,7 +124,7 @@ export default function QrShowScreen() {
                 {booking.poster?.phone && (
                     <Pressable
                         onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); }}
-                        style={({ pressed }) => [styles.sosBtn, { backgroundColor: C.red + '1E' }, pressed && { opacity: 0.8 }]}
+                        style={({ pressed }) => [styles.sosBtn, { backgroundColor: C.redDim }, pressed && { opacity: 0.8 }]}
                     >
                         <Phone size={15} color={C.red} strokeWidth={2.2} />
                         <Text style={[styles.sosText, { color: C.red }]}>{text.sosContact}</Text>
@@ -141,9 +141,9 @@ export default function QrShowScreen() {
                         </Text>
                     </View>
                 ) : payload ? (
-                    <ClaySurface radius={28} contentStyle={styles.qrCard}>
+                    <View style={styles.qrCard}>
                         <QRCode value={payload} size={250} backgroundColor="#FFFFFF" color="#000000" />
-                    </ClaySurface>
+                    </View>
                 ) : (
                     <ActivityIndicator size="large" color={C.accent} />
                 )}
@@ -171,7 +171,7 @@ export default function QrShowScreen() {
                 </>
             )}
 
-            <ClayButton label={text.closeAction} variant="ghost" onPress={() => goBack()} style={{ marginTop: 20 }} />
+            <Button label={text.closeAction} variant="ghost" onPress={() => goBack()} style={{ marginTop: 20 }} />
         </SafeAreaView>
     );
 }
@@ -180,18 +180,18 @@ const styles = StyleSheet.create({
     root: { flex: 1, alignItems: 'center', paddingHorizontal: 24 },
     centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignSelf: 'stretch', paddingVertical: 12 },
-    title: { fontSize: 19, fontWeight: '800', letterSpacing: -0.4 },
-    sosBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12 },
-    sosText: { fontSize: 12.5, fontWeight: '800' },
+    title: { fontSize: 17, fontWeight: '600' },
+    sosBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.md },
+    sosText: { fontSize: 12.5, fontWeight: '700' },
     qrWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    qrCard: { padding: 20 },
+    qrCard: { padding: 20, backgroundColor: '#FFFFFF', borderRadius: RADIUS.xl },
     summaryWrap: { alignItems: 'center', gap: 8 },
-    summaryTitle: { fontSize: 20, fontWeight: '800', letterSpacing: -0.4 },
-    summaryTime: { fontSize: 32, fontWeight: '800', letterSpacing: -0.6 },
-    status: { fontSize: 16, fontWeight: '800', letterSpacing: -0.3, marginBottom: 10 },
+    summaryTitle: { fontSize: 20, fontWeight: '700', letterSpacing: -0.4 },
+    summaryTime: { fontSize: 32, fontWeight: '700', letterSpacing: -0.6 },
+    status: { fontSize: 16, fontWeight: '700', letterSpacing: -0.3, marginBottom: 10 },
     tickerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
-    workedTime: { fontSize: 22, fontWeight: '800', letterSpacing: -0.5 },
-    brigyPill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 },
-    brigyText: { fontSize: 12.5, fontWeight: '800' },
+    workedTime: { fontSize: 22, fontWeight: '700', letterSpacing: -0.5 },
+    brigyPill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: RADIUS.sm },
+    brigyText: { fontSize: 12.5, fontWeight: '700' },
     countdown: { fontSize: 12.5, fontWeight: '600', marginBottom: 10 },
 });
