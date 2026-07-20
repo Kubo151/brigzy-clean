@@ -1,17 +1,24 @@
-import React, { useRef } from 'react';
-import { View, Pressable, Text, Animated, StyleSheet, Platform } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Pressable, Text, StyleSheet, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Home, Briefcase, Plus, MessageSquare, User, Search, Heart } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+    interpolateColor,
+    Easing,
+} from 'react-native-reanimated';
 import { GlassView, isLiquidGlassAvailable } from '@/lib/glassEffect';
 import { useText } from '@/lib/useText';
-import { useClay } from '@/lib/useClay';
+import { useFlint, RADIUS, EASE_OUT } from '@/lib/useFlint';
 import useAppStore from '@/lib/state/app-store';
-import type { ClayColors } from '@/lib/useClay';
+import type { FlintColors } from '@/lib/useFlint';
 
 const TAB_BAR_H = 66;
-const CAPSULE_RADIUS = 26;
+const CAPSULE_RADIUS = RADIUS.xl;
 const CAPSULE_INSET = 16;
 
 type TabItem = {
@@ -22,66 +29,89 @@ type TabItem = {
 };
 
 // ─── TAB BUTTON ──────────────────────────────────────
+// Highest-frequency interaction in the app (100+/day) — per
+// docs/design/Flint-Motion-Spec.md, that means NO position/scale
+// motion, just an instant-feeling color + background transition
+// (150ms ease-out). The center FAB is the one exception (occasional,
+// gets real press feedback) — see below.
 function TabButton({ item, focused, onPress, C }: {
-    item: TabItem; focused: boolean; onPress: () => void; C: ClayColors;
+    item: TabItem; focused: boolean; onPress: () => void; C: FlintColors;
 }) {
-    const scaleAnim = useRef(new Animated.Value(1)).current;
     const Icon = item.icon;
+    const f = useSharedValue(focused ? 1 : 0);
+
+    useEffect(() => {
+        f.value = withTiming(focused ? 1 : 0, { duration: 150, easing: Easing.bezier(...EASE_OUT) });
+    }, [focused]);
+
+    const blobStyle = useAnimatedStyle(() => ({
+        opacity: f.value,
+    }));
+    const iconColorStyle = useAnimatedStyle(() => ({
+        color: interpolateColor(f.value, [0, 1], [C.muted, C.accent]),
+    }));
 
     const handlePress = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        Animated.sequence([
-            Animated.spring(scaleAnim, { toValue: 0.85, useNativeDriver: true, speed: 80, bounciness: 0 }),
-            Animated.spring(scaleAnim, { toValue: 1.05, useNativeDriver: true, speed: 28, bounciness: 10 }),
-            Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, speed: 35, bounciness: 6 }),
-        ]).start();
         onPress();
     };
 
     if (item.isCenter) {
         return (
             <Pressable onPress={handlePress} style={styles.tabSlot}>
-                <Animated.View style={[styles.centerWrap, { transform: [{ scale: scaleAnim }] }]}>
-                    <LinearGradient
-                        colors={[C.accent2, C.accent]}
-                        start={{ x: 0.3, y: 0 }}
-                        end={{ x: 0.7, y: 1 }}
-                        style={[styles.centerBtn, Platform.select({
-                            ios: {
-                                shadowColor: C.accentShadow.color,
-                                shadowOffset: { width: 0, height: 6 },
-                                shadowOpacity: C.accentShadow.opacity,
-                                shadowRadius: 14,
-                            },
-                            android: { elevation: 8 },
-                            web: { boxShadow: `0 6px 16px ${C.accentSd}` } as any,
-                        })]}
-                    >
-                        <LinearGradient
-                            colors={['rgba(255,255,255,0.35)', 'rgba(255,255,255,0.05)', 'transparent']}
-                            start={{ x: 0.5, y: 0 }}
-                            end={{ x: 0.5, y: 0.6 }}
-                            style={styles.centerSpecular}
-                        />
-                        <Icon size={24} color={C.onAccent} strokeWidth={2.6} />
-                    </LinearGradient>
-                </Animated.View>
+                <CenterButton C={C} Icon={Icon} />
             </Pressable>
         );
     }
 
     return (
         <Pressable onPress={handlePress} style={styles.tabSlot}>
-            <Animated.View style={[styles.tabContent, { transform: [{ scale: scaleAnim }] }]}>
-                {focused && <View style={[styles.activeBlob, { backgroundColor: C.accentDim }]} />}
-                <Icon
-                    size={22}
-                    color={focused ? C.accent : C.muted}
-                    strokeWidth={focused ? 2.2 : 1.8}
-                />
+            <View style={styles.tabContent}>
+                <Animated.View style={[styles.activeBlob, { backgroundColor: C.accentDim }, blobStyle]} />
+                <Icon size={22} color={focused ? C.accent : C.muted} strokeWidth={focused ? 2.2 : 1.8} />
                 {focused && (
-                    <Text numberOfLines={1} style={[styles.tabLabel, { color: C.accent }]}>{item.label}</Text>
+                    <Animated.Text numberOfLines={1} style={[styles.tabLabel, iconColorStyle]}>
+                        {item.label}
+                    </Animated.Text>
                 )}
+            </View>
+        </Pressable>
+    );
+}
+
+// Center FAB — the app's other deliberate "bold accent" moment
+// alongside the wallet hero. Flat solid accent fill, single shadow,
+// no gradient sheen (that was a clay-era flourish). Occasional
+// interaction (not 100+/day like the surrounding tabs), so it does
+// get real press feedback: scale(0.94), 140ms ease-out.
+function CenterButton({ C, Icon }: { C: FlintColors; Icon: any }) {
+    const scale = useSharedValue(1);
+    const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
+    const onPressIn = () => {
+        scale.value = withTiming(0.94, { duration: 140, easing: Easing.bezier(...EASE_OUT) });
+    };
+    const onPressOut = () => {
+        scale.value = withTiming(1, { duration: 140, easing: Easing.bezier(...EASE_OUT) });
+    };
+
+    return (
+        <Pressable onPressIn={onPressIn} onPressOut={onPressOut} hitSlop={8}>
+            <Animated.View
+                style={[
+                    styles.centerBtn,
+                    {
+                        backgroundColor: C.accent,
+                        shadowColor: C.accentShadow.color,
+                        shadowOffset: C.accentShadow.offset,
+                        shadowOpacity: C.accentShadow.opacity,
+                        shadowRadius: C.accentShadow.radius,
+                    },
+                    Platform.select({ android: { elevation: 8 } }),
+                    animStyle,
+                ]}
+            >
+                <Icon size={24} color={C.onAccent} strokeWidth={2.6} />
             </Animated.View>
         </Pressable>
     );
@@ -90,41 +120,36 @@ function TabButton({ item, focused, onPress, C }: {
 // ─── TAB BAR CONTAINER ───────────────────────────────
 const glassAvailable = Platform.OS === 'ios' && isLiquidGlassAvailable();
 
-function TabBarContainer({ C, children }: { C: ClayColors; children: React.ReactNode }) {
+function TabBarContainer({ C, children }: { C: FlintColors; children: React.ReactNode }) {
     return (
         <View style={styles.barWrapper} pointerEvents="box-none">
-            <LinearGradient colors={['transparent', C.bg]} style={styles.fadeOverlay} pointerEvents="none" />
-            <View style={[styles.capsuleOuter, Platform.select({
-                ios: {
-                    shadowColor: C.darkShadow.color,
-                    shadowOffset: { width: 0, height: glassAvailable ? 12 : 8 },
-                    shadowOpacity: glassAvailable ? 0.22 : (C.isLight ? 0.18 : 0.4),
-                    shadowRadius: glassAvailable ? 20 : 14,
-                },
-                android: { elevation: 14 },
-                web: { boxShadow: `0 8px 20px ${C.sd}, 0 -2px 8px ${C.sl}` } as any,
-            })]}>
+            <LinearGradient
+                colors={[`${C.bg}00`, C.bg]}
+                style={styles.fadeOverlay}
+                pointerEvents="none"
+            />
+            <View
+                style={[
+                    styles.capsuleOuter,
+                    glassAvailable
+                        ? Platform.select({
+                              ios: { shadowColor: C.shadow, shadowOffset: { width: 0, height: 12 }, shadowOpacity: 1, shadowRadius: 20 },
+                          })
+                        : {
+                              backgroundColor: C.card,
+                              ...Platform.select({
+                                  ios: { shadowColor: C.shadow, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 1, shadowRadius: 14 },
+                                  android: { elevation: 14 },
+                              }),
+                          },
+                ]}
+            >
                 {glassAvailable ? (
-                    <GlassView
-                        glassEffectStyle="regular"
-                        colorScheme="auto"
-                        isInteractive
-                        style={[styles.capsuleFace, styles.glassFace]}
-                    >
+                    <GlassView glassEffectStyle="regular" colorScheme="auto" isInteractive style={styles.capsuleFace}>
                         {children}
                     </GlassView>
                 ) : (
-                    <>
-                        <View style={[StyleSheet.absoluteFill, { borderRadius: CAPSULE_RADIUS, backgroundColor: C.cLo }]} />
-                        <LinearGradient
-                            colors={[C.cHi, C.cLo]}
-                            start={{ x: 0.1, y: 0 }}
-                            end={{ x: 0.9, y: 1 }}
-                            style={[styles.capsuleFace, { borderColor: C.hair }]}
-                        >
-                            {children}
-                        </LinearGradient>
-                    </>
+                    <View style={styles.capsuleFace}>{children}</View>
                 )}
             </View>
         </View>
@@ -132,7 +157,7 @@ function TabBarContainer({ C, children }: { C: ClayColors; children: React.React
 }
 
 // ─── FLOATING TAB BAR ───────────────────────────────
-function FloatingTabBar({ state, navigation, C, tabs }: { state: any; navigation: any; C: ClayColors; tabs: TabItem[] }) {
+function FloatingTabBar({ state, navigation, C, tabs }: { state: any; navigation: any; C: FlintColors; tabs: TabItem[] }) {
     return (
         <TabBarContainer C={C}>
             {state.routes.map((route: any, index: number) => {
@@ -159,7 +184,7 @@ function FloatingTabBar({ state, navigation, C, tabs }: { state: any; navigation
 // ─── LAYOUT EXPORT ──────────────────────────────────
 export default function TabLayout() {
     const text = useText();
-    const C = useClay();
+    const C = useFlint();
     const currentRole = useAppStore((s) => s.currentRole);
     const isWorker = currentRole === 'worker';
 
@@ -205,14 +230,11 @@ const styles = StyleSheet.create({
     capsuleOuter: { marginHorizontal: CAPSULE_INSET, marginBottom: 28, borderRadius: CAPSULE_RADIUS },
     capsuleFace: {
         flexDirection: 'row', alignItems: 'center', height: TAB_BAR_H,
-        borderRadius: CAPSULE_RADIUS, borderWidth: 1, paddingHorizontal: 6,
+        borderRadius: CAPSULE_RADIUS, paddingHorizontal: 6, overflow: 'hidden',
     },
-    glassFace: { borderColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
     tabSlot: { flex: 1, alignItems: 'center', justifyContent: 'center', height: TAB_BAR_H },
     tabContent: { alignItems: 'center', justifyContent: 'center', position: 'relative', paddingVertical: 6, paddingHorizontal: 8 },
-    activeBlob: { ...StyleSheet.absoluteFill, borderRadius: 14 },
+    activeBlob: { ...StyleSheet.absoluteFill, borderRadius: RADIUS.md },
     tabLabel: { fontSize: 10, fontWeight: '800', marginTop: 2, letterSpacing: 0.1 },
-    centerWrap: { marginTop: -22 },
-    centerBtn: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-    centerSpecular: { position: 'absolute', top: 0, left: 4, right: 4, height: 26, borderTopLeftRadius: 26, borderTopRightRadius: 26 },
+    centerBtn: { width: 52, height: 52, borderRadius: 26, marginTop: -22, alignItems: 'center', justifyContent: 'center' },
 });

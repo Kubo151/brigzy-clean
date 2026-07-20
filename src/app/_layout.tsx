@@ -3,16 +3,16 @@ import { useEffect, useState } from 'react';
 import { useFonts } from 'expo-font';
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
-import { MANROPE_FONTS, patchTextWithManrope } from '../lib/fonts';
+import { INTER_FONTS, patchTextWithInter } from '../lib/fonts';
 import useAppStore from '../lib/state/app-store';
 
 export default function RootLayout() {
     const [session, setSession] = useState<Session | null>(null);
-    const [fontsLoaded] = useFonts(MANROPE_FONTS);
+    const [fontsLoaded] = useFonts(INTER_FONTS);
     const setCurrentUser = useAppStore((s) => s.setCurrentUser);
 
     useEffect(() => {
-        if (fontsLoaded) patchTextWithManrope();
+        if (fontsLoaded) patchTextWithInter();
     }, [fontsLoaded]);
 
     useEffect(() => {
@@ -35,7 +35,7 @@ export default function RootLayout() {
         return () => subscription.unsubscribe();
     }, []);
 
-    // Hold render until Manrope is ready so text doesn't flash in the system font.
+    // Hold render until Inter is ready so text doesn't flash in the system font.
     if (!fontsLoaded) return null;
 
     return (

@@ -11,18 +11,18 @@ export default function Root({ children }: { children: React.ReactNode }) {
                 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
                 <ScrollViewStyleReset />
 
-                {/* Manrope via Google Fonts — avoids bundled-asset 404 on Vercel */}
+                {/* Inter via Google Fonts — avoids bundled-asset 404 on Vercel */}
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 {/* @ts-ignore crossOrigin is valid HTML but TS types are strict here */}
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link
-                    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+                    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
                     rel="stylesheet"
                 />
 
                 <style dangerouslySetInnerHTML={{ __html: `
                     * { box-sizing: border-box; }
-                    body { margin: 0; font-family: 'Manrope', system-ui, sans-serif; }
+                    body { margin: 0; font-family: 'Inter', system-ui, sans-serif; }
                     #root, #__next { display: flex; flex-direction: column; flex: 1; }
                 ` }} />
 

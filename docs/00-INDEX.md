@@ -52,7 +52,11 @@ question lives here and is updated continuously during discovery and development
 - `Brigzy_Sablony_Zmluv.docx` — example contract templates (DoVP/DoPČ/ZoD), **NOT verified** (C-1)
 
 **Design / UX**
-- [[Design-System]] — claymorphism tokens + mockups · [[UX-Spec]] — screen-by-screen UX plan (in progress)
+- [[ADR-0006-flint-design-system]] — ⭐ 2026-07-20: claymorphism dropped, full flat/Revolut-style
+  redesign underway (`docs/design/flint-mockups.html` v2, purple accent kept, Inter font) —
+  supersedes the visual (not functional) parts of [[Design-System]] below
+- [[Flint-Motion-Spec]] — animation rules (easing/duration/spring per interaction), reanimated adopted
+- [[Design-System]] — claymorphism tokens + mockups (historical — superseded by ADR-0006 for visuals) · [[UX-Spec]] — screen-by-screen UX plan (still the functional/flow authority, unaffected)
 - [[Admin-Panel-Spec]] — interný web admin panel (Next.js + Supabase; spory, support, štatistiky, feature flags)
 
 **Review**

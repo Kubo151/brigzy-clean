@@ -18,5 +18,6 @@ items stay **provisional** until [[Legal-Compliance-Register]] verifies them.
 | [[ADR-0003-claymorphism-design-system]] | Claymorphism as a shared RN component kit, mockups-first | accepted |
 | [[ADR-0004-kyc-via-stripe]] | KYC/AML via Stripe (no own AML program) | accepted |
 | [[ADR-0005-employment-contract-model]] | Contract-type matrix (DoVP/DoPČ/Zmluva o dielo); Brigzy = intermediary | proposed |
+| [[ADR-0006-flint-design-system]] | Flint: flat, Revolut-style design system replacing claymorphism | accepted |
 
 _Template: Context · Decision · Alternatives considered · Consequences · Legal/risk links._
