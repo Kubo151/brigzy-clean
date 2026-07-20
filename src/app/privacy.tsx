@@ -1,43 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Pressable, Switch, Alert, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, Switch, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { ChevronLeft, ChevronRight, Eye, Phone, Mail, Lock, ShieldCheck, Download, Trash2 } from "lucide-react-native";
-import { useClay } from "@/lib/useClay";
-import type { ClayColors } from "@/lib/useClay";
-import { ClaySurface, ClayIconBox } from "@/components/clay";
+import { ChevronLeft, Eye, Phone, Mail, Lock, ShieldCheck, Download, Trash2 } from "lucide-react-native";
+import { useFlint, RADIUS } from "@/lib/useFlint";
+import { ListRow, Divider } from "@/components/ui";
 import { goBack } from '@/lib/nav';
 import { showAlert } from '@/lib/notify';
 
-function ToggleRow({ C, label, icon, value, onToggle }: {
-    C: ClayColors; label: string; icon: React.ReactNode; value: boolean; onToggle: (v: boolean) => void;
-}) {
-    return (
-        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 13 }}>
-            <ClayIconBox size={42} radius={13} style={{ marginRight: 14 }}>{icon}</ClayIconBox>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: C.text, flex: 1, letterSpacing: -0.2 }}>{label}</Text>
-            <Switch value={value} onValueChange={onToggle} trackColor={{ false: C.cLo, true: C.accent }} thumbColor="#FFF" ios_backgroundColor={C.cLo} style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }} />
-        </View>
-    );
-}
-
-function NavRow({ C, label, icon, tintBg, onPress, danger }: {
-    C: ClayColors; label: string; icon: React.ReactNode; tintBg?: string; onPress: () => void; danger?: boolean;
-}) {
-    return (
-        <Pressable onPress={onPress} style={({ pressed }) => [{ paddingHorizontal: 14, paddingVertical: 13 }, pressed && { opacity: 0.7 }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <ClayIconBox size={42} radius={13} tintBg={tintBg ?? C.accentDim} style={{ marginRight: 14 }}>{icon}</ClayIconBox>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: danger ? C.red : C.text, flex: 1, letterSpacing: -0.2 }}>{label}</Text>
-                {!danger && <ChevronRight size={18} color={C.muted} strokeWidth={2} />}
-            </View>
-        </Pressable>
-    );
-}
-
 export default function PrivacyScreen() {
-    const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const [publicProfile, setPublicProfile] = useState(true);
     const [showPhone, setShowPhone] = useState(false);
     const [showEmail, setShowEmail] = useState(true);
@@ -49,21 +20,22 @@ export default function PrivacyScreen() {
         ]);
     };
 
+    const toggleTrack = { false: C.card2, true: C.accent };
+
     const Section = ({ label, children }: { label: string; children: React.ReactNode }) => (
         <View style={styles.section}>
             <Text style={[styles.sectionLabel, { color: C.muted }]}>{label}</Text>
-            <ClaySurface radius={18}>{children}</ClaySurface>
+            <View style={{ backgroundColor: C.card, borderRadius: RADIUS.lg }}>{children}</View>
         </View>
     );
-    const Divider = () => <View style={{ height: 1, backgroundColor: C.hair, marginLeft: 70 }} />;
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
             <View style={styles.header}>
                 <Pressable onPress={() => goBack()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={[styles.backBtn, { backgroundColor: C.card2 }]}>
                         <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
-                    </ClaySurface>
+                    </View>
                 </Pressable>
                 <Text style={[styles.headerTitle, { color: C.text }]}>Nastavenia súkromia</Text>
                 <View style={{ width: 42 }} />
@@ -71,23 +43,35 @@ export default function PrivacyScreen() {
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40, paddingTop: 8 }}>
                 <Section label="VIDITEĽNOSŤ PROFILU">
-                    <ToggleRow C={C} label="Verejný profil" icon={<Eye size={18} color={C.accent} strokeWidth={2} />} value={publicProfile} onToggle={setPublicProfile} />
+                    <ListRow
+                        icon={<Eye size={18} color={C.accent} strokeWidth={2} />}
+                        label="Verejný profil"
+                        trailing={<Switch value={publicProfile} onValueChange={setPublicProfile} trackColor={toggleTrack} thumbColor="#FFF" ios_backgroundColor={C.card2} style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }} />}
+                    />
                     <Divider />
-                    <ToggleRow C={C} label="Zobraziť telefón" icon={<Phone size={18} color={C.accent} strokeWidth={2} />} value={showPhone} onToggle={setShowPhone} />
+                    <ListRow
+                        icon={<Phone size={18} color={C.accent} strokeWidth={2} />}
+                        label="Zobraziť telefón"
+                        trailing={<Switch value={showPhone} onValueChange={setShowPhone} trackColor={toggleTrack} thumbColor="#FFF" ios_backgroundColor={C.card2} style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }} />}
+                    />
                     <Divider />
-                    <ToggleRow C={C} label="Zobraziť email" icon={<Mail size={18} color={C.accent} strokeWidth={2} />} value={showEmail} onToggle={setShowEmail} />
+                    <ListRow
+                        icon={<Mail size={18} color={C.accent} strokeWidth={2} />}
+                        label="Zobraziť email"
+                        trailing={<Switch value={showEmail} onValueChange={setShowEmail} trackColor={toggleTrack} thumbColor="#FFF" ios_backgroundColor={C.card2} style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }} />}
+                    />
                 </Section>
 
                 <Section label="BEZPEČNOSŤ">
-                    <NavRow C={C} icon={<Lock size={18} color={C.accent} strokeWidth={2} />} label="Zmeniť heslo" onPress={() => { }} />
+                    <ListRow icon={<Lock size={18} color={C.accent} strokeWidth={2} />} label="Zmeniť heslo" onPress={() => { }} />
                     <Divider />
-                    <NavRow C={C} icon={<ShieldCheck size={18} color={C.accent} strokeWidth={2} />} label="Dvojfaktorové overenie" onPress={() => { }} />
+                    <ListRow icon={<ShieldCheck size={18} color={C.accent} strokeWidth={2} />} label="Dvojfaktorové overenie" onPress={() => { }} />
                 </Section>
 
                 <Section label="DÁTA">
-                    <NavRow C={C} icon={<Download size={18} color={C.accent} strokeWidth={2} />} label="Stiahnuť moje dáta" onPress={() => { }} />
+                    <ListRow icon={<Download size={18} color={C.accent} strokeWidth={2} />} label="Stiahnuť moje dáta" onPress={() => { }} />
                     <Divider />
-                    <NavRow C={C} icon={<Trash2 size={18} color={C.red} strokeWidth={2} />} tintBg="rgba(255,69,58,0.13)" label="Vymazať účet" onPress={handleDeleteAccount} danger />
+                    <ListRow icon={<Trash2 size={18} color={C.red} strokeWidth={2} />} label="Vymazať účet" onPress={handleDeleteAccount} danger />
                 </Section>
             </ScrollView>
         </SafeAreaView>
@@ -96,7 +80,8 @@ export default function PrivacyScreen() {
 
 const styles = StyleSheet.create({
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 },
-    headerTitle: { fontSize: 18, fontWeight: '800', letterSpacing: -0.3 },
+    backBtn: { width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
+    headerTitle: { fontSize: 17, fontWeight: '600' },
     section: { paddingHorizontal: 20, marginBottom: 26 },
-    sectionLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.8, marginBottom: 12, marginLeft: 4 },
+    sectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 0.8, marginBottom: 12, marginLeft: 4 },
 });

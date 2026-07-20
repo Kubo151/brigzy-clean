@@ -9,9 +9,8 @@ import {
     ChevronLeft, Heart, MessageSquare, Briefcase,
     CheckCircle, XCircle, Star, Settings, Bell,
 } from 'lucide-react-native';
-import { useClay } from '@/lib/useClay';
-import type { ClayColors } from '@/lib/useClay';
-import { ClaySurface, ClayIconBox } from '@/components/clay';
+import { useFlint, RADIUS } from '@/lib/useFlint';
+import type { FlintColors } from '@/lib/useFlint';
 import { goBack } from '@/lib/nav';
 
 // ─── MOCK ACTIVITY DATA ─────────────────────────────
@@ -23,20 +22,20 @@ const MOCK_ACTIVITY = [
     { id: '5', type: 'review' as const, title: 'Nové hodnotenie', message: 'jakub vám dal hodnotenie ⭐ 5.0 za brigádu Čašník.', time: 'Pred 3 dňami', read: true },
 ];
 
-const getActivityIcon = (type: string, C: ClayColors) => {
+const getActivityIcon = (type: string, C: FlintColors) => {
     switch (type) {
         case 'application_accepted': return { icon: CheckCircle, color: C.green, bg: C.greenDim };
-        case 'application_rejected': return { icon: XCircle, color: C.red, bg: 'rgba(255,69,58,0.13)' };
-        case 'new_message': return { icon: MessageSquare, color: C.verified, bg: 'rgba(46,168,255,0.15)' };
+        case 'application_rejected': return { icon: XCircle, color: C.red, bg: C.redDim };
+        case 'new_message': return { icon: MessageSquare, color: C.verified, bg: C.card2 };
         case 'new_job': return { icon: Briefcase, color: C.accent, bg: C.accentDim };
-        case 'review': return { icon: Star, color: C.star, bg: 'rgba(255,179,0,0.15)' };
+        case 'review': return { icon: Star, color: C.star, bg: C.card2 };
         default: return { icon: Heart, color: C.accent, bg: C.accentDim };
     }
 };
 
 // ─── ACTIVITY ITEM ──────────────────────────────────
 function ActivityItem({ item, C, onPress }: {
-    item: typeof MOCK_ACTIVITY[0]; C: ClayColors; onPress: () => void;
+    item: typeof MOCK_ACTIVITY[0]; C: FlintColors; onPress: () => void;
 }) {
     const { icon: Icon, color, bg } = getActivityIcon(item.type, C);
     return (
@@ -44,19 +43,19 @@ function ActivityItem({ item, C, onPress }: {
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onPress(); }}
             style={({ pressed }) => [pressed && { transform: [{ scale: 0.98 }], opacity: 0.85 }]}
         >
-            <ClaySurface radius={16} contentStyle={{ flexDirection: 'row', padding: 14, backgroundColor: item.read ? 'transparent' : C.accentDim, borderRadius: 16 }}>
-                <ClayIconBox size={46} radius={14} tintBg={bg} style={{ marginRight: 14 }}>
+            <View style={{ flexDirection: 'row', padding: 14, backgroundColor: item.read ? C.card : C.accentDim, borderRadius: RADIUS.lg }}>
+                <View style={{ width: 46, height: 46, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center', backgroundColor: bg, marginRight: 14 }}>
                     <Icon size={22} color={color} strokeWidth={1.9} />
-                </ClayIconBox>
+                </View>
                 <View style={{ flex: 1 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                        <Text style={{ fontSize: 15, fontWeight: '800', color: C.text, flex: 1, letterSpacing: -0.2 }} numberOfLines={1}>{item.title}</Text>
+                        <Text style={{ fontSize: 15, fontWeight: '700', color: C.text, flex: 1, letterSpacing: -0.2 }} numberOfLines={1}>{item.title}</Text>
                         {!item.read && <View style={{ width: 9, height: 9, borderRadius: 5, backgroundColor: C.accent, marginLeft: 8 }} />}
                     </View>
                     <Text style={{ fontSize: 13.5, color: C.muted, lineHeight: 19, marginBottom: 6, fontWeight: '500' }} numberOfLines={2}>{item.message}</Text>
                     <Text style={{ fontSize: 11.5, color: C.muted, fontWeight: '600' }}>{item.time}</Text>
                 </View>
-            </ClaySurface>
+            </View>
         </Pressable>
     );
 }
@@ -64,7 +63,7 @@ function ActivityItem({ item, C, onPress }: {
 // ─── ACTIVITY SCREEN ────────────────────────────────
 export default function ActivityScreen() {
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const [refreshing, setRefreshing] = useState(false);
     const [activities, setActivities] = useState(MOCK_ACTIVITY);
 
@@ -89,7 +88,7 @@ export default function ActivityScreen() {
 
     const IconBtn = ({ children, onPress }: { children: React.ReactNode; onPress: () => void }) => (
         <Pressable onPress={onPress} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-            <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>{children}</ClaySurface>
+            <View style={{ width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center', backgroundColor: C.card2 }}>{children}</View>
         </Pressable>
     );
 
@@ -97,7 +96,7 @@ export default function ActivityScreen() {
         <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top']}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 }}>
                 <IconBtn onPress={() => goBack()}><ChevronLeft size={22} color={C.text} strokeWidth={2.2} /></IconBtn>
-                <Text style={{ fontSize: 18, fontWeight: '800', color: C.text, letterSpacing: -0.3 }}>Aktivita</Text>
+                <Text style={{ fontSize: 17, fontWeight: '600', color: C.text }}>Aktivita</Text>
                 <IconBtn onPress={() => router.push('/notifications')}><Settings size={18} color={C.text} strokeWidth={2} /></IconBtn>
             </View>
 
@@ -106,10 +105,10 @@ export default function ActivityScreen() {
                 <Pressable onPress={markAllRead} style={({ pressed }) => [{
                     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
                     marginHorizontal: 20, marginTop: 8, marginBottom: 18, paddingVertical: 12,
-                    borderRadius: 13, backgroundColor: C.accentDim, gap: 8,
+                    borderRadius: RADIUS.md, backgroundColor: C.accentDim, gap: 8,
                 }, pressed && { opacity: 0.7 }]}>
                     <Bell size={15} color={C.accent} strokeWidth={2.2} />
-                    <Text style={{ fontSize: 13.5, fontWeight: '800', color: C.accent }}>{unreadCount} neprečítaných · Označiť všetky</Text>
+                    <Text style={{ fontSize: 13.5, fontWeight: '700', color: C.accent }}>{unreadCount} neprečítaných · Označiť všetky</Text>
                 </Pressable>
             )}
 
@@ -124,8 +123,10 @@ export default function ActivityScreen() {
                     ))
                 ) : (
                     <View style={{ alignItems: 'center', paddingVertical: 80, paddingHorizontal: 40 }}>
-                        <ClayIconBox size={72} radius={24}><Bell size={32} color={C.accent} strokeWidth={1.6} /></ClayIconBox>
-                        <Text style={{ fontSize: 20, fontWeight: '800', color: C.text, marginBottom: 8, marginTop: 20, letterSpacing: -0.4 }}>Žiadna aktivita</Text>
+                        <View style={{ width: 72, height: 72, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center', backgroundColor: C.card2 }}>
+                            <Bell size={32} color={C.accent} strokeWidth={1.6} />
+                        </View>
+                        <Text style={{ fontSize: 20, fontWeight: '700', color: C.text, marginBottom: 8, marginTop: 20, letterSpacing: -0.4 }}>Žiadna aktivita</Text>
                         <Text style={{ fontSize: 14, color: C.muted, textAlign: 'center', lineHeight: 21, fontWeight: '500' }}>Tu sa zobrazia vaše notifikácie, správy a aktualizácie prihlášok.</Text>
                     </View>
                 )}
