@@ -5,12 +5,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { ChevronLeft, BadgeCheck, Star, Zap, Briefcase, MessageCircle, CalendarDays } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { useClay } from '@/lib/useClay';
+import { useFlint, RADIUS } from '@/lib/useFlint';
 import { useText } from '@/lib/useText';
 import { supabase } from '@/lib/supabase';
-import { ClaySurface, ClayIconBox } from '@/components/clay';
+import { Button } from '@/components/ui';
 import { goBack } from '@/lib/nav';
 
 // W13 — public profile (the trust surface). Read-only: verified badge,
@@ -42,7 +41,7 @@ interface Review {
 export default function PublicProfileScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const text = useText();
 
     const [profile, setProfile] = useState<PublicProfile | null>(null);
@@ -97,7 +96,7 @@ export default function PublicProfileScreen() {
     if (!profile) {
         return (
             <SafeAreaView style={[styles.centered, { backgroundColor: C.bg }]}>
-                <Text style={{ color: C.text, fontSize: 16, fontWeight: '700' }}>{text.profileNotFound}</Text>
+                <Text style={{ color: C.text, fontSize: 16, fontWeight: '600' }}>{text.profileNotFound}</Text>
             </SafeAreaView>
         );
     }
@@ -111,22 +110,22 @@ export default function PublicProfileScreen() {
         <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={['top']}>
             <View style={styles.header}>
                 <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); goBack(); }} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={[styles.backBtn, { backgroundColor: C.card2 }]}>
                         <ChevronLeft size={20} color={C.text} strokeWidth={2.2} />
-                    </ClaySurface>
+                    </View>
                 </Pressable>
                 <Text style={[styles.headerTitle, { color: C.text }]} numberOfLines={1}>{displayName}</Text>
             </View>
 
             <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Identity card */}
-                <ClaySurface radius={22} style={{ marginBottom: 16 }} contentStyle={styles.identityCard}>
+                <View style={[styles.identityCard, { backgroundColor: C.card, marginBottom: 16 }]}>
                     {profile.avatar_url ? (
                         <Image source={{ uri: profile.avatar_url }} style={styles.avatar} />
                     ) : (
-                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.avatar}>
+                        <View style={[styles.avatar, { backgroundColor: C.accent }]}>
                             <Text style={[styles.avatarInitial, { color: C.onAccent }]}>{initial}</Text>
-                        </LinearGradient>
+                        </View>
                     )}
                     <View style={styles.nameRow}>
                         <Text style={[styles.name, { color: C.text }]}>{displayName}</Text>
@@ -141,7 +140,7 @@ export default function PublicProfileScreen() {
                     </View>
 
                     {/* Stats */}
-                    <View style={[styles.statsRow, { borderTopColor: C.hair }]}>
+                    <View style={[styles.statsRow, { borderTopColor: C.divider }]}>
                         <View style={styles.statCol}>
                             <View style={styles.statValueRow}>
                                 <Star size={15} color={C.star} strokeWidth={2.4} fill={C.star} />
@@ -153,7 +152,7 @@ export default function PublicProfileScreen() {
                                 {text.ratingLabel}{hasRating ? ` (${profile.rating_count})` : ''}
                             </Text>
                         </View>
-                        <View style={[styles.statDivider, { backgroundColor: C.hair }]} />
+                        <View style={[styles.statDivider, { backgroundColor: C.divider }]} />
                         <View style={styles.statCol}>
                             <View style={styles.statValueRow}>
                                 <Zap size={15} color={C.accent} strokeWidth={2.4} />
@@ -161,7 +160,7 @@ export default function PublicProfileScreen() {
                             </View>
                             <Text style={[styles.statLabel, { color: C.muted }]}>XP</Text>
                         </View>
-                        <View style={[styles.statDivider, { backgroundColor: C.hair }]} />
+                        <View style={[styles.statDivider, { backgroundColor: C.divider }]} />
                         <View style={styles.statCol}>
                             <View style={styles.statValueRow}>
                                 <Briefcase size={15} color={C.green} strokeWidth={2.4} />
@@ -175,35 +174,32 @@ export default function PublicProfileScreen() {
                             {text.postedJobsLabel}: {postedJobs}
                         </Text>
                     )}
-                </ClaySurface>
+                </View>
 
                 {/* Message CTA (not on own profile) */}
                 {!isMe && (
-                    <Pressable
-                        onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); router.push(`/messages/${profile.id}`); }}
-                        style={({ pressed }) => [pressed && { opacity: 0.85 }]}
-                    >
-                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.messageBtn}>
-                            <MessageCircle size={18} color={C.onAccent} strokeWidth={2.2} />
-                            <Text style={[styles.messageBtnText, { color: C.onAccent }]}>{text.sendMessage}</Text>
-                        </LinearGradient>
-                    </Pressable>
+                    <Button
+                        label={text.sendMessage}
+                        icon={<MessageCircle size={18} color={C.onAccent} strokeWidth={2.2} />}
+                        onPress={() => router.push(`/messages/${profile.id}`)}
+                        style={{ marginBottom: 22 }}
+                    />
                 )}
 
                 {/* Reviews */}
                 <Text style={[styles.sectionTitle, { color: C.text }]}>{text.reviewsTitle}</Text>
                 {reviews.length === 0 ? (
                     <View style={styles.emptyReviews}>
-                        <ClayIconBox size={56} radius={18}>
+                        <View style={[styles.emptyIconBox, { backgroundColor: C.card2 }]}>
                             <Star size={26} color={C.muted} strokeWidth={1.6} />
-                        </ClayIconBox>
+                        </View>
                         <Text style={[styles.emptyText, { color: C.muted }]}>{text.noReviewsYet}</Text>
                     </View>
                 ) : (
                     reviews.map((r) => {
                         const stars = r.rating_overall ?? r.rating ?? 0;
                         return (
-                            <ClaySurface key={r.id} radius={16} style={{ marginBottom: 10 }} contentStyle={{ padding: 14 }}>
+                            <View key={r.id} style={[styles.reviewCard, { backgroundColor: C.card, marginBottom: 10 }]}>
                                 <View style={styles.reviewHeader}>
                                     <Text style={[styles.reviewAuthor, { color: C.text }]}>{r.author?.display_name ?? 'Anonym'}</Text>
                                     <View style={styles.reviewStars}>
@@ -217,7 +213,7 @@ export default function PublicProfileScreen() {
                                 <Text style={[styles.reviewDate, { color: C.muted }]}>
                                     {new Date(r.created_at).toLocaleDateString('sk-SK')}
                                 </Text>
-                            </ClaySurface>
+                            </View>
                         );
                     })
                 )}
@@ -230,30 +226,31 @@ const styles = StyleSheet.create({
     root: { flex: 1 },
     centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12, gap: 12 },
-    headerTitle: { fontSize: 19, fontWeight: '800', flex: 1, letterSpacing: -0.4 },
+    backBtn: { width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
+    headerTitle: { fontSize: 18, fontWeight: '600', flex: 1, letterSpacing: -0.3 },
     content: { padding: 20, paddingBottom: 48 },
-    identityCard: { padding: 20, alignItems: 'center' },
+    identityCard: { padding: 20, alignItems: 'center', borderRadius: RADIUS.lg },
     avatar: { width: 84, height: 84, borderRadius: 42, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-    avatarInitial: { fontSize: 34, fontWeight: '800' },
+    avatarInitial: { fontSize: 34, fontWeight: '700' },
     nameRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-    name: { fontSize: 21, fontWeight: '800', letterSpacing: -0.4 },
-    rankTier: { fontSize: 13, fontWeight: '800', marginTop: 3 },
+    name: { fontSize: 21, fontWeight: '700', letterSpacing: -0.4 },
+    rankTier: { fontSize: 13, fontWeight: '700', marginTop: 3 },
     memberRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6 },
     memberText: { fontSize: 12.5, fontWeight: '600' },
     statsRow: { flexDirection: 'row', alignItems: 'center', marginTop: 18, paddingTop: 16, borderTopWidth: 1, alignSelf: 'stretch' },
     statCol: { flex: 1, alignItems: 'center', gap: 3 },
     statValueRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-    statValue: { fontSize: 17, fontWeight: '800', letterSpacing: -0.3 },
+    statValue: { fontSize: 17, fontWeight: '700', letterSpacing: -0.3 },
     statLabel: { fontSize: 11.5, fontWeight: '600' },
     statDivider: { width: 1, height: 32 },
     postedNote: { fontSize: 12, fontWeight: '600', marginTop: 12 },
-    messageBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 15, borderRadius: 18, marginBottom: 22 },
-    messageBtnText: { fontSize: 15, fontWeight: '800', letterSpacing: -0.2 },
-    sectionTitle: { fontSize: 17, fontWeight: '800', letterSpacing: -0.3, marginBottom: 12 },
+    sectionTitle: { fontSize: 17, fontWeight: '700', letterSpacing: -0.3, marginBottom: 12 },
     emptyReviews: { alignItems: 'center', paddingVertical: 28, gap: 12 },
+    emptyIconBox: { width: 56, height: 56, borderRadius: RADIUS.lg, alignItems: 'center', justifyContent: 'center' },
     emptyText: { fontSize: 13.5, fontWeight: '500' },
+    reviewCard: { padding: 14, borderRadius: RADIUS.md },
     reviewHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-    reviewAuthor: { fontSize: 14, fontWeight: '800' },
+    reviewAuthor: { fontSize: 14, fontWeight: '700' },
     reviewStars: { flexDirection: 'row', gap: 2 },
     reviewComment: { fontSize: 13.5, lineHeight: 19, fontWeight: '500', marginBottom: 6 },
     reviewDate: { fontSize: 11.5, fontWeight: '500' },
