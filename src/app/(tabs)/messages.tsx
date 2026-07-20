@@ -5,12 +5,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useText } from "@/lib/useText";
-import { useClay } from "@/lib/useClay";
+import { useFlint, RADIUS } from "@/lib/useFlint";
 import { Search, MessageSquare, ChevronRight } from "lucide-react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { ClaySurface, ClayInset, ClayIconBox } from "@/components/clay";
 
 interface Conversation {
   userId: string;
@@ -40,7 +38,7 @@ interface PersonResult {
 }
 
 export default function MessagesScreen() {
-  const C = useClay();
+  const C = useFlint();
   const text = useText();
   const router = useRouter();
   const { employerId, jobId } = useLocalSearchParams<{ employerId?: string; jobId?: string }>();
@@ -189,7 +187,7 @@ export default function MessagesScreen() {
 
         {/* Search Bar */}
         <View style={styles.searchWrapper}>
-          <ClayInset radius={14} contentStyle={styles.searchBar}>
+          <View style={[styles.searchBar, { backgroundColor: C.card2 }]}>
             <Search size={18} color={C.muted} strokeWidth={1.9} />
             <TextInput
               value={searchQuery}
@@ -198,7 +196,7 @@ export default function MessagesScreen() {
               placeholderTextColor={C.muted}
               style={[styles.searchInput, { color: C.text }]}
             />
-          </ClayInset>
+          </View>
         </View>
       </SafeAreaView>
 
@@ -211,15 +209,15 @@ export default function MessagesScreen() {
         {/* People results (search across all users → public profile) */}
         {people.length > 0 && (
           <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
-            <Text style={{ fontSize: 13, fontWeight: '800', color: C.muted, textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 10 }}>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: C.muted, textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 10 }}>
               {text.peopleSection}
             </Text>
-            <ClaySurface radius={18}>
+            <View style={{ backgroundColor: C.card, borderRadius: RADIUS.lg }}>
               {people.map((p, i) => {
                 const pName = p.display_name || [p.name, p.surname].filter(Boolean).join(' ') || '—';
                 return (
                   <React.Fragment key={p.id}>
-                    {i > 0 && <View style={{ height: 1, backgroundColor: C.hair, marginLeft: 16 }} />}
+                    {i > 0 && <View style={{ height: 1, backgroundColor: C.divider, marginLeft: 16 }} />}
                     <Pressable
                       onPress={() => router.push(`/user/${p.id}`)}
                       style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', padding: 13 }, pressed && { opacity: 0.7 }]}
@@ -227,9 +225,9 @@ export default function MessagesScreen() {
                       {p.avatar_url ? (
                         <Image source={{ uri: p.avatar_url }} style={{ width: 42, height: 42, borderRadius: 21 }} />
                       ) : (
-                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' }}>
-                          <Text style={{ color: C.onAccent, fontSize: 17, fontWeight: '800' }}>{pName.charAt(0).toUpperCase()}</Text>
-                        </LinearGradient>
+                        <View style={{ width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: C.accent }}>
+                          <Text style={{ color: C.onAccent, fontSize: 17, fontWeight: '700' }}>{pName.charAt(0).toUpperCase()}</Text>
+                        </View>
                       )}
                       <View style={{ flex: 1, marginLeft: 12 }}>
                         <Text numberOfLines={1} style={{ fontSize: 15, fontWeight: '700', color: C.text, letterSpacing: -0.2 }}>
@@ -244,7 +242,7 @@ export default function MessagesScreen() {
                   </React.Fragment>
                 );
               })}
-            </ClaySurface>
+            </View>
           </View>
         )}
 
@@ -260,28 +258,28 @@ export default function MessagesScreen() {
                 onPress={() => router.push(`/messages/${conv.userId}`)}
                 style={({ pressed }) => [pressed && { transform: [{ scale: 0.99 }], opacity: 0.9 }]}
               >
-                <ClaySurface radius={20} contentStyle={{ flexDirection: 'row', alignItems: 'center', padding: 14 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', padding: 14, backgroundColor: C.card, borderRadius: RADIUS.lg }}>
                   {/* Avatar */}
                   <View style={{ width: 52, height: 52 }}>
                     {conv.otherUser.avatar_url ? (
                       <Image source={{ uri: conv.otherUser.avatar_url }} style={{ width: 52, height: 52, borderRadius: 26 }} />
                     ) : (
-                      <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ color: C.onAccent, fontSize: 20, fontWeight: '800' }}>
+                      <View style={{ width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center', backgroundColor: C.accent }}>
+                        <Text style={{ color: C.onAccent, fontSize: 20, fontWeight: '700' }}>
                           {(conv.otherUser.display_name || conv.otherUser.name)?.charAt(0).toUpperCase()}
                         </Text>
-                      </LinearGradient>
+                      </View>
                     )}
                     {conv.unreadCount > 0 && (
-                      <View style={{ position: 'absolute', top: -2, right: -2, backgroundColor: C.red, borderRadius: 10, minWidth: 20, height: 20, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5, borderWidth: 2, borderColor: C.cHi }}>
-                        <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '800' }}>{conv.unreadCount}</Text>
+                      <View style={{ position: 'absolute', top: -2, right: -2, backgroundColor: C.red, borderRadius: 10, minWidth: 20, height: 20, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5, borderWidth: 2, borderColor: C.card }}>
+                        <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '700' }}>{conv.unreadCount}</Text>
                       </View>
                     )}
                   </View>
 
                   <View style={{ flex: 1, marginLeft: 14 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 3 }}>
-                      <Text numberOfLines={1} style={{ flex: 1, fontSize: 15.5, fontWeight: conv.unreadCount > 0 ? '800' : '700', color: C.text, marginRight: 8, letterSpacing: -0.3 }}>
+                      <Text numberOfLines={1} style={{ flex: 1, fontSize: 15.5, fontWeight: conv.unreadCount > 0 ? '700' : '600', color: C.text, marginRight: 8, letterSpacing: -0.3 }}>
                         {conv.otherUser.display_name || conv.otherUser.name}
                       </Text>
                       <Text style={{ fontSize: 12, color: C.muted, fontWeight: '600' }}>{formatTime(conv.lastMessageTime)}</Text>
@@ -295,13 +293,13 @@ export default function MessagesScreen() {
                   </View>
 
                   <ChevronRight size={16} color={C.muted} strokeWidth={2} style={{ marginLeft: 4 }} />
-                </ClaySurface>
+                </View>
               </Pressable>
             ))}
           </View>
         ) : (
           <View style={styles.emptyState}>
-            <ClayIconBox size={80} radius={26}><MessageSquare size={36} color={C.accent} strokeWidth={1.6} /></ClayIconBox>
+            <View style={[styles.iconBoxLg, { backgroundColor: C.card2 }]}><MessageSquare size={36} color={C.accent} strokeWidth={1.6} /></View>
             <Text style={[styles.emptyTitle, { color: C.text }]}>Zatiaľ žiadne správy</Text>
             <Text style={[styles.emptyDesc, { color: C.muted }]}>Začnite aplikovať na brigády a spojte sa so zamestnávateľmi</Text>
           </View>
@@ -314,14 +312,15 @@ export default function MessagesScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 },
-  largeTitle: { fontSize: 32, fontWeight: '800', letterSpacing: -0.5, marginBottom: 4 },
+  largeTitle: { fontSize: 32, fontWeight: '700', letterSpacing: -0.5, marginBottom: 4 },
   subtitle: { fontSize: 14, fontWeight: '600' },
   searchWrapper: { paddingHorizontal: 20, paddingBottom: 12 },
-  searchBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, height: 46, gap: 10 },
+  searchBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, height: 46, gap: 10, borderRadius: RADIUS.md },
   searchInput: { flex: 1, fontSize: 15, fontWeight: '500' },
   listContent: { paddingTop: 4, paddingBottom: 120 },
   centerState: { paddingVertical: 80, alignItems: 'center' },
+  iconBoxLg: { width: 80, height: 80, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center' },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 80, paddingHorizontal: 32 },
-  emptyTitle: { fontSize: 20, fontWeight: '800', marginBottom: 8, marginTop: 20, letterSpacing: -0.4 },
+  emptyTitle: { fontSize: 20, fontWeight: '700', marginBottom: 8, marginTop: 20, letterSpacing: -0.4 },
   emptyDesc: { fontSize: 14, textAlign: 'center', lineHeight: 21, fontWeight: '500' },
 });

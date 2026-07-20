@@ -6,16 +6,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import {
-    Bell, Plus, Users, Briefcase, CheckCircle,
-    Clock, ChevronRight, Euro, Zap,
+    Bell, Plus, Users, Briefcase, CheckCircle, Zap,
 } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '@/lib/supabase';
 import useAppStore from '@/lib/state/app-store';
-import { useClay } from '@/lib/useClay';
-import { ClaySurface, ClayIconBox, ClayStatusPill } from '@/components/clay';
-import type { BookingStatus } from '@/components/clay';
+import { useFlint, RADIUS } from '@/lib/useFlint';
+import { StatusPill } from '@/components/ui';
+import type { BookingStatus } from '@/components/ui';
 
 type PostedJob = {
     id: string;
@@ -31,23 +29,23 @@ type PostedJob = {
 // ─── STAT CARD ───────────────────────────────────────
 function StatCard({ icon: Icon, value, label, color, C }: {
     icon: any; value: number; label: string; color: string;
-    C: ReturnType<typeof useClay>;
+    C: ReturnType<typeof useFlint>;
 }) {
     return (
-        <ClaySurface radius={18} style={styles.statCard} contentStyle={styles.statInner}>
+        <View style={[styles.statCard, { backgroundColor: C.card }]}>
             <View style={[styles.statIcon, { backgroundColor: color + '22' }]}>
                 <Icon size={18} color={color} strokeWidth={2} />
             </View>
             <Text style={[styles.statValue, { color: C.text }]}>{value}</Text>
             <Text style={[styles.statLabel, { color: C.muted }]}>{label}</Text>
-        </ClaySurface>
+        </View>
     );
 }
 
 // ─── JOB ROW ─────────────────────────────────────────
 function JobRow({ job, onPress, C }: {
     job: PostedJob; onPress: () => void;
-    C: ReturnType<typeof useClay>;
+    C: ReturnType<typeof useFlint>;
 }) {
     const pay = job.pay_type === 'hourly' ? `${job.pay_amount} €/h` : `${job.pay_amount} €`;
     const statusBadge: BookingStatus = job.status === 'active' ? 'in_progress'
@@ -57,10 +55,10 @@ function JobRow({ job, onPress, C }: {
 
     return (
         <Pressable onPress={onPress} style={({ pressed }) => [pressed && { opacity: 0.82, transform: [{ scale: 0.99 }] }]}>
-            <ClaySurface radius={18} style={styles.jobRow} contentStyle={styles.jobRowInner}>
-                <ClayIconBox size={44} radius={14}>
+            <View style={[styles.jobRowInner, { backgroundColor: C.card }]}>
+                <View style={[styles.jobIcon, { backgroundColor: C.card2 }]}>
                     <Briefcase size={20} color={C.accent} strokeWidth={1.9} />
-                </ClayIconBox>
+                </View>
                 <View style={styles.jobRowInfo}>
                     <Text style={[styles.jobTitle, { color: C.text }]} numberOfLines={1}>{job.title}</Text>
                     <View style={styles.jobMeta}>
@@ -70,7 +68,7 @@ function JobRow({ job, onPress, C }: {
                     </View>
                 </View>
                 <View style={styles.jobRowRight}>
-                    <ClayStatusPill status={statusBadge} size="sm" />
+                    <StatusPill status={statusBadge} size="sm" />
                     {job.applicant_count > 0 && (
                         <View style={[styles.applicantBadge, { backgroundColor: C.accent }]}>
                             <Users size={10} color={C.onAccent} strokeWidth={2.5} />
@@ -78,7 +76,7 @@ function JobRow({ job, onPress, C }: {
                         </View>
                     )}
                 </View>
-            </ClaySurface>
+            </View>
         </Pressable>
     );
 }
@@ -86,7 +84,7 @@ function JobRow({ job, onPress, C }: {
 // ─── POSTER DASHBOARD ────────────────────────────────
 export function PosterDashboard() {
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const currentUser = useAppStore((s) => s.currentUser);
 
     const [jobs, setJobs] = useState<PostedJob[]>([]);
@@ -151,9 +149,9 @@ export function PosterDashboard() {
                         <Text style={[styles.name, { color: C.text }]}>{firstName} 👋</Text>
                     </View>
                     <Pressable onPress={() => router.push('/activity')}>
-                        <ClaySurface radius={20} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                        <View style={[styles.bellIcon, { backgroundColor: C.card2 }]}>
                             <Bell size={18} color={C.text} strokeWidth={1.9} />
-                        </ClaySurface>
+                        </View>
                     </Pressable>
                 </View>
 
@@ -167,26 +165,16 @@ export function PosterDashboard() {
                 {/* ─── QUICK POST BUTTON ─── */}
                 <Pressable
                     onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); router.push('/(tabs)/add'); }}
-                    style={({ pressed }) => [styles.postBtn, pressed && { transform: [{ scale: 0.98 }], opacity: 0.9 }]}
+                    style={({ pressed }) => [styles.postBtn, { backgroundColor: C.accent }, pressed && { transform: [{ scale: 0.98 }], opacity: 0.9 }]}
                 >
-                    <LinearGradient
-                        colors={[C.accent2, C.accent]}
-                        start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }}
-                        style={styles.postBtnGrad}
-                    >
-                        <LinearGradient
-                            colors={['rgba(255,255,255,0.28)', 'transparent']}
-                            style={styles.postBtnSheen}
-                        />
-                        <View style={[styles.postBtnIcon, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-                            <Plus size={20} color={C.onAccent} strokeWidth={2.6} />
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <Text style={[styles.postBtnTitle, { color: C.onAccent }]}>Pridať novú brigádu</Text>
-                            <Text style={[styles.postBtnSub, { color: 'rgba(255,255,255,0.7)' }]}>Nájdi brigádnikov rýchlo</Text>
-                        </View>
-                        <Zap size={20} color={C.onAccent} strokeWidth={2} />
-                    </LinearGradient>
+                    <View style={[styles.postBtnIcon, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+                        <Plus size={20} color={C.onAccent} strokeWidth={2.6} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={[styles.postBtnTitle, { color: C.onAccent }]}>Pridať novú brigádu</Text>
+                        <Text style={[styles.postBtnSub, { color: 'rgba(255,255,255,0.7)' }]}>Nájdi brigádnikov rýchlo</Text>
+                    </View>
+                    <Zap size={20} color={C.onAccent} strokeWidth={2} />
                 </Pressable>
 
                 {/* ─── MY JOBS ─── */}
@@ -203,11 +191,11 @@ export function PosterDashboard() {
                     {loading ? (
                         <ActivityIndicator color={C.accent} style={{ marginTop: 24 }} />
                     ) : jobs.length === 0 ? (
-                        <ClaySurface radius={20} contentStyle={styles.emptyState}>
+                        <View style={[styles.emptyState, { backgroundColor: C.card }]}>
                             <Briefcase size={32} color={C.muted} strokeWidth={1.5} />
                             <Text style={[styles.emptyTitle, { color: C.text }]}>Zatiaľ žiadne brigády</Text>
                             <Text style={[styles.emptyDesc, { color: C.muted }]}>Pridajte prvú brigádu a nájdite brigádnikov</Text>
-                        </ClaySurface>
+                        </View>
                     ) : (
                         <View style={styles.jobList}>
                             {jobs.map((job) => (
@@ -229,40 +217,38 @@ export function PosterDashboard() {
 const styles = StyleSheet.create({
     header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 20 },
     greeting: { fontSize: 13, fontWeight: '600', marginBottom: 2 },
-    name: { fontSize: 24, fontWeight: '800', letterSpacing: -0.5 },
+    name: { fontSize: 24, fontWeight: '700', letterSpacing: -0.5 },
+    bellIcon: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
 
     statsRow: { flexDirection: 'row', paddingHorizontal: 20, gap: 12, marginBottom: 18 },
-    statCard: { flex: 1 },
-    statInner: { alignItems: 'center', paddingVertical: 14, paddingHorizontal: 8 },
+    statCard: { flex: 1, borderRadius: RADIUS.lg, alignItems: 'center', paddingVertical: 14, paddingHorizontal: 8 },
     statIcon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-    statValue: { fontSize: 22, fontWeight: '800', letterSpacing: -0.5, marginBottom: 2 },
+    statValue: { fontSize: 22, fontWeight: '700', letterSpacing: -0.5, marginBottom: 2 },
     statLabel: { fontSize: 11, fontWeight: '600', textAlign: 'center' },
 
-    postBtn: { marginHorizontal: 20, marginBottom: 28, borderRadius: 22, overflow: 'hidden' },
-    postBtnGrad: { flexDirection: 'row', alignItems: 'center', padding: 18, gap: 14, borderRadius: 22 },
-    postBtnSheen: { position: 'absolute', top: 0, left: 0, right: 0, height: '50%', borderTopLeftRadius: 22, borderTopRightRadius: 22 },
+    postBtn: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 20, marginBottom: 28, borderRadius: RADIUS.lg, padding: 18, gap: 14 },
     postBtnIcon: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-    postBtnTitle: { fontSize: 16, fontWeight: '800', letterSpacing: -0.3, marginBottom: 2 },
+    postBtnTitle: { fontSize: 16, fontWeight: '700', letterSpacing: -0.3, marginBottom: 2 },
     postBtnSub: { fontSize: 12.5, fontWeight: '500' },
 
     section: { paddingHorizontal: 20 },
     sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 14, gap: 10 },
-    sectionTitle: { fontSize: 20, fontWeight: '800', letterSpacing: -0.4 },
+    sectionTitle: { fontSize: 20, fontWeight: '700', letterSpacing: -0.4 },
     pendingBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
-    pendingBadgeText: { fontSize: 11, fontWeight: '800' },
+    pendingBadgeText: { fontSize: 11, fontWeight: '700' },
 
     jobList: { gap: 12 },
-    jobRow: { marginBottom: 0 },
-    jobRowInner: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12 },
+    jobRowInner: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12, borderRadius: RADIUS.lg },
+    jobIcon: { width: 44, height: 44, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
     jobRowInfo: { flex: 1 },
-    jobTitle: { fontSize: 15, fontWeight: '800', letterSpacing: -0.2, marginBottom: 4 },
+    jobTitle: { fontSize: 15, fontWeight: '700', letterSpacing: -0.2, marginBottom: 4 },
     jobMeta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     jobMetaText: { fontSize: 12.5, fontWeight: '600' },
     jobRowRight: { alignItems: 'flex-end', gap: 6 },
     applicantBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 7, paddingVertical: 3, borderRadius: 10 },
-    applicantCount: { fontSize: 11, fontWeight: '800' },
+    applicantCount: { fontSize: 11, fontWeight: '700' },
 
-    emptyState: { alignItems: 'center', paddingVertical: 44, paddingHorizontal: 24 },
-    emptyTitle: { fontSize: 16, fontWeight: '800', marginTop: 14, marginBottom: 6 },
+    emptyState: { alignItems: 'center', paddingVertical: 44, paddingHorizontal: 24, borderRadius: RADIUS.lg },
+    emptyTitle: { fontSize: 16, fontWeight: '700', marginTop: 14, marginBottom: 6 },
     emptyDesc: { fontSize: 13.5, textAlign: 'center', lineHeight: 20 },
 });

@@ -5,17 +5,16 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Heart, MapPin, Users, ChevronRight, Briefcase } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Heart, MapPin, ChevronRight, Briefcase } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '../../lib/supabase';
 import useAppStore from '../../lib/state/app-store';
 import useThemeStore from '@/lib/state/theme-store';
 import { useText } from '@/lib/useText';
-import { useClay } from '@/lib/useClay';
-import type { ClayColors } from '@/lib/useClay';
+import { useFlint, RADIUS } from '@/lib/useFlint';
+import type { FlintColors } from '@/lib/useFlint';
 import { JOB_CATEGORIES } from '@/lib/types';
-import { ClaySurface, ClayIconBox, ClayButton } from '@/components/clay';
+import { Button } from '@/components/ui';
 
 interface Job {
     id: string;
@@ -34,7 +33,7 @@ interface Job {
 }
 
 // ─── SAVED JOB CARD ─────────────────────────────────
-function SavedJobCard({ job, onPress, C }: { job: Job; onPress: () => void; C: ClayColors }) {
+function SavedJobCard({ job, onPress, C }: { job: Job; onPress: () => void; C: FlintColors }) {
     const scaleAnim = useRef(new Animated.Value(1)).current;
     const savedJobIds = useAppStore((s) => s.savedJobIds);
     const toggleSavedJob = useAppStore((s) => s.toggleSavedJob);
@@ -62,12 +61,12 @@ function SavedJobCard({ job, onPress, C }: { job: Job; onPress: () => void; C: C
                 onPressIn={() => Animated.spring(scaleAnim, { toValue: 0.975, useNativeDriver: true }).start()}
                 onPressOut={() => Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true }).start()}
             >
-                <ClaySurface radius={22} contentStyle={{ padding: 16 }}>
+                <View style={[styles.card, { backgroundColor: C.card, padding: 16 }]}>
                     {/* Header row */}
                     <View style={styles.cardHeader}>
-                        <ClayIconBox size={46} radius={15}>
+                        <View style={[styles.iconBox, { backgroundColor: C.card2 }]}>
                             <Briefcase size={20} color={C.accent} strokeWidth={1.9} />
-                        </ClayIconBox>
+                        </View>
                         <View style={{ flex: 1 }}>
                             <Text style={[styles.cardTitle, { color: C.text }]} numberOfLines={1}>{jobTitle}</Text>
                             <Text style={[styles.cardCompany, { color: C.muted }]}>{job.company_name || 'Unknown'}</Text>
@@ -90,12 +89,12 @@ function SavedJobCard({ job, onPress, C }: { job: Job; onPress: () => void; C: C
                                 <Text style={[styles.metaText, { color: C.muted }]} numberOfLines={1}>{jobLocation}</Text>
                             </View>
                         </View>
-                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.salaryChip}>
-                            <Text style={{ fontSize: 14, fontWeight: '800', color: C.onAccent }}>€{job.pay_amount}{job.pay_type === 'hourly' ? '/h' : ''}</Text>
+                        <View style={[styles.salaryChip, { backgroundColor: C.accent }]}>
+                            <Text style={{ fontSize: 14, fontWeight: '700', color: C.onAccent }}>€{job.pay_amount}{job.pay_type === 'hourly' ? '/h' : ''}</Text>
                             <ChevronRight size={14} color={C.onAccent} strokeWidth={2.4} />
-                        </LinearGradient>
+                        </View>
                     </View>
-                </ClaySurface>
+                </View>
             </Pressable>
         </Animated.View>
     );
@@ -104,7 +103,7 @@ function SavedJobCard({ job, onPress, C }: { job: Job; onPress: () => void; C: C
 // ─── FAVORITES SCREEN ───────────────────────────────
 export default function Favorites() {
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const text = useText();
 
     const [savedJobs, setSavedJobs] = useState<Job[]>([]);
@@ -163,10 +162,10 @@ export default function Favorites() {
 
             {savedJobs.length === 0 ? (
                 <View style={styles.emptyContainer}>
-                    <ClayIconBox size={100} radius={32}><Heart size={42} color={C.accent} strokeWidth={1.6} /></ClayIconBox>
+                    <View style={[styles.iconBoxLg, { backgroundColor: C.card2 }]}><Heart size={42} color={C.accent} strokeWidth={1.6} /></View>
                     <Text style={[styles.emptyTitle, { color: C.text }]}>{text.noSavedJobsYet}</Text>
                     <Text style={[styles.emptyDesc, { color: C.muted }]}>{text.tapHeartToSave}</Text>
-                    <ClayButton label={text.browseJobs} onPress={() => router.push('/(tabs)')} style={{ marginTop: 28, paddingHorizontal: 32 }} />
+                    <Button label={text.browseJobs} onPress={() => router.push('/(tabs)')} style={{ marginTop: 28, paddingHorizontal: 32 }} />
                 </View>
             ) : (
                 <ScrollView
@@ -187,19 +186,22 @@ const styles = StyleSheet.create({
     container: { flex: 1 },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 16 },
-    largeTitle: { fontSize: 32, fontWeight: '800', letterSpacing: -0.5, marginBottom: 4 },
+    largeTitle: { fontSize: 32, fontWeight: '700', letterSpacing: -0.5, marginBottom: 4 },
     subtitle: { fontSize: 14, fontWeight: '600' },
     list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 120 },
+    card: { borderRadius: RADIUS.lg },
+    iconBox: { width: 46, height: 46, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
+    iconBoxLg: { width: 100, height: 100, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center' },
     cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
-    cardTitle: { fontSize: 16, fontWeight: '800', marginBottom: 2, letterSpacing: -0.3 },
+    cardTitle: { fontSize: 16, fontWeight: '700', marginBottom: 2, letterSpacing: -0.3 },
     cardCompany: { fontSize: 13, fontWeight: '600' },
     cardFooterRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
     metaText: { fontSize: 12, fontWeight: '600', maxWidth: 90 },
     categoryPill: { paddingHorizontal: 11, paddingVertical: 5, borderRadius: 9 },
-    categoryText: { fontSize: 11.5, fontWeight: '800' },
+    categoryText: { fontSize: 11.5, fontWeight: '700' },
     salaryChip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 12 },
     emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 40, paddingBottom: 100 },
-    emptyTitle: { fontSize: 21, fontWeight: '800', marginBottom: 8, marginTop: 24, textAlign: 'center', letterSpacing: -0.4 },
+    emptyTitle: { fontSize: 21, fontWeight: '700', marginBottom: 8, marginTop: 24, textAlign: 'center', letterSpacing: -0.4 },
     emptyDesc: { fontSize: 14, textAlign: 'center', lineHeight: 21, fontWeight: '500' },
 });
