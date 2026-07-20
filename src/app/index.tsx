@@ -3,11 +3,11 @@ import { useRouter } from 'expo-router';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { supabase } from '../lib/supabase';
 import useAppStore from '../lib/state/app-store';
-import { useClay } from '@/lib/useClay';
+import { useFlint } from '@/lib/useFlint';
 
 export default function Index() {
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
 
     useEffect(() => {
         const route = async () => {

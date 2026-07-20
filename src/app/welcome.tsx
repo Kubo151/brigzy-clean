@@ -1,20 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View, Text, Pressable, Animated, StyleSheet, Platform,
+  View, Text, Pressable, Animated, StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { Briefcase, Search, ChevronRight, Zap } from "lucide-react-native";
 import useAppStore from "@/lib/state/app-store";
-import { useClay } from "@/lib/useClay";
+import { useFlint, RADIUS } from "@/lib/useFlint";
 import { useText } from "@/lib/useText";
-import { ClaySurface, ClayIconBox } from "@/components/clay";
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const C = useClay();
+  const C = useFlint();
   const text = useText();
   const [selectedRole, setSelectedRole] = useState<"worker" | "employer" | null>(null);
   const setCurrentRole = useAppStore((s) => s.setCurrentRole);
@@ -51,27 +49,21 @@ export default function WelcomeScreen() {
     const active = selectedRole === role;
     return (
       <Pressable onPress={() => handleRoleSelection(role)} style={({ pressed }) => [pressed && { transform: [{ scale: 0.98 }] }]}>
-        {active ? (
-          <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.roleCardActive}>
-            <View style={[styles.roleIcon, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-              {React.isValidElement(icon) ? React.cloneElement(icon as any, { color: C.onAccent }) : icon}
-            </View>
-            <View style={styles.roleTextWrap}>
-              <Text style={[styles.roleTitle, { color: C.onAccent }]}>{title}</Text>
-              <Text style={[styles.roleDesc, { color: 'rgba(255,255,255,0.75)' }]}>{desc}</Text>
-            </View>
-            <ChevronRight size={18} color="rgba(255,255,255,0.7)" strokeWidth={2.2} />
-          </LinearGradient>
-        ) : (
-          <ClaySurface radius={20} contentStyle={styles.roleCard}>
-            <ClayIconBox size={52} radius={16}>{icon}</ClayIconBox>
-            <View style={styles.roleTextWrap}>
-              <Text style={[styles.roleTitle, { color: C.text }]}>{title}</Text>
-              <Text style={[styles.roleDesc, { color: C.muted }]}>{desc}</Text>
-            </View>
-            <ChevronRight size={18} color={C.accent} strokeWidth={2.2} />
-          </ClaySurface>
-        )}
+        <View
+          style={[
+            styles.roleCard,
+            { backgroundColor: active ? C.accent : C.card },
+          ]}
+        >
+          <View style={[styles.roleIcon, { backgroundColor: active ? 'rgba(255,255,255,0.2)' : C.card2 }]}>
+            {React.isValidElement(icon) ? React.cloneElement(icon as any, { color: active ? C.onAccent : C.accent }) : icon}
+          </View>
+          <View style={styles.roleTextWrap}>
+            <Text style={[styles.roleTitle, { color: active ? C.onAccent : C.text }]}>{title}</Text>
+            <Text style={[styles.roleDesc, { color: active ? 'rgba(255,255,255,0.75)' : C.muted }]}>{desc}</Text>
+          </View>
+          <ChevronRight size={18} color={active ? 'rgba(255,255,255,0.7)' : C.accent} strokeWidth={2.2} />
+        </View>
       </Pressable>
     );
   };
@@ -82,10 +74,9 @@ export default function WelcomeScreen() {
         <View style={styles.content}>
           {/* Brand */}
           <Animated.View style={[styles.brandWrap, { opacity: fade1 }]}>
-            <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.brandCircle}>
-              <LinearGradient colors={['rgba(255,255,255,0.4)', 'transparent']} style={styles.brandSpecular} />
+            <View style={[styles.brandCircle, { backgroundColor: C.accent }]}>
               <Zap size={36} color={C.onAccent} fill={C.onAccent} strokeWidth={0} />
-            </LinearGradient>
+            </View>
             <Text style={[styles.brandName, { color: C.text }]}>Brigzy</Text>
             <Text style={[styles.brandSub, { color: C.muted }]}>{text.welcomeSubtitle}</Text>
           </Animated.View>
@@ -117,22 +108,14 @@ const styles = StyleSheet.create({
 
   // Brand
   brandWrap: { alignItems: 'center', marginBottom: 48 },
-  brandCircle: { width: 88, height: 88, borderRadius: 28, alignItems: 'center', justifyContent: 'center', marginBottom: 20, overflow: 'hidden' },
-  brandSpecular: { position: 'absolute', top: 0, left: 0, right: 0, height: 44 },
+  brandCircle: { width: 88, height: 88, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
   brandName: { fontSize: 38, fontWeight: '800', letterSpacing: -0.5, marginBottom: 8 },
   brandSub: { fontSize: 16, textAlign: 'center', fontWeight: '600' },
 
   // Role cards
   roleCards: { gap: 14 },
-  roleCard: { flexDirection: 'row', alignItems: 'center', padding: 16, gap: 14, borderRadius: 20 },
-  roleCardActive: {
-    flexDirection: 'row', alignItems: 'center', padding: 16, gap: 14, borderRadius: 20,
-    ...Platform.select({
-      ios: { shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.32, shadowRadius: 16 },
-      android: { elevation: 6 },
-    }),
-  },
-  roleIcon: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  roleCard: { flexDirection: 'row', alignItems: 'center', padding: 16, gap: 14, borderRadius: RADIUS.lg },
+  roleIcon: { width: 52, height: 52, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
   roleTextWrap: { flex: 1 },
   roleTitle: { fontSize: 17, fontWeight: '800', marginBottom: 3, letterSpacing: -0.3 },
   roleDesc: { fontSize: 13.5, fontWeight: '500' },
