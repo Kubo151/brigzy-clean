@@ -9,16 +9,15 @@ import {
     Briefcase, MapPin, Euro, Clock, FileText, CheckCircle, ChevronLeft,
     Building2, User, Zap, Users, Eye, EyeOff, Sparkles,
 } from "lucide-react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import useAppStore from "@/lib/state/app-store";
 import { supabase } from "@/lib/supabase";
-import { useClay } from "@/lib/useClay";
-import type { ClayColors } from "@/lib/useClay";
+import { useFlint, RADIUS } from "@/lib/useFlint";
+import type { FlintColors } from "@/lib/useFlint";
 import type { JobCategory, SalaryType } from "@/lib/types";
 import { useText } from "@/lib/useText";
 import { JOB_CATEGORIES } from "@/lib/types";
-import { ClaySurface, ClayInset, ClayIconBox, ClayButton } from "@/components/clay";
+import { Button } from "@/components/ui";
 import { showAlert } from "@/lib/notify";
 
 const CATEGORIES: JobCategory[] = [
@@ -33,15 +32,15 @@ const TOTAL_STEPS = 7;
 type TaskNature = "result" | "activity";
 type PostingAs = "individual" | "company";
 
-// ─── Small building blocks (clay inset input, section title) ───
+// ─── Small building blocks (flat field input, section title) ───
 function FieldInput({ icon: Icon, label, value, onChangeText, placeholder, C, multiline, keyboardType }: {
     icon: any; label: string; value: string; onChangeText: (t: string) => void;
-    placeholder: string; C: ClayColors; multiline?: boolean; keyboardType?: any;
+    placeholder: string; C: FlintColors; multiline?: boolean; keyboardType?: any;
 }) {
     return (
         <View style={styles.fieldGroup}>
             <Text style={[styles.fieldLabel, { color: C.muted }]}>{label}</Text>
-            <ClayInset radius={14} contentStyle={[styles.inputRow, multiline && { alignItems: 'flex-start', paddingTop: 14 }]}>
+            <View style={[styles.inputRow, { backgroundColor: C.card2 }, multiline && { alignItems: 'flex-start', paddingTop: 14 }]}>
                 <Icon size={18} color={C.muted} strokeWidth={1.9} />
                 <TextInput
                     value={value}
@@ -54,38 +53,28 @@ function FieldInput({ icon: Icon, label, value, onChangeText, placeholder, C, mu
                     keyboardType={keyboardType}
                     style={[styles.input, { color: C.text }, multiline && { minHeight: 100, paddingTop: 0 }]}
                 />
-            </ClayInset>
+            </View>
         </View>
     );
 }
 
-function StepTitle({ children, C }: { children: string; C: ClayColors }) {
+function StepTitle({ children, C }: { children: string; C: FlintColors }) {
     return <Text style={[styles.stepTitle, { color: C.text }]}>{children}</Text>;
 }
 
 function ChoiceCard({ selected, icon: Icon, title, subtitle, onPress, C }: {
-    selected: boolean; icon: any; title: string; subtitle?: string; onPress: () => void; C: ClayColors;
+    selected: boolean; icon: any; title: string; subtitle?: string; onPress: () => void; C: FlintColors;
 }) {
     return (
         <Pressable onPress={() => { Haptics.selectionAsync(); onPress(); }} style={{ marginBottom: 10 }}>
-            {selected ? (
-                <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.1, y: 0 }} end={{ x: 0.9, y: 1 }} style={styles.choiceCard}>
-                    <Icon size={20} color={C.onAccent} strokeWidth={2} />
-                    <View style={{ flex: 1 }}>
-                        <Text style={[styles.choiceTitle, { color: C.onAccent }]}>{title}</Text>
-                        {!!subtitle && <Text style={[styles.choiceSubtitle, { color: C.onAccent, opacity: 0.85 }]}>{subtitle}</Text>}
-                    </View>
-                    <CheckCircle size={19} color={C.onAccent} strokeWidth={2.2} />
-                </LinearGradient>
-            ) : (
-                <View style={[styles.choiceCard, { backgroundColor: C.cLo, borderWidth: 1, borderColor: C.hair }]}>
-                    <Icon size={20} color={C.muted} strokeWidth={2} />
-                    <View style={{ flex: 1 }}>
-                        <Text style={[styles.choiceTitle, { color: C.text }]}>{title}</Text>
-                        {!!subtitle && <Text style={[styles.choiceSubtitle, { color: C.muted }]}>{subtitle}</Text>}
-                    </View>
+            <View style={[styles.choiceCard, { backgroundColor: selected ? C.accent : C.card2 }]}>
+                <Icon size={20} color={selected ? C.onAccent : C.muted} strokeWidth={2} />
+                <View style={{ flex: 1 }}>
+                    <Text style={[styles.choiceTitle, { color: selected ? C.onAccent : C.text }]}>{title}</Text>
+                    {!!subtitle && <Text style={[styles.choiceSubtitle, { color: selected ? C.onAccent : C.muted, opacity: selected ? 0.85 : 1 }]}>{subtitle}</Text>}
                 </View>
-            )}
+                {selected && <CheckCircle size={19} color={C.onAccent} strokeWidth={2.2} />}
+            </View>
         </Pressable>
     );
 }
@@ -99,18 +88,18 @@ export default function AddJobScreen() {
 
 function WorkerGuard() {
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     return (
         <View style={[styles.center, { backgroundColor: C.bg, flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 }]}>
             <Briefcase size={40} color={C.muted} strokeWidth={1.5} />
-            <Text style={{ fontSize: 18, fontWeight: '800', color: C.text, marginTop: 16, marginBottom: 8, textAlign: 'center' }}>
+            <Text style={{ fontSize: 18, fontWeight: '700', color: C.text, marginTop: 16, marginBottom: 8, textAlign: 'center' }}>
                 Táto sekcia je pre zadávateľov
             </Text>
             <Text style={{ fontSize: 14, color: C.muted, textAlign: 'center', marginBottom: 24, lineHeight: 20 }}>
                 Prepnite na rolu Zadávateľa v profile a budete môcť pridávať brigády.
             </Text>
-            <Pressable onPress={() => router.push('/(tabs)')} style={{ backgroundColor: C.accentDim, paddingHorizontal: 22, paddingVertical: 12, borderRadius: 16 }}>
-                <Text style={{ color: C.accent, fontWeight: '800', fontSize: 15 }}>Späť na domov</Text>
+            <Pressable onPress={() => router.push('/(tabs)')} style={{ backgroundColor: C.accentDim, paddingHorizontal: 22, paddingVertical: 12, borderRadius: RADIUS.md }}>
+                <Text style={{ color: C.accent, fontWeight: '700', fontSize: 15 }}>Späť na domov</Text>
             </Pressable>
         </View>
     );
@@ -119,7 +108,7 @@ function WorkerGuard() {
 // ─── P2 — Post a job wizard (7 steps, auto-derives contract type) ───
 function PostJobWizard() {
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const text = useText();
     const currentUser = useAppStore((s) => s.currentUser);
 
@@ -175,6 +164,7 @@ function PostJobWizard() {
     const isB2B = postingAs === 'company';
     const showRecurring = isB2B && taskNature === 'activity';
 
+    // Auto-derived contract type — never a user choice (per spec v2.7 §3 / ADR-0005).
     const contractType = useMemo(() => {
         if (!isB2B) return { name: 'Zmluva o dielo', ref: '§ 631–643 OZ' };
         return taskNature === 'activity'
@@ -283,9 +273,9 @@ function PostJobWizard() {
     if (showSuccess) {
         return (
             <View style={[styles.center, { backgroundColor: C.bg }]}>
-                <ClayIconBox size={100} radius={32} tintBg={C.greenDim}>
+                <View style={[styles.successIconBox, { backgroundColor: C.greenDim }]}>
                     <CheckCircle size={52} color={C.green} strokeWidth={1.8} />
-                </ClayIconBox>
+                </View>
                 <Text style={[styles.successTitle, { color: C.text }]}>{text.jobPublishedTitle}</Text>
                 <Text style={[styles.successDesc, { color: C.muted }]}>{text.jobPostedSuccess}</Text>
             </View>
@@ -297,13 +287,13 @@ function PostJobWizard() {
             <SafeAreaView edges={['top']} style={{ backgroundColor: C.bg }}>
                 <View style={styles.header}>
                     <Pressable onPress={goBackStep} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-                        <ClaySurface radius={14} style={{ width: 40, height: 40 }} contentStyle={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
+                        <View style={[styles.backBtn, { backgroundColor: C.card2 }]}>
                             <ChevronLeft size={19} color={C.text} strokeWidth={2.2} />
-                        </ClaySurface>
+                        </View>
                     </Pressable>
                     <View style={{ flex: 1 }}>
                         <Text style={[styles.stepCounter, { color: C.muted }]}>{text.wizardStepOf} {step}/{TOTAL_STEPS}</Text>
-                        <View style={[styles.progressTrack, { backgroundColor: C.hair }]}>
+                        <View style={[styles.progressTrack, { backgroundColor: C.card2 }]}>
                             <View style={[styles.progressFill, { backgroundColor: C.accent, width: `${(step / TOTAL_STEPS) * 100}%` }]} />
                         </View>
                     </View>
@@ -323,17 +313,10 @@ function PostJobWizard() {
                                     const isSelected = category === cat;
                                     return (
                                         <Pressable key={cat} onPress={() => { Haptics.selectionAsync(); setCategory(cat); }}>
-                                            {isSelected ? (
-                                                <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.categoryChip}>
-                                                    <Text style={{ fontSize: 15, marginRight: 5 }}>{catData?.icon || '📋'}</Text>
-                                                    <Text style={[styles.categoryChipText, { color: C.onAccent, fontWeight: '800' }]}>{catData?.name || cat}</Text>
-                                                </LinearGradient>
-                                            ) : (
-                                                <View style={[styles.categoryChip, { backgroundColor: C.cLo, borderWidth: 1, borderColor: C.hair }]}>
-                                                    <Text style={{ fontSize: 15, marginRight: 5 }}>{catData?.icon || '📋'}</Text>
-                                                    <Text style={[styles.categoryChipText, { color: C.text, fontWeight: '600' }]}>{catData?.name || cat}</Text>
-                                                </View>
-                                            )}
+                                            <View style={[styles.categoryChip, { backgroundColor: isSelected ? C.accent : C.card2 }]}>
+                                                <Text style={{ fontSize: 15, marginRight: 5 }}>{catData?.icon || '📋'}</Text>
+                                                <Text style={[styles.categoryChipText, { color: isSelected ? C.onAccent : C.text, fontWeight: isSelected ? '700' : '600' }]}>{catData?.name || cat}</Text>
+                                            </View>
                                         </Pressable>
                                     );
                                 })}
@@ -372,24 +355,18 @@ function PostJobWizard() {
                             <StepTitle C={C}>{text.stepPayTitle}</StepTitle>
                             <View style={styles.fieldGroup}>
                                 <Text style={[styles.fieldLabel, { color: C.muted }]}>{text.salaryType}</Text>
-                                <ClayInset radius={14} contentStyle={styles.toggleRow}>
+                                <View style={[styles.toggleRow, { backgroundColor: C.card2 }]}>
                                     {(['hourly', 'fixed'] as SalaryType[]).map(type => {
                                         const active = salaryType === type;
                                         return (
                                             <Pressable key={type} onPress={() => { Haptics.selectionAsync(); setSalaryType(type); }} style={{ flex: 1 }}>
-                                                {active ? (
-                                                    <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.toggleBtn}>
-                                                        <Text style={[styles.toggleText, { color: C.onAccent, fontWeight: '800' }]}>{type === 'hourly' ? text.hourly : text.fixed}</Text>
-                                                    </LinearGradient>
-                                                ) : (
-                                                    <View style={styles.toggleBtn}>
-                                                        <Text style={[styles.toggleText, { color: C.muted, fontWeight: '600' }]}>{type === 'hourly' ? text.hourly : text.fixed}</Text>
-                                                    </View>
-                                                )}
+                                                <View style={[styles.toggleBtn, active && { backgroundColor: C.accent }]}>
+                                                    <Text style={[styles.toggleText, { color: active ? C.onAccent : C.muted, fontWeight: active ? '700' : '600' }]}>{type === 'hourly' ? text.hourly : text.fixed}</Text>
+                                                </View>
                                             </Pressable>
                                         );
                                     })}
-                                </ClayInset>
+                                </View>
                             </View>
                             <FieldInput icon={Euro} label={salaryType === "hourly" ? text.hourlyRate : text.fixedAmount} value={salary} onChangeText={setSalary} placeholder="napr. 10" C={C} keyboardType="numeric" />
                             {salaryType === 'hourly' && (
@@ -402,7 +379,7 @@ function PostJobWizard() {
                             )}
 
                             {rewardCents > 0 && (
-                                <ClaySurface radius={16} contentStyle={{ padding: 16 }}>
+                                <View style={[styles.card, { backgroundColor: C.card }]}>
                                     <View style={styles.feeRow}>
                                         <Text style={[styles.feeLabel, { color: C.muted }]}>{text.feeGross}</Text>
                                         <Text style={[styles.feeValue, { color: C.text }]}>€{(rewardCents / 100).toFixed(2)}</Text>
@@ -411,12 +388,12 @@ function PostJobWizard() {
                                         <Text style={[styles.feeLabel, { color: C.muted }]}>{text.feeService}</Text>
                                         <Text style={[styles.feeValue, { color: C.text }]}>€{(feeCents / 100).toFixed(2)}</Text>
                                     </View>
-                                    <View style={[styles.feeDivider, { backgroundColor: C.hair }]} />
+                                    <View style={[styles.feeDivider, { backgroundColor: C.divider }]} />
                                     <View style={styles.feeRow}>
                                         <Text style={[styles.feeLabelBold, { color: C.text }]}>{text.totalToPay}</Text>
                                         <Text style={[styles.feeValueBold, { color: C.accent }]}>€{((rewardCents + feeCents) / 100).toFixed(2)}</Text>
                                     </View>
-                                </ClaySurface>
+                                </View>
                             )}
                         </>
                     )}
@@ -436,12 +413,12 @@ function PostJobWizard() {
                             <FieldInput icon={Users} label={text.slotsCountLabel} value={slotsTotal} onChangeText={(v) => setSlotsTotal(v.replace(/\D/g, ''))} placeholder="1" C={C} keyboardType="numeric" />
                             <FieldInput icon={Clock} label={text.duration} value={duration} onChangeText={setDuration} placeholder={text.durationPlaceholder} C={C} />
                             {showRecurring && (
-                                <View style={[styles.switchRow, { backgroundColor: C.cLo, borderColor: C.hair }]}>
+                                <View style={[styles.switchRow, { backgroundColor: C.card2 }]}>
                                     <View style={{ flex: 1 }}>
                                         <Text style={[styles.switchLabel, { color: C.text }]}>{text.recurringLabel}</Text>
                                         <Text style={[styles.switchHint, { color: C.muted }]}>{text.recurringHint}</Text>
                                     </View>
-                                    <Switch value={recurring} onValueChange={(v) => { Haptics.selectionAsync(); setRecurring(v); }} trackColor={{ false: C.hair, true: C.accent }} />
+                                    <Switch value={recurring} onValueChange={(v) => { Haptics.selectionAsync(); setRecurring(v); }} trackColor={{ false: C.card, true: C.accent }} />
                                 </View>
                             )}
                         </>
@@ -451,13 +428,13 @@ function PostJobWizard() {
                     {step === 6 && (
                         <>
                             <StepTitle C={C}>{text.stepSettingsTitle}</StepTitle>
-                            <View style={[styles.switchRow, { backgroundColor: C.cLo, borderColor: C.hair }]}>
-                                <ClayIconBox size={38} radius={12} tintBg={C.red + '1E'}><Zap size={17} color={C.red} strokeWidth={2.2} /></ClayIconBox>
+                            <View style={[styles.switchRow, { backgroundColor: C.card2 }]}>
+                                <View style={[styles.smallIconBox, { backgroundColor: C.redDim }]}><Zap size={17} color={C.red} strokeWidth={2.2} /></View>
                                 <View style={{ flex: 1, marginLeft: 12 }}>
                                     <Text style={[styles.switchLabel, { color: C.text }]}>{text.sosSettingLabel}</Text>
                                     <Text style={[styles.switchHint, { color: C.muted }]}>{text.sosSettingHint}</Text>
                                 </View>
-                                <Switch value={isSos} onValueChange={(v) => { Haptics.selectionAsync(); setIsSos(v); }} trackColor={{ false: C.hair, true: C.red }} />
+                                <Switch value={isSos} onValueChange={(v) => { Haptics.selectionAsync(); setIsSos(v); }} trackColor={{ false: C.card, true: C.red }} />
                             </View>
 
                             <Text style={[styles.fieldLabel, { color: C.muted, marginTop: 14 }]}>{text.visibilityLabel}</Text>
@@ -470,22 +447,23 @@ function PostJobWizard() {
                     {step === 7 && (
                         <>
                             <StepTitle C={C}>{text.stepSummaryTitle}</StepTitle>
-                            <ClaySurface radius={18} style={{ marginBottom: 14 }} contentStyle={{ padding: 16 }}>
+                            <View style={[styles.card, { backgroundColor: C.card, marginBottom: 14 }]}>
                                 <Text style={[styles.summaryJobTitle, { color: C.text }]}>{title || '—'}</Text>
                                 <View style={styles.metaRow}><MapPin size={14} color={C.muted} strokeWidth={1.9} /><Text style={[styles.metaText, { color: C.muted }]}>{location || '—'}</Text></View>
                                 <View style={styles.metaRow}><Clock size={14} color={C.muted} strokeWidth={1.9} /><Text style={[styles.metaText, { color: C.muted }]}>{duration || '—'}</Text></View>
                                 <View style={styles.metaRow}><Users size={14} color={C.muted} strokeWidth={1.9} /><Text style={[styles.metaText, { color: C.muted }]}>{slotsTotal} {text.slotsCountLabel.toLowerCase()}</Text></View>
-                            </ClaySurface>
+                            </View>
 
-                            <ClaySurface radius={18} style={{ marginBottom: 14 }} contentStyle={{ padding: 16 }}>
+                            {/* Auto-derived contract type — display only, never user-editable (ADR-0005) */}
+                            <View style={[styles.card, { backgroundColor: C.card, marginBottom: 14 }]}>
                                 <View style={styles.feeRow}>
                                     <Text style={[styles.feeLabel, { color: C.muted }]}>{text.contractTypePreview}</Text>
                                     <Text style={[styles.feeValueBold, { color: C.accent }]}>{contractType.name}</Text>
                                 </View>
                                 <Text style={[styles.switchHint, { color: C.muted, marginTop: 2 }]}>{contractType.ref}</Text>
-                            </ClaySurface>
+                            </View>
 
-                            <ClaySurface radius={18} style={{ marginBottom: 14 }} contentStyle={{ padding: 16 }}>
+                            <View style={[styles.card, { backgroundColor: C.card, marginBottom: 14 }]}>
                                 <View style={styles.feeRow}>
                                     <Text style={[styles.feeLabel, { color: C.muted }]}>{text.feeGross}</Text>
                                     <Text style={[styles.feeValue, { color: C.text }]}>€{(rewardCents / 100).toFixed(2)}</Text>
@@ -494,25 +472,25 @@ function PostJobWizard() {
                                     <Text style={[styles.feeLabel, { color: C.muted }]}>{text.feeService}</Text>
                                     <Text style={[styles.feeValue, { color: C.text }]}>€{(feeCents / 100).toFixed(2)}</Text>
                                 </View>
-                                <View style={[styles.feeDivider, { backgroundColor: C.hair }]} />
+                                <View style={[styles.feeDivider, { backgroundColor: C.divider }]} />
                                 <View style={styles.feeRow}>
                                     <Text style={[styles.feeLabelBold, { color: C.text }]}>{text.totalToPay}</Text>
                                     <Text style={[styles.feeValueBold, { color: C.accent }]}>€{((rewardCents + feeCents) / 100).toFixed(2)}</Text>
                                 </View>
-                            </ClaySurface>
+                            </View>
                         </>
                     )}
 
                     {/* Nav buttons */}
                     <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
                         {step < TOTAL_STEPS ? (
-                            <ClayButton label={text.wizardNext} onPress={goNext} flex={1} style={!stepValid ? { opacity: 0.5 } : undefined} />
+                            <Button label={text.wizardNext} onPress={goNext} flex={1} style={!stepValid ? { opacity: 0.5 } : undefined} />
                         ) : isSubmitting ? (
                             <View style={{ flex: 1, alignItems: 'center', paddingVertical: 10 }}>
                                 <ActivityIndicator size="large" color={C.accent} />
                             </View>
                         ) : (
-                            <ClayButton label={text.wizardPublish} onPress={handlePublish} flex={1} />
+                            <Button label={text.wizardPublish} onPress={handlePublish} flex={1} />
                         )}
                     </View>
                 </ScrollView>
@@ -525,36 +503,40 @@ const styles = StyleSheet.create({
     container: { flex: 1 },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
     header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingTop: 8, paddingBottom: 16, gap: 12 },
-    stepCounter: { fontSize: 12, fontWeight: '700', marginBottom: 6 },
+    backBtn: { width: 40, height: 40, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
+    stepCounter: { fontSize: 12, fontWeight: '600', marginBottom: 6 },
     progressTrack: { height: 5, borderRadius: 3, overflow: 'hidden' },
     progressFill: { height: 5, borderRadius: 3 },
     scrollContent: { paddingHorizontal: 20, paddingBottom: 140 },
-    stepTitle: { fontSize: 22, fontWeight: '800', letterSpacing: -0.5, marginBottom: 18 },
+    stepTitle: { fontSize: 22, fontWeight: '700', letterSpacing: -0.5, marginBottom: 18 },
+    card: { borderRadius: RADIUS.lg, padding: 16 },
     fieldGroup: { marginBottom: 18 },
-    fieldLabel: { fontSize: 11, fontWeight: '800', marginBottom: 8, marginLeft: 4, textTransform: 'uppercase', letterSpacing: 0.7 },
-    inputRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 13, gap: 10 },
+    fieldLabel: { fontSize: 11, fontWeight: '700', marginBottom: 8, marginLeft: 4, textTransform: 'uppercase', letterSpacing: 0.7 },
+    inputRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 13, gap: 10, borderRadius: RADIUS.md },
     input: { flex: 1, fontSize: 16, fontWeight: '500' },
-    toggleRow: { flexDirection: 'row', padding: 4, gap: 4 },
+    toggleRow: { flexDirection: 'row', padding: 4, gap: 4, borderRadius: RADIUS.md },
     toggleBtn: { paddingVertical: 11, borderRadius: 10, alignItems: 'center' },
     toggleText: { fontSize: 14.5 },
     categoryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     categoryChip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12 },
     categoryChipText: { fontSize: 14 },
-    choiceCard: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16 },
-    choiceTitle: { fontSize: 14.5, fontWeight: '800' },
+    choiceCard: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: RADIUS.lg },
+    choiceTitle: { fontSize: 14.5, fontWeight: '700' },
     choiceSubtitle: { fontSize: 12, fontWeight: '600', marginTop: 2 },
-    switchRow: { flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 16, borderWidth: 1, marginBottom: 10 },
-    switchLabel: { fontSize: 14.5, fontWeight: '800' },
+    switchRow: { flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: RADIUS.lg, marginBottom: 10 },
+    smallIconBox: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+    switchLabel: { fontSize: 14.5, fontWeight: '700' },
     switchHint: { fontSize: 12, fontWeight: '600', marginTop: 2 },
     feeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
     feeLabel: { fontSize: 13.5, fontWeight: '600' },
     feeValue: { fontSize: 14.5, fontWeight: '700' },
     feeDivider: { height: 1, marginVertical: 8 },
-    feeLabelBold: { fontSize: 15, fontWeight: '800' },
-    feeValueBold: { fontSize: 17, fontWeight: '800' },
-    summaryJobTitle: { fontSize: 17, fontWeight: '800', marginBottom: 8, letterSpacing: -0.3 },
+    feeLabelBold: { fontSize: 15, fontWeight: '700' },
+    feeValueBold: { fontSize: 17, fontWeight: '700' },
+    summaryJobTitle: { fontSize: 17, fontWeight: '700', marginBottom: 8, letterSpacing: -0.3 },
     metaRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 4 },
     metaText: { fontSize: 13, fontWeight: '500' },
-    successTitle: { fontSize: 23, fontWeight: '800', marginBottom: 8, marginTop: 24, letterSpacing: -0.4 },
+    successIconBox: { width: 100, height: 100, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center' },
+    successTitle: { fontSize: 23, fontWeight: '700', marginBottom: 8, marginTop: 24, letterSpacing: -0.4 },
     successDesc: { fontSize: 14, textAlign: 'center', fontWeight: '500' },
 });

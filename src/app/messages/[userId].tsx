@@ -6,17 +6,15 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ChevronLeft, Send, Paperclip, Mic, Square, Play, Pause, Pencil, Trash2, X, Handshake, Check, Clock3 } from "lucide-react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 import {
     useAudioRecorder, useAudioRecorderState, RecordingPresets,
     requestRecordingPermissionsAsync, useAudioPlayer, useAudioPlayerStatus,
 } from "expo-audio";
 import { supabase } from "@/lib/supabase";
-import { useClay } from "@/lib/useClay";
-import type { ClayColors } from "@/lib/useClay";
+import { useFlint, RADIUS } from "@/lib/useFlint";
+import type { FlintColors } from "@/lib/useFlint";
 import * as Haptics from "expo-haptics";
-import { ClaySurface, ClayInset } from "@/components/clay";
 import { goBack } from '@/lib/nav';
 import { showAlert } from '@/lib/notify';
 
@@ -52,7 +50,7 @@ const QUICK_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 export default function ChatScreen() {
     const { userId, jobId } = useLocalSearchParams<{ userId: string; jobId?: string }>();
     const router = useRouter();
-    const C = useClay();
+    const C = useFlint();
     const st = useMemo(() => makeStyles(C), [C]);
 
     const [messages, setMessages] = useState<Message[]>([]);
@@ -466,9 +464,9 @@ export default function ChatScreen() {
             {/* Header */}
             <View style={st.chatHeader}>
                 <Pressable onPress={() => goBack()} style={({ pressed }) => [pressed && { transform: [{ scale: 0.94 }] }]}>
-                    <ClaySurface radius={14} style={{ width: 42, height: 42 }} contentStyle={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={[st.backBtn, { backgroundColor: C.card2 }]}>
                         <ChevronLeft size={22} color={C.text} strokeWidth={2.2} />
-                    </ClaySurface>
+                    </View>
                 </Pressable>
                 <Pressable
                     onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(`/user/${userId}`); }}
@@ -477,9 +475,9 @@ export default function ChatScreen() {
                     {otherUser?.avatar_url ? (
                         <Image source={{ uri: otherUser.avatar_url }} style={st.avatar} />
                     ) : (
-                        <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={st.avatar}>
+                        <View style={[st.avatar, { backgroundColor: C.accent }]}>
                             <Text style={[st.avatarLetter, { color: C.onAccent }]}>{initial}</Text>
-                        </LinearGradient>
+                        </View>
                     )}
                     <View style={{ flex: 1 }}>
                         <Text style={st.chatName}>{otherUser?.display_name || otherUser?.name}</Text>
@@ -513,7 +511,7 @@ export default function ChatScreen() {
                                         style={{ flexDirection: 'row', justifyContent: isSent ? 'flex-end' : 'flex-start' }}
                                     >
                                         {isDeleted ? (
-                                            <View style={[st.bubble, st.deletedBubble, { borderColor: C.hair }]}>
+                                            <View style={[st.bubble, st.deletedBubble, { borderColor: C.divider, backgroundColor: C.card2 }]}>
                                                 <Text style={[st.bubbleText, { color: C.muted, fontStyle: 'italic' }]}>Správa bola vymazaná</Text>
                                             </View>
                                         ) : message.message_type === 'image' ? (
@@ -521,15 +519,15 @@ export default function ChatScreen() {
                                         ) : message.message_type === 'audio' ? (
                                             <AudioMessageBubble url={signedUrl} durationSeconds={message.media_duration_seconds ?? 0} isSent={isSent} C={C} />
                                         ) : isSent ? (
-                                            <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={[st.bubble, { borderBottomRightRadius: 5 }]}>
+                                            <View style={[st.bubble, { borderBottomRightRadius: 5, backgroundColor: C.accent }]}>
                                                 <Text style={[st.bubbleText, { color: C.onAccent }]}>{message.content}</Text>
                                                 {message.edited_at && <Text style={[st.editedLabel, { color: C.onAccent }]}>upravené</Text>}
-                                            </LinearGradient>
+                                            </View>
                                         ) : (
-                                            <ClaySurface radius={18} style={{ maxWidth: '78%' }} contentStyle={{ paddingHorizontal: 14, paddingVertical: 10 }}>
+                                            <View style={[st.bubble, { maxWidth: '78%', backgroundColor: C.card2, borderBottomLeftRadius: 5 }]}>
                                                 <Text style={[st.bubbleText, { color: C.text }]}>{message.content}</Text>
                                                 {message.edited_at && <Text style={[st.editedLabel, { color: C.muted }]}>upravené</Text>}
-                                            </ClaySurface>
+                                            </View>
                                         )}
                                     </Pressable>
                                     {!isDeleted && msgReactions.length > 0 && (
@@ -546,7 +544,7 @@ export default function ChatScreen() {
                 </ScrollView>
 
                 {negotiationApp && negotiationApp.status === 'pending' && (
-                    <View style={[st.negBar, { backgroundColor: C.cLo, borderTopColor: C.hair }]}>
+                    <View style={[st.negBar, { backgroundColor: C.card2, borderTopColor: C.divider }]}>
                         {!latestNegotiation ? (
                             <Pressable onPress={() => setProposeVisible(true)} style={st.negRow}>
                                 <Handshake size={16} color={C.accent} strokeWidth={2.2} />
@@ -579,7 +577,7 @@ export default function ChatScreen() {
                                     <Pressable disabled={negotiating} onPress={() => respondToProposal('reject')} style={[st.negBtn, { backgroundColor: C.red }]}>
                                         <Text style={st.negBtnText}>Odmietnuť</Text>
                                     </Pressable>
-                                    <Pressable disabled={negotiating} onPress={() => setProposeVisible(true)} style={[st.negBtn, { backgroundColor: C.cHi, borderWidth: 1, borderColor: C.hair }]}>
+                                    <Pressable disabled={negotiating} onPress={() => setProposeVisible(true)} style={[st.negBtn, { backgroundColor: C.card }]}>
                                         <Text style={[st.negBtnText, { color: C.text }]}>Protinávrh</Text>
                                     </Pressable>
                                 </View>
@@ -596,7 +594,7 @@ export default function ChatScreen() {
                 )}
 
                 {editingMessage && (
-                    <View style={[st.editingBar, { backgroundColor: C.cLo, borderTopColor: C.hair }]}>
+                    <View style={[st.editingBar, { backgroundColor: C.card2, borderTopColor: C.divider }]}>
                         <Pencil size={14} color={C.accent} strokeWidth={2.2} />
                         <Text style={[st.editingBarText, { color: C.text }]} numberOfLines={1}>Upravujete správu</Text>
                         <Pressable onPress={cancelEdit} accessibilityLabel="Zrušiť úpravu">
@@ -606,49 +604,49 @@ export default function ChatScreen() {
                 )}
 
                 {/* Input */}
-                <View style={[st.inputBar, { backgroundColor: C.bg, borderTopColor: C.hair }]}>
+                <View style={[st.inputBar, { backgroundColor: C.bg, borderTopColor: C.divider }]}>
                     {recorderState.isRecording ? (
                         <>
-                            <View style={[st.recordingIndicator, { backgroundColor: C.cLo, borderColor: C.hair }]}>
+                            <View style={[st.recordingIndicator, { backgroundColor: C.card2 }]}>
                                 <View style={st.recordingDot} />
                                 <Text style={[st.recordingText, { color: C.text }]}>
                                     Nahrávam... {Math.round((recorderState.durationMillis || 0) / 1000)}s
                                 </Text>
                             </View>
                             <Pressable onPress={toggleRecording} accessibilityLabel="Zastaviť nahrávanie a odoslať">
-                                <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={st.sendBtn}>
+                                <View style={[st.sendBtn, { backgroundColor: C.accent }]}>
                                     <Square size={16} color={C.onAccent} strokeWidth={2.2} fill={C.onAccent} />
-                                </LinearGradient>
+                                </View>
                             </Pressable>
                         </>
                     ) : (
                         <>
                             {!editingMessage && (
                                 <Pressable onPress={attachPress} disabled={sending} accessibilityLabel="Priložiť fotku">
-                                    <ClaySurface radius={22} style={{ width: 44, height: 44 }} contentStyle={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+                                    <View style={[st.attachBtn, { backgroundColor: C.card2 }]}>
                                         <Paperclip size={19} color={C.muted} strokeWidth={2} />
-                                    </ClaySurface>
+                                    </View>
                                 </Pressable>
                             )}
-                            <ClayInset radius={22} style={{ flex: 1 }} contentStyle={{ paddingHorizontal: 16, paddingVertical: 10 }}>
+                            <View style={[st.textInputWrap, { backgroundColor: C.card2 }]}>
                                 <TextInput
                                     value={newMessage} onChangeText={setNewMessage}
                                     placeholder="Napíšte správu..." placeholderTextColor={C.muted}
                                     multiline maxLength={500}
                                     style={[st.textInput, { color: C.text }]}
                                 />
-                            </ClayInset>
+                            </View>
                             <Pressable
                                 onPress={canSend ? sendMessage : (editingMessage ? undefined : toggleRecording)}
                                 disabled={sending || (!canSend && !!editingMessage)}
                                 accessibilityLabel={canSend ? (editingMessage ? 'Uložiť úpravu' : 'Odoslať správu') : 'Nahrať hlasovku'}
                             >
                                 {canSend ? (
-                                    <LinearGradient colors={[C.accent2, C.accent]} start={{ x: 0.2, y: 0 }} end={{ x: 0.8, y: 1 }} style={st.sendBtn}>
+                                    <View style={[st.sendBtn, { backgroundColor: C.accent }]}>
                                         {sending ? <ActivityIndicator size="small" color={C.onAccent} /> : <Send size={18} color={C.onAccent} strokeWidth={2.2} />}
-                                    </LinearGradient>
+                                    </View>
                                 ) : (
-                                    <View style={[st.sendBtn, { backgroundColor: C.cLo, borderWidth: 1, borderColor: C.hair }]}>
+                                    <View style={[st.sendBtn, { backgroundColor: C.card2 }]}>
                                         {sending ? <ActivityIndicator size="small" color={C.muted} /> : <Mic size={18} color={C.muted} strokeWidth={2} />}
                                     </View>
                                 )}
@@ -676,29 +674,29 @@ export default function ChatScreen() {
                         <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
                             {(['hourly', 'fixed'] as const).map(t => (
                                 <Pressable key={t} onPress={() => setProposeRateType(t)}
-                                    style={[st.rateTypeBtn, { backgroundColor: proposeRateType === t ? C.accent : C.cLo }]}>
+                                    style={[st.rateTypeBtn, { backgroundColor: proposeRateType === t ? C.accent : C.card2 }]}>
                                     <Text style={[st.rateTypeText, { color: proposeRateType === t ? C.onAccent : C.text }]}>
                                         {t === 'hourly' ? 'Na hodinu' : 'Pevná suma'}
                                     </Text>
                                 </Pressable>
                             ))}
                         </View>
-                        <ClayInset radius={14} style={{ marginBottom: 10 }} contentStyle={{ paddingHorizontal: 14, paddingVertical: 10 }}>
+                        <View style={[st.proposeInputWrap, { backgroundColor: C.card2, marginBottom: 10 }]}>
                             <TextInput
                                 value={proposeAmount} onChangeText={setProposeAmount}
                                 placeholder="Suma v €" placeholderTextColor={C.muted}
                                 keyboardType="decimal-pad"
                                 style={[st.proposeInput, { color: C.text }]}
                             />
-                        </ClayInset>
-                        <ClayInset radius={14} style={{ marginBottom: 16 }} contentStyle={{ paddingHorizontal: 14, paddingVertical: 10 }}>
+                        </View>
+                        <View style={[st.proposeInputWrap, { backgroundColor: C.card2, marginBottom: 16 }]}>
                             <TextInput
                                 value={proposeNote} onChangeText={setProposeNote}
                                 placeholder="Poznámka (nepovinné)" placeholderTextColor={C.muted}
                                 maxLength={200}
                                 style={[st.proposeInput, { color: C.text }]}
                             />
-                        </ClayInset>
+                        </View>
                         <Pressable disabled={negotiating} onPress={submitProposal} style={[st.negBtn, { backgroundColor: C.accent, paddingVertical: 13 }]}>
                             {negotiating ? <ActivityIndicator size="small" color={C.onAccent} /> : <Text style={st.negBtnText}>Odoslať návrh</Text>}
                         </Pressable>
@@ -709,22 +707,25 @@ export default function ChatScreen() {
     );
 }
 
-const makeStyles = (C: ClayColors) => StyleSheet.create({
+const makeStyles = (C: FlintColors) => StyleSheet.create({
     container: { flex: 1, backgroundColor: C.bg },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    chatHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.hair, gap: 12 },
+    chatHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.divider, gap: 12 },
+    backBtn: { width: 42, height: 42, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
     avatar: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-    avatarLetter: { fontSize: 16, fontWeight: '800' },
-    chatName: { fontSize: 16.5, fontWeight: '800', color: C.text, letterSpacing: -0.3 },
-    chatRole: { fontSize: 12.5, fontWeight: '700', color: C.accent },
+    avatarLetter: { fontSize: 16, fontWeight: '700' },
+    chatName: { fontSize: 16.5, fontWeight: '700', color: C.text, letterSpacing: -0.3 },
+    chatRole: { fontSize: 12.5, fontWeight: '600', color: C.accent },
     emptyText: { textAlign: 'center', fontSize: 14, fontWeight: '500', lineHeight: 21 },
     timestamp: { textAlign: 'center', fontSize: 11, marginBottom: 8, fontWeight: '600' },
     bubble: { maxWidth: '78%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 },
     bubbleText: { fontSize: 14.5, lineHeight: 21, fontWeight: '500' },
     inputBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderTopWidth: StyleSheet.hairlineWidth, gap: 8 },
+    attachBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+    textInputWrap: { flex: 1, borderRadius: 22, paddingHorizontal: 16, paddingVertical: 10 },
     textInput: { fontSize: 15, maxHeight: 100, fontWeight: '500' },
     sendBtn: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
-    recordingIndicator: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 22, borderWidth: 1, paddingHorizontal: 16, paddingVertical: 13 },
+    recordingIndicator: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 22, paddingHorizontal: 16, paddingVertical: 13 },
     recordingDot: { width: 9, height: 9, borderRadius: 5, backgroundColor: '#ef4444' },
     recordingText: { fontSize: 14, fontWeight: '600' },
     deletedBubble: { borderWidth: 1, borderStyle: 'dashed' },
@@ -733,21 +734,22 @@ const makeStyles = (C: ClayColors) => StyleSheet.create({
     editingBarText: { flex: 1, fontSize: 12.5, fontWeight: '600' },
     negBar: { paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: StyleSheet.hairlineWidth },
     negRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    negText: { fontSize: 13.5, fontWeight: '700', flexShrink: 1 },
+    negText: { fontSize: 13.5, fontWeight: '600', flexShrink: 1 },
     negBtn: { flex: 1, paddingVertical: 9, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-    negBtnText: { fontSize: 13, fontWeight: '800', color: '#fff' },
+    negBtnText: { fontSize: 13, fontWeight: '700', color: '#fff' },
     sheetBackdropAlt: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', padding: 24 },
-    proposeSheet: { width: '100%', maxWidth: 380, borderRadius: 20, padding: 20 },
-    proposeTitle: { fontSize: 17, fontWeight: '800', marginBottom: 16 },
+    proposeSheet: { width: '100%', maxWidth: 380, borderRadius: RADIUS.lg, padding: 20 },
+    proposeTitle: { fontSize: 17, fontWeight: '700', marginBottom: 16 },
     rateTypeBtn: { flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center' },
-    rateTypeText: { fontSize: 13, fontWeight: '700' },
+    rateTypeText: { fontSize: 13, fontWeight: '600' },
+    proposeInputWrap: { borderRadius: RADIUS.md, paddingHorizontal: 14, paddingVertical: 10 },
     proposeInput: { fontSize: 15, fontWeight: '500' },
 });
 
-function ImageMessageBubble({ url, isSent, C }: { url?: string; isSent: boolean; C: ClayColors }) {
+function ImageMessageBubble({ url, isSent, C }: { url?: string; isSent: boolean; C: FlintColors }) {
     if (!url) {
         return (
-            <View style={[chatMediaStyles.imageBubble, { backgroundColor: C.cLo, alignItems: 'center', justifyContent: 'center' }]}>
+            <View style={[chatMediaStyles.imageBubble, { backgroundColor: C.card2, alignItems: 'center', justifyContent: 'center' }]}>
                 <ActivityIndicator size="small" color={C.muted} />
             </View>
         );
@@ -759,7 +761,7 @@ function ImageMessageBubble({ url, isSent, C }: { url?: string; isSent: boolean;
     );
 }
 
-function AudioMessageBubble({ url, durationSeconds, isSent, C }: { url?: string; durationSeconds: number; isSent: boolean; C: ClayColors }) {
+function AudioMessageBubble({ url, durationSeconds, isSent, C }: { url?: string; durationSeconds: number; isSent: boolean; C: FlintColors }) {
     const player = useAudioPlayer(url ?? null);
     const status = useAudioPlayerStatus(player);
     const totalSeconds = status.duration > 0 ? status.duration : durationSeconds;
@@ -773,18 +775,18 @@ function AudioMessageBubble({ url, durationSeconds, isSent, C }: { url?: string;
 
     const bg = isSent
         ? { backgroundColor: C.accent }
-        : { backgroundColor: C.cLo, borderWidth: 1, borderColor: C.hair };
+        : { backgroundColor: C.card2 };
     const fg = isSent ? C.onAccent : C.text;
 
     return (
         <View style={[chatMediaStyles.audioBubble, bg]}>
-            <Pressable onPress={toggle} style={[chatMediaStyles.audioPlayBtn, { backgroundColor: isSent ? 'rgba(255,255,255,0.25)' : C.cHi }]}>
+            <Pressable onPress={toggle} style={[chatMediaStyles.audioPlayBtn, { backgroundColor: isSent ? 'rgba(255,255,255,0.25)' : C.card }]}>
                 {!url ? <ActivityIndicator size="small" color={fg} /> : status.playing
                     ? <Pause size={15} color={fg} strokeWidth={2.4} fill={fg} />
                     : <Play size={15} color={fg} strokeWidth={2.4} fill={fg} />}
             </Pressable>
             <View style={{ flex: 1 }}>
-                <View style={[chatMediaStyles.audioTrack, { backgroundColor: isSent ? 'rgba(255,255,255,0.3)' : C.hair }]}>
+                <View style={[chatMediaStyles.audioTrack, { backgroundColor: isSent ? 'rgba(255,255,255,0.3)' : C.divider }]}>
                     <View style={[chatMediaStyles.audioTrackFill, { width: `${progress * 100}%`, backgroundColor: fg }]} />
                 </View>
                 <Text style={{ fontSize: 11, fontWeight: '600', color: fg, marginTop: 5, opacity: 0.85 }}>
@@ -805,7 +807,7 @@ const chatMediaStyles = StyleSheet.create({
 
 function ReactionPills({ reactions, currentUserId, isSent, onToggle, C }: {
     reactions: Reaction[]; currentUserId: string | null; isSent: boolean;
-    onToggle: (emoji: string) => void; C: ClayColors;
+    onToggle: (emoji: string) => void; C: FlintColors;
 }) {
     const groups = new Map<string, Reaction[]>();
     for (const r of reactions) groups.set(r.emoji, [...(groups.get(r.emoji) ?? []), r]);
@@ -818,8 +820,7 @@ function ReactionPills({ reactions, currentUserId, isSent, onToggle, C }: {
                         key={emoji}
                         onPress={() => onToggle(emoji)}
                         style={[st2.reactionPill, {
-                            backgroundColor: mine ? C.accentDim : C.cLo,
-                            borderColor: mine ? C.accent : C.hair,
+                            backgroundColor: mine ? C.accentDim : C.card2,
                         }]}
                     >
                         <Text style={st2.reactionEmoji}>{emoji}</Text>
@@ -834,27 +835,27 @@ function ReactionPills({ reactions, currentUserId, isSent, onToggle, C }: {
 function MessageActionSheet({ message, isOwn, canEdit, onClose, onReact, onEdit, onDelete, C }: {
     message: Message | null; isOwn: boolean; canEdit: boolean;
     onClose: () => void; onReact: (emoji: string) => void;
-    onEdit: () => void; onDelete: () => void; C: ClayColors;
+    onEdit: () => void; onDelete: () => void; C: FlintColors;
 }) {
     return (
         <Modal visible={!!message} transparent animationType="fade" onRequestClose={onClose}>
             <Pressable style={st2.sheetBackdrop} onPress={onClose}>
-                <Pressable style={[st2.sheetContent, { backgroundColor: C.bg }]} onPress={(e) => e.stopPropagation()}>
+                <Pressable style={[st2.sheetContent, { backgroundColor: C.card }]} onPress={(e) => e.stopPropagation()}>
                     <View style={st2.sheetEmojiRow}>
                         {QUICK_REACTIONS.map(emoji => (
-                            <Pressable key={emoji} onPress={() => onReact(emoji)} style={[st2.sheetEmojiBtn, { backgroundColor: C.cLo }]}>
+                            <Pressable key={emoji} onPress={() => onReact(emoji)} style={[st2.sheetEmojiBtn, { backgroundColor: C.card2 }]}>
                                 <Text style={st2.sheetEmojiText}>{emoji}</Text>
                             </Pressable>
                         ))}
                     </View>
                     {isOwn && canEdit && (
-                        <Pressable onPress={onEdit} style={[st2.sheetActionRow, { borderTopColor: C.hair }]}>
+                        <Pressable onPress={onEdit} style={[st2.sheetActionRow, { borderTopColor: C.divider }]}>
                             <Pencil size={18} color={C.text} strokeWidth={2} />
                             <Text style={[st2.sheetActionText, { color: C.text }]}>Upraviť</Text>
                         </Pressable>
                     )}
                     {isOwn && (
-                        <Pressable onPress={onDelete} style={[st2.sheetActionRow, { borderTopColor: C.hair }]}>
+                        <Pressable onPress={onDelete} style={[st2.sheetActionRow, { borderTopColor: C.divider }]}>
                             <Trash2 size={18} color="#ef4444" strokeWidth={2} />
                             <Text style={[st2.sheetActionText, { color: '#ef4444' }]}>Vymazať</Text>
                         </Pressable>
@@ -867,7 +868,7 @@ function MessageActionSheet({ message, isOwn, canEdit, onClose, onReact, onEdit,
 
 const st2 = StyleSheet.create({
     reactionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
-    reactionPill: { flexDirection: 'row', alignItems: 'center', gap: 3, borderRadius: 12, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1 },
+    reactionPill: { flexDirection: 'row', alignItems: 'center', gap: 3, borderRadius: 12, paddingHorizontal: 8, paddingVertical: 3 },
     reactionEmoji: { fontSize: 12 },
     reactionCount: { fontSize: 11, fontWeight: '700' },
     sheetBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
